@@ -3,11 +3,13 @@ package org.komapper.processor.command
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.symbol.Variance
+import org.komapper.annotation.KomapperPartial
 import org.komapper.annotation.KomapperUnused
 import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
@@ -60,6 +62,7 @@ internal class CommandFactory(
         val disableValidation = annotation.findValue("disableValidation")?.toString()?.toBooleanStrict()
             ?: report("The annotation value \"disableValidation\" is not found.", annotation)
         val (kind, returnType) = findKindAndReturnType(classDeclaration, emptyMap())
+        val sqlPartialMap = buildSqlPartialMap(classDeclaration)
         val (packageName, fileName) = createFileName(context, classDeclaration)
         return Command(
             kind = kind,
@@ -71,9 +74,25 @@ internal class CommandFactory(
             paramMap = paramMap,
             unusedParams = unusedParams,
             returnType = returnType,
+            sqlPartialMap = sqlPartialMap,
             packageName = packageName,
             fileName = fileName,
         )
+    }
+
+    private fun buildSqlPartialMap(classDeclaration: KSClassDeclaration): Map<String, String> {
+        val file = classDeclaration.containingFile ?: return emptyMap()
+        return file.declarations
+            .mapNotNull { it as? KSPropertyDeclaration }
+            .filter { Modifier.CONST in it.modifiers }
+            .map {
+                val value = it.findAnnotation(KomapperPartial::class)
+                    ?.findValue("sql")
+                    ?.toString()
+                    ?.trimIndent() ?: ""
+                it.simpleName.asString() to value
+            }
+            .toMap()
     }
 
     private fun findKindAndReturnType(classDeclaration: KSClassDeclaration, map: Map<KSTypeParameter, KSTypeArgument>): Pair<CommandKind, KSType> {

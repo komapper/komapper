@@ -15,6 +15,7 @@ internal enum class SqlTokenType {
     ELSE_DIRECTIVE,
     FOR_DIRECTIVE,
     END_DIRECTIVE,
+    PARTIAL_DIRECTIVE,
     DELIMITER,
     SELECT,
     WHERE,

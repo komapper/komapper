@@ -11,6 +11,7 @@ import integration.core.selectAsAddress
 import integration.core.selectAsAddressDto
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.annotation.KomapperCommand
+import org.komapper.annotation.KomapperPartial
 import org.komapper.annotation.KomapperUnused
 import org.komapper.core.Exec
 import org.komapper.core.ExecReturnMany
@@ -29,6 +30,15 @@ import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+
+@KomapperPartial(
+    """
+    /*%if pagination != null */
+    limit /* pagination.limit */0 offset /*pagination.offset*/0
+    /*%end*/
+    """,
+)
+private const val paginationPartial = ""
 
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
@@ -689,6 +699,26 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).where { a.addressId eq 16 }.single()
         }
         assertEquals("hi world!", address.street)
+    }
+
+    data class Pagination(val limit: Int, val offset: Int)
+
+    @KomapperCommand(
+        """
+        select * from address order by address_id
+        /*> paginationPartial */
+        """,
+    )
+    class UsePartial(val pagination: Pagination?) : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun includeSqlFragment() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UsePartial(Pagination(2, 3)))
+        }
+        assertEquals(2, addresses.size)
+        println(addresses)
+        assertEquals(listOf(4, 5), addresses.map { it.addressId })
     }
 
     /* TODO

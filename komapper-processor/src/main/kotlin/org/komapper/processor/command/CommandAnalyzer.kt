@@ -13,7 +13,13 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
 
     fun analyze(symbol: KSAnnotated): CommandAnalysisResult {
         val command = try {
-            CommandFactory(context, annotationClass, symbol).create()
+            CommandFactory(context, annotationClass, symbol).create().let {
+                if (it.sqlPartialMap.isNotEmpty()) {
+                    reassembleSql(it)
+                } else {
+                    it
+                }
+            }
         } catch (e: Exit) {
             return CommandAnalysisResult.Error(e)
         }
@@ -27,9 +33,14 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
         return CommandAnalysisResult.Success(command)
     }
 
+    private fun reassembleSql(command: Command): Command {
+        val sql = SqlAssembler(context, command).assemble()
+        return command.copy(sql = sql)
+    }
+
     private fun validateCommand(command: Command) {
         val usedParams = try {
-            SqlValidator(context).validate(command)
+            SqlValidator(context, command).validate()
         } catch (e: SqlException) {
             report("SQL validation error: ${e.message}", command.annotation)
         }

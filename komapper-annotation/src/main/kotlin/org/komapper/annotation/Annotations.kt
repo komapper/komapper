@@ -296,6 +296,17 @@ annotation class KomapperCommand(
 }
 
 /**
+ * Indicates that the annotated property is a partial SQL fragment.
+ *
+ * @property sql the SQL fragment
+ */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperPartial(
+    @Language("sql") val sql: String,
+)
+
+/**
  * Indicates that the annotated property is not used within [KomapperCommand.sql].
  */
 @Target(AnnotationTarget.PROPERTY)

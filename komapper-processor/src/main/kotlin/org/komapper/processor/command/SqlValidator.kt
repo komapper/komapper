@@ -10,7 +10,7 @@ import org.komapper.core.template.sql.SqlLocation
 import org.komapper.core.template.sql.SqlNode
 import org.komapper.processor.Context
 
-internal class SqlValidator(context: Context) {
+internal class SqlValidator(context: Context, val command: Command) {
 
     private val intType = context.resolver.builtIns.intType
     private val booleanType = context.resolver.builtIns.booleanType
@@ -19,7 +19,7 @@ internal class SqlValidator(context: Context) {
     private val nodeFactory = NoCacheSqlNodeFactory()
     private val exprValidator = ExprValidator(context)
 
-    fun validate(command: Command): Set<String> {
+    fun validate(): Set<String> {
         val node = nodeFactory.get(command.sql)
         visit(command.paramMap, node)
         return exprValidator.usedParams
@@ -28,9 +28,9 @@ internal class SqlValidator(context: Context) {
     private fun visit(paramMap: Map<String, KSType>, node: SqlNode): Map<String, KSType> = when (node) {
         is SqlNode.Statement -> node.nodeList.fold(paramMap, ::visit)
         is SqlNode.Set -> {
-            visit(paramMap, node.left)
-            visit(paramMap, node.right)
-            paramMap
+            visit(paramMap, node.left).let {
+                visit(it, node.right)
+            }
         }
 
         is SqlNode.Clause.Select -> {
@@ -47,7 +47,6 @@ internal class SqlValidator(context: Context) {
 
         is SqlNode.Clause -> {
             node.nodeList.fold(paramMap, ::visit)
-            paramMap
         }
 
         is SqlNode.BiLogicalOp -> {
@@ -91,16 +90,17 @@ internal class SqlValidator(context: Context) {
             if (ifEvalResult.type != booleanType) {
                 throw SqlException("The expression eval result must be a Boolean at ${ifEvalResult.location} at ${node.ifDirective.location}.")
             }
-            node.ifDirective.nodeList.fold(paramMap, ::visit)
-            node.elseifDirectives.forEach {
-                val elseifEvalResult = validateExpression(it.location, it.expression, paramMap)
+            val ifParamMap = node.ifDirective.nodeList.fold(paramMap, ::visit)
+
+            val elseifParamMap = node.elseifDirectives.fold(ifParamMap) { map, elseifDirective ->
+                val elseifEvalResult = validateExpression(elseifDirective.location, elseifDirective.expression, map)
                 if (elseifEvalResult.type != booleanType) {
-                    throw SqlException("The expression eval result must be a Boolean at ${elseifEvalResult.location} at ${it.location}.")
+                    throw SqlException("The expression eval result must be a Boolean at ${elseifEvalResult.location} at ${elseifDirective.location}.")
                 }
-                it.nodeList.fold(paramMap, ::visit)
+                elseifDirective.nodeList.fold(map, ::visit)
             }
-            node.elseDirective?.nodeList?.fold(paramMap, ::visit)
-            paramMap
+
+            node.elseDirective?.nodeList?.fold(elseifParamMap, ::visit) ?: elseifParamMap
         }
 
         is SqlNode.ForBlock -> {
@@ -144,6 +144,7 @@ internal class SqlValidator(context: Context) {
         is SqlNode.ElseDirective,
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
+        is SqlNode.PartialDirective,
         -> error("unreachable")
     }
 

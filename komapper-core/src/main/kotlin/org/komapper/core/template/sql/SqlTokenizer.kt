@@ -27,6 +27,7 @@ import org.komapper.core.template.sql.SqlTokenType.OR
 import org.komapper.core.template.sql.SqlTokenType.ORDER_BY
 import org.komapper.core.template.sql.SqlTokenType.OTHER
 import org.komapper.core.template.sql.SqlTokenType.PARSER_LEVEL_COMMENT_DIRECTIVE
+import org.komapper.core.template.sql.SqlTokenType.PARTIAL_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.QUOTE
 import org.komapper.core.template.sql.SqlTokenType.SELECT
 import org.komapper.core.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
@@ -291,6 +292,8 @@ internal class SqlTokenizer(private val sql: String) {
                     type = LITERAL_VALUE_DIRECTIVE
                 } else if (c2 == '#') {
                     type = EMBEDDED_VALUE_DIRECTIVE
+                } else if (c2 == '>') {
+                    type = PARTIAL_DIRECTIVE
                 } else if (c2 == '%') {
                     if (buf.hasRemaining()) {
                         val c3 = buf.get()
@@ -352,7 +355,8 @@ internal class SqlTokenizer(private val sql: String) {
                         type !== FOR_DIRECTIVE &&
                         type !== END_DIRECTIVE &&
                         type !== ELSE_DIRECTIVE &&
-                        type !== ELSEIF_DIRECTIVE
+                        type !== ELSEIF_DIRECTIVE &&
+                        type !== PARTIAL_DIRECTIVE
                     ) {
                         throw SqlException("Unsupported directive name is found at $location")
                     }

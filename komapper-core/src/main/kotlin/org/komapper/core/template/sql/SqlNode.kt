@@ -158,6 +158,10 @@ sealed class SqlNode {
         override fun toText(): String = token
     }
 
+    data class PartialDirective(val location: Loc, val token: String, val expression: String) : SqlNode() {
+        override fun toText(): String = token
+    }
+
     data class LiteralValueDirective(
         val location: Loc,
         val token: String,

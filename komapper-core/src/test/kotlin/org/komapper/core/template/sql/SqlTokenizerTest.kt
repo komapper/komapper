@@ -23,6 +23,7 @@ import org.komapper.core.template.sql.SqlTokenType.OPTION
 import org.komapper.core.template.sql.SqlTokenType.OR
 import org.komapper.core.template.sql.SqlTokenType.ORDER_BY
 import org.komapper.core.template.sql.SqlTokenType.PARSER_LEVEL_COMMENT_DIRECTIVE
+import org.komapper.core.template.sql.SqlTokenType.PARTIAL_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.QUOTE
 import org.komapper.core.template.sql.SqlTokenType.SELECT
 import org.komapper.core.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
@@ -496,6 +497,21 @@ class SqlTokenizerTest {
         assertEquals("bbb", tokenizer.token)
         assertEquals(END_DIRECTIVE, tokenizer.next())
         assertEquals("/*%end*/", tokenizer.token)
+        assertEquals(EOF, tokenizer.next())
+        assertEquals("", tokenizer.token)
+    }
+
+    @Test
+    fun testPartialBlockComment() {
+        val tokenizer = SqlTokenizer("where bbb/*> orderBy */")
+        assertEquals(WHERE, tokenizer.next())
+        assertEquals("where", tokenizer.token)
+        assertEquals(SPACE, tokenizer.next())
+        assertEquals(" ", tokenizer.token)
+        assertEquals(WORD, tokenizer.next())
+        assertEquals("bbb", tokenizer.token)
+        assertEquals(PARTIAL_DIRECTIVE, tokenizer.next())
+        assertEquals("/*> orderBy */", tokenizer.token)
         assertEquals(EOF, tokenizer.next())
         assertEquals("", tokenizer.token)
     }

@@ -16,6 +16,7 @@ internal data class Command(
     val paramMap: Map<String, KSType>,
     val unusedParams: Set<String>,
     val returnType: KSType,
+    val sqlPartialMap: Map<String, String>,
     val packageName: String,
     val fileName: String,
 )

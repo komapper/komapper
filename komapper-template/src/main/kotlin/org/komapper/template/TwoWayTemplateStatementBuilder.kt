@@ -158,6 +158,9 @@ internal class TwoWayTemplateStatementBuilder(
             }
             state
         }
+        is SqlNode.PartialDirective -> {
+            error("PartialDirective \"${node.token}\" is not supported in this builder. Use @KomapperCommand.")
+        }
         is SqlNode.LiteralValueDirective -> {
             val (obj, type) = eval(node.location, node.expression, state.asExprContext())
             val literal = dialect.formatValue(obj, type, false)

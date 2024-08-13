@@ -27,6 +27,7 @@ import org.komapper.core.template.sql.SqlTokenType.OR
 import org.komapper.core.template.sql.SqlTokenType.ORDER_BY
 import org.komapper.core.template.sql.SqlTokenType.OTHER
 import org.komapper.core.template.sql.SqlTokenType.PARSER_LEVEL_COMMENT_DIRECTIVE
+import org.komapper.core.template.sql.SqlTokenType.PARTIAL_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.QUOTE
 import org.komapper.core.template.sql.SqlTokenType.SELECT
 import org.komapper.core.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
@@ -94,6 +95,7 @@ internal class SqlParser constructor(
                 ELSE_DIRECTIVE -> parseElseDirective()
                 END_DIRECTIVE -> parseEndDirective()
                 FOR_DIRECTIVE -> parseForDirective()
+                PARTIAL_DIRECTIVE -> parsePartialDirective()
                 PARSER_LEVEL_COMMENT_DIRECTIVE -> Unit // do nothing
             }
         }
@@ -182,6 +184,14 @@ internal class SqlParser constructor(
         }
         reducers.push(ForBlockReducer(location))
         reducers.push(ForDirectiveReducer(location, token, identifier, expression))
+    }
+
+    private fun parsePartialDirective() {
+        val expression = token.substring(4, token.length - 2).trim()
+        if (expression.isEmpty()) {
+            throw SqlException("The expression is not found in the compile-time embedded value directive at $location")
+        }
+        pushNode(SqlNode.PartialDirective(location, token, expression))
     }
 
     private fun reduceUntil(predicate: (SqlReducer) -> Boolean) {
