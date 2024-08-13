@@ -14,6 +14,7 @@ import org.komapper.core.template.expression.ExprNode
 import org.komapper.core.template.expression.ExprNodeFactory
 import org.komapper.core.template.expression.NoCacheExprNodeFactory
 import org.komapper.processor.Context
+import org.komapper.processor.getClassDeclaration
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
@@ -24,25 +25,17 @@ internal class ExprValidator(private val context: Context) {
     private val unitType = context.resolver.builtIns.unitType
 
     private val comparableType by lazy {
-        context.resolver.getKSNameFromString(Comparable::class.qualifiedName!!).let {
-            context.resolver.getClassDeclarationByName(it)?.asStarProjectedType()
-                ?: throw ExprException("Class not found: ${it.asString()}")
-        }
+        context.getClassDeclaration(Comparable::class) {
+            throw ExprException("Class not found: $it")
+        }.asStarProjectedType()
     }
 
     private val templateExtensionsDeclaration by lazy {
-        val name = context.config.templateExtensions
-        context.resolver.getKSNameFromString(name).let {
-            context.resolver.getClassDeclarationByName(it)
-                ?: throw ExprException("Class not found: ${it.asString()}")
-        }
+        context.getClassDeclaration(context.config.templateExtensions) { throw ExprException("Class not found: $it") }
     }
 
     private val arrayDeclaration by lazy {
-        context.resolver.getKSNameFromString(Array::class.qualifiedName!!).let {
-            context.resolver.getClassDeclarationByName(it)
-                ?: throw ExprException("Class not found: ${it.asString()}")
-        }
+        context.getClassDeclaration(Array::class) { throw ExprException("Class not found: $it") }
     }
 
     private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
@@ -158,21 +151,16 @@ internal class ExprValidator(private val context: Context) {
         }
         if (!comparableType.isAssignableFrom(left)) {
             throw ExprException(
-                "Cannot compare because the left operand is not Comparable type at $location",
-            )
-        }
-        if (!comparableType.isAssignableFrom(right)) {
-            throw ExprException(
-                "Cannot compare because the left operand is not Comparable type at $location",
+                "Cannot compare because operands are not Comparable type at $location",
             )
         }
         return booleanType
     }
 
     private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>): KSType {
-        val classDeclaration = context.resolver.getKSNameFromString(node.name).let {
-            context.resolver.getClassDeclarationByName(it)
-        } ?: throw ExprException("The class \"${node.name}\" is not found at ${node.location}")
+        val classDeclaration = context.getClassDeclaration(node.name) {
+            throw ExprException("The class \"${node.name}\" is not found at ${node.location}")
+        }
         val companionObject = classDeclaration.declarations
             .mapNotNull { it as? KSClassDeclaration }
             .filter { it.isCompanionObject }

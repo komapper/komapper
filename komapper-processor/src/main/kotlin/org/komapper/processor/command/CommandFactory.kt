@@ -6,7 +6,6 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
-import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.symbol.Variance
 import org.komapper.annotation.KomapperPartial
@@ -21,8 +20,10 @@ import org.komapper.processor.command.CommandKind.MANY
 import org.komapper.processor.command.CommandKind.ONE
 import org.komapper.processor.findAnnotation
 import org.komapper.processor.findValue
+import org.komapper.processor.getClassDeclaration
 import org.komapper.processor.hasAnnotation
 import org.komapper.processor.report
+import org.komapper.processor.resolveTypeArgumentsOfAncestor
 import kotlin.reflect.KClass
 
 internal class CommandFactory(
@@ -30,7 +31,6 @@ internal class CommandFactory(
     private val annotationClass: KClass<*>,
     private val symbol: KSAnnotated,
 ) {
-    private val commandKindMap = CommandKind.values().associateBy { it.className }
     private val longTypeArg by lazy {
         val longType = context.resolver.builtIns.longType
         val typeRef = context.resolver.createKSTypeReferenceFromKSType(longType)
@@ -41,8 +41,8 @@ internal class CommandFactory(
         val classDeclaration = symbol as? KSClassDeclaration
             ?: report("The annotated element is not a class.", symbol)
         when (classDeclaration.classKind) {
-            ClassKind.CLASS, ClassKind.OBJECT, ClassKind.INTERFACE -> Unit
-            else -> report("The annotated element must be either a class, an object, or an interface.", symbol)
+            ClassKind.CLASS -> Unit
+            else -> report("The annotated element must be a class.", symbol)
         }
         if (classDeclaration.typeParameters.isNotEmpty()) {
             report("The class with type parameters is not supported.", symbol)
@@ -61,7 +61,10 @@ internal class CommandFactory(
         }
         val disableValidation = annotation.findValue("disableValidation")?.toString()?.toBooleanStrict()
             ?: report("The annotation value \"disableValidation\" is not found.", annotation)
-        val (kind, returnType) = findKindAndReturnType(classDeclaration, emptyMap())
+        val (kind, returnType) = findKindAndReturnType(classDeclaration) ?: report(
+            "${classDeclaration.qualifiedName?.asString()} must extend one of the following classes: One, Many, Exec, ExecReturnOne, or ExecReturnMany.",
+            symbol,
+        )
         val sqlPartialMap = buildSqlPartialMap(classDeclaration)
         val (packageName, fileName) = createFileName(context, classDeclaration)
         return Command(
@@ -95,43 +98,33 @@ internal class CommandFactory(
             .toMap()
     }
 
-    private fun findKindAndReturnType(classDeclaration: KSClassDeclaration, map: Map<KSTypeParameter, KSTypeArgument>): Pair<CommandKind, KSType> {
-        for (superType in classDeclaration.superTypes) {
-            val type = superType.resolve()
-            val declaration = type.declaration as? KSClassDeclaration ?: continue
-            val name = declaration.qualifiedName?.asString()
-            val kind = commandKindMap[name]
-            return if (kind != null) {
-                // resolve type arguments
-                val typeArgs = type.arguments.asSequence()
-                    .map { arg -> arg to arg.type?.resolve()?.declaration }
-                    .map { (type, decl) -> if (decl == null) type to null else type to map[decl] }
-                    .map { (original, resolved) -> resolved ?: original }
-                    .toList()
-                when (kind) {
-                    ONE -> ONE to createType(Query::class, typeArgs)
-                    MANY -> MANY to createType(ListQuery::class, typeArgs)
-                    EXEC -> EXEC to createType(Query::class, listOf(longTypeArg))
-                    EXEC_RETURN_ONE -> EXEC_RETURN_ONE to createType(Query::class, typeArgs)
-                    EXEC_RETURN_MANY -> EXEC_RETURN_MANY to createType(ListQuery::class, typeArgs)
-                }
-            } else {
-                val newMap = map + declaration.typeParameters.zip(type.arguments).toMap()
-                findKindAndReturnType(declaration, newMap)
+    private fun findKindAndReturnType(classDeclaration: KSClassDeclaration): Pair<CommandKind, KSType>? {
+        val descendantType = classDeclaration.asType(emptyList())
+        for (kind in CommandKind.values()) {
+            val ancestorType = context.getClassDeclaration(kind.className, symbol).asStarProjectedType()
+            if (kind == EXEC && ancestorType.isAssignableFrom(descendantType)) {
+                return kind to createType(Query::class, listOf(longTypeArg))
+            }
+            val typeArgs = resolveTypeArgumentsOfAncestor(descendantType, ancestorType)
+            if (typeArgs.isEmpty()) continue
+            if (typeArgs.any { it == null }) report("Cannot get type argument of ${kind.className}.", symbol)
+            val nonNullTypeArgs = typeArgs.filterNotNull()
+            if (nonNullTypeArgs.any { it.variance == Variance.STAR }) {
+                report("Specifying a star projection for ${kind.className} is not supported.", symbol)
+            }
+            return kind to when (kind) {
+                ONE -> createType(Query::class, nonNullTypeArgs)
+                MANY -> createType(ListQuery::class, nonNullTypeArgs)
+                EXEC_RETURN_ONE -> createType(Query::class, nonNullTypeArgs)
+                EXEC_RETURN_MANY -> createType(ListQuery::class, nonNullTypeArgs)
+                EXEC -> error("unreachable. descendant=$descendantType, ancestor=$ancestorType")
             }
         }
-        val name = classDeclaration.qualifiedName?.asString()
-        report(
-            "$name must extend one of the following classes: One, Many, Exec, ExecReturnOne, or ExecReturnMany.",
-            symbol,
-        )
+        return null
     }
 
     private fun createType(klass: KClass<*>, typeArgs: List<KSTypeArgument>): KSType {
-        return context.resolver.getKSNameFromString(klass.qualifiedName!!).let {
-            context.resolver.getClassDeclarationByName(it)?.asType(typeArgs)
-                ?: report("Class not found: ${it.asString()}", symbol)
-        }
+        return context.getClassDeclaration(klass.qualifiedName!!, symbol).asType(typeArgs)
     }
 
     private fun createFileName(context: Context, classDeclaration: KSClassDeclaration): Pair<String, String> {

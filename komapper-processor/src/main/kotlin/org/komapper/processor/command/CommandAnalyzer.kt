@@ -34,7 +34,12 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
     }
 
     private fun reassembleSql(command: Command): Command {
-        val sql = SqlAssembler(context, command).assemble()
+        val sql =
+            try {
+                SqlAssembler(context, command).assemble()
+            } catch (e: SqlException) {
+                report("SQL assembly error: ${e.message}", command.annotation)
+            }
         return command.copy(sql = sql)
     }
 

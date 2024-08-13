@@ -1,14 +1,14 @@
 package org.komapper.processor.command
 
-import com.google.devtools.ksp.getAllSuperTypes
-import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.Variance
 import org.komapper.core.template.expression.ExprException
 import org.komapper.core.template.sql.NoCacheSqlNodeFactory
 import org.komapper.core.template.sql.SqlException
 import org.komapper.core.template.sql.SqlLocation
 import org.komapper.core.template.sql.SqlNode
 import org.komapper.processor.Context
+import org.komapper.processor.resolveTypeArgumentsOfAncestor
 
 internal class SqlValidator(context: Context, val command: Command) {
 
@@ -107,35 +107,24 @@ internal class SqlValidator(context: Context, val command: Command) {
             val forDirective = node.forDirective
             val id = forDirective.identifier
             val expression = forDirective.expression
-
             val evalResult = validateExpression(forDirective.location, expression, paramMap)
-            if (!iterableType.isAssignableFrom(evalResult.type)) {
+
+            val typeArgs = resolveTypeArgumentsOfAncestor(evalResult.type, iterableType)
+            if (typeArgs.isEmpty()) {
                 throw SqlException("The expression must be Iterable at ${evalResult.location} at ${forDirective.location}.")
             }
-            val resultDeclaration = evalResult.type.declaration as? KSClassDeclaration
-                ?: throw SqlException("The expression must be a class at ${evalResult.location} at ${forDirective.location}.")
-            val typeArgs = if (resultDeclaration.qualifiedName?.asString() == Iterable::class.qualifiedName) {
-                evalResult.type.arguments
-            } else {
-                resultDeclaration.getAllSuperTypes().filter {
-                    it.declaration.qualifiedName?.asString() == Iterable::class.qualifiedName
-                }.map {
-                    it.arguments
-                }.firstOrNull() ?: emptyList()
+            val typeArg = typeArgs.first()
+                ?: throw SqlException("Cannot get type argument of Iterable at ${evalResult.location} at ${forDirective.location}.")
+            if (typeArg.variance == Variance.STAR) {
+                throw SqlException("Specifying a star projection for Iterable is not supported at ${evalResult.location} at ${forDirective.location}.")
             }
-
-            if (typeArgs.isEmpty()) {
-                throw SqlException("The Iterable expression must have a type argument at ${evalResult.location} at ${forDirective.location}.")
-            }
-            val typeArg = typeArgs.first().type?.resolve()
-                ?: throw SqlException("The Iterable type argument is illegal at ${evalResult.location} at ${forDirective.location}.")
-
+            val type = typeArg.type?.resolve()
+                ?: throw SqlException("Cannot resolve type argument of Iterable at ${evalResult.location} at ${forDirective.location}.")
             val newParamMap = paramMap + mapOf(
-                id to typeArg,
+                id to type,
                 id + "_index" to intType,
                 id + "_has_next" to booleanType,
             )
-
             forDirective.nodeList.fold(newParamMap, ::visit)
         }
 

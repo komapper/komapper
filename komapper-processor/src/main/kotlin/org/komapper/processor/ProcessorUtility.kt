@@ -200,3 +200,34 @@ internal fun resolveLiteralTag(typeName: String): String {
         else -> ""
     }
 }
+
+internal fun resolveTypeArgumentsOfAncestor(descendantType: KSType, ancestorType: KSType): List<KSTypeArgument?> {
+    val typeMap = descendantType.declaration.typeParameters.zip(descendantType.arguments).toMap()
+    return resolveTypeArgumentsOfAncestor(descendantType, ancestorType, listOf(typeMap))
+}
+
+internal fun resolveTypeArgumentsOfAncestor(descendantType: KSType, ancestorType: KSType, typeMapList: List<Map<KSTypeParameter, KSTypeArgument>> = emptyList()): List<KSTypeArgument?> {
+    if (ancestorType.arguments.isEmpty()) return emptyList()
+    if (!ancestorType.isAssignableFrom(descendantType)) return emptyList()
+    return if (descendantType.declaration == ancestorType.declaration) {
+        descendantType.declaration.typeParameters.zip(descendantType.arguments).asSequence().map {
+            var formal: KSDeclaration? = it.first
+            var actual: KSTypeArgument? = it.second
+            for (typeMap in typeMapList) {
+                actual = typeMap[formal] ?: break
+                formal = actual.type?.resolve()?.declaration
+            }
+            actual
+        }.toList()
+    } else {
+        val descendantDecl = descendantType.declaration as KSClassDeclaration
+        for (supertype in descendantDecl.superTypes) {
+            val superType = supertype.resolve()
+            val typeMap = superType.declaration.typeParameters.zip(superType.arguments).toMap()
+            val newTypeMapList = listOf(typeMap) + typeMapList
+            val typeArgs = resolveTypeArgumentsOfAncestor(superType, ancestorType, newTypeMapList)
+            if (typeArgs.isNotEmpty()) return typeArgs
+        }
+        return emptyList()
+    }
+}
