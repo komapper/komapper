@@ -235,7 +235,7 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ order by /*%if false*/name/*%end*/"
             val statement = statementBuilder.build(template, mapOf("name" to Value(null, typeOf<String>())), extensions)
-            assertEquals("select name, age from person ", statement.toSql())
+            assertEquals("select name, age from person", statement.toSql())
         }
     }
 
@@ -324,8 +324,8 @@ class TwoWayTemplateStatementBuilderTest {
         @Test
         fun `Handle multiple 'union' keywords`() {
             val template = """
-                select name from a 
-                union 
+                select name from a
+                union
                 select name from b
                 union
                 select name from c
@@ -337,7 +337,7 @@ class TwoWayTemplateStatementBuilderTest {
         @Test
         fun `Handle multiple 'union' keywords and remove a 'union' keyword automatically`() {
             val template = """
-                select name from a 
+                select name from a
                 union
                 /*%if false*/
                 select name from b
@@ -348,7 +348,7 @@ class TwoWayTemplateStatementBuilderTest {
             val statement = statementBuilder.build(template, emptyMap(), extensions)
             assertEquals(
                 """
-                select name from a 
+                select name from a
                 union
                 select name from c
                 """.trimIndent(),

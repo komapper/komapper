@@ -172,14 +172,18 @@ sealed class SqlNode {
         override fun toText(): String = token + node.toText() + nodeList.toText()
     }
 
+    sealed interface Blank {
+        val token: String
+    }
+
     sealed class Token : SqlNode() {
         abstract val token: String
         override fun toText(): String = token
 
-        data class Eol(override val token: String) : Token()
+        data class Eol(override val token: String) : Token(), Blank
         data class Comment(override val token: String) : Token()
         data class Word(override val token: String) : Token()
-        data class Space(override val token: String) : Token() {
+        data class Space(override val token: String) : Token(), Blank {
             companion object {
                 private val MAP = listOf(
                     "\u0009",
