@@ -278,6 +278,7 @@ annotation class KomapperProjectionDef(
 /**
  * The annotated class is a command that encapsulates an SQL template, SQL parameters, and SQL execution into a single unit.
  *
+ * The annotated class must inherit from one of the following classes: `One`, `Many`, `Exec`, `ExecReturnOne`, or `ExecReturnMany`.
  * @property sql the SQL template
  * @property functionName the function name for the command. The default function name is "execute".
  * @property disableValidation if `true`, SQL validation at compile time will be disabled
