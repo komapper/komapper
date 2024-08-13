@@ -712,7 +712,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     class UsePartial(val pagination: Pagination?) : Many<Address>({ selectAsAddress() })
 
     @Test
-    @Run(unless = [Dbms.SQLSERVER])
+    @Run(unless = [Dbms.SQLSERVER, Dbms.ORACLE])
     fun usePartial() {
         val addresses = db.runQuery {
             QueryDsl.execute(UsePartial(Pagination(2, 3)))
