@@ -7,7 +7,6 @@ import com.tschuchort.compiletesting.KotlinCompilation
 import org.junit.jupiter.api.Assertions.assertNull
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 internal class ProcessorUtilityTest : AbstractKspTest() {
 
@@ -46,7 +45,6 @@ internal class ProcessorUtilityTest : AbstractKspTest() {
             val typeArgs = resolveTypeArgumentsOfAncestor(listType, resolver.builtIns.iterableType)
             assertEquals(1, typeArgs.size)
             val typeArg = typeArgs.single()
-            assertNotNull(typeArg)
             assertEquals(Variance.INVARIANT, typeArg.variance)
             assertEquals(resolver.builtIns.stringType, typeArg.type?.resolve())
 
@@ -79,7 +77,6 @@ internal class ProcessorUtilityTest : AbstractKspTest() {
             val typeArgs = resolveTypeArgumentsOfAncestor(listType, resolver.builtIns.iterableType)
             assertEquals(1, typeArgs.size)
             val typeArg = typeArgs.single()
-            assertNotNull(typeArg)
             assertEquals(Variance.STAR, typeArg.variance)
             assertNull(typeArg.type?.resolve())
 
@@ -113,7 +110,6 @@ internal class ProcessorUtilityTest : AbstractKspTest() {
             val typeArgs = resolveTypeArgumentsOfAncestor(descendantType, ancestorType)
             assertEquals(1, typeArgs.size)
             val typeArg = typeArgs.single()
-            assertNotNull(typeArg)
             assertEquals(Variance.INVARIANT, typeArg.variance)
             assertEquals(resolver.builtIns.stringType, typeArg.type?.resolve())
 

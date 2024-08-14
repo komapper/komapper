@@ -722,6 +722,30 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals(listOf(4, 5), addresses.map { it.addressId })
     }
 
+    abstract class GetSingleAddress(@KomapperUnused val unknown: Int) : One<Address>({ select(asAddress).single() })
+
+    @KomapperCommand(
+        """
+        select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
+        """,
+    )
+    class GetSingleAddressByStreet(val street: String) : GetSingleAddress(1)
+
+    @Test
+    fun inheritance() {
+        val address = db.runQuery {
+            QueryDsl.execute(GetSingleAddressByStreet("STREET 10"))
+        }
+        assertEquals(
+            Address(
+                10,
+                "STREET 10",
+                1,
+            ),
+            address,
+        )
+    }
+
     /* TODO
     @KomapperCommand(
         """

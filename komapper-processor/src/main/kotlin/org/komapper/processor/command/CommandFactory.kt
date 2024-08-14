@@ -107,16 +107,14 @@ internal class CommandFactory(
             }
             val typeArgs = resolveTypeArgumentsOfAncestor(descendantType, ancestorType)
             if (typeArgs.isEmpty()) continue
-            if (typeArgs.any { it == null }) report("Cannot get type argument of ${kind.className}.", symbol)
-            val nonNullTypeArgs = typeArgs.filterNotNull()
-            if (nonNullTypeArgs.any { it.variance == Variance.STAR }) {
+            if (typeArgs.any { it.variance == Variance.STAR }) {
                 report("Specifying a star projection for ${kind.className} is not supported.", symbol)
             }
             return kind to when (kind) {
-                ONE -> createType(Query::class, nonNullTypeArgs)
-                MANY -> createType(ListQuery::class, nonNullTypeArgs)
-                EXEC_RETURN_ONE -> createType(Query::class, nonNullTypeArgs)
-                EXEC_RETURN_MANY -> createType(ListQuery::class, nonNullTypeArgs)
+                ONE -> createType(Query::class, typeArgs)
+                MANY -> createType(ListQuery::class, typeArgs)
+                EXEC_RETURN_ONE -> createType(Query::class, typeArgs)
+                EXEC_RETURN_MANY -> createType(ListQuery::class, typeArgs)
                 EXEC -> error("unreachable. descendant=$descendantType, ancestor=$ancestorType")
             }
         }

@@ -114,7 +114,6 @@ internal class SqlValidator(context: Context, val command: Command) {
                 throw SqlException("The expression must be Iterable at ${evalResult.location} at ${forDirective.location}.")
             }
             val typeArg = typeArgs.first()
-                ?: throw SqlException("Cannot get type argument of Iterable at ${evalResult.location} at ${forDirective.location}.")
             if (typeArg.variance == Variance.STAR) {
                 throw SqlException("Specifying a star projection for Iterable is not supported at ${evalResult.location} at ${forDirective.location}.")
             }
