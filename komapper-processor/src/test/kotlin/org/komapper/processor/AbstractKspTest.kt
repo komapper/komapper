@@ -1,6 +1,10 @@
 package org.komapper.processor
 
+import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
+import com.google.devtools.ksp.symbol.KSAnnotated
 import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
@@ -17,8 +21,9 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
     @JvmField
     protected var tempDir: Path? = null
 
-    protected fun compile(@Language("kotlin") contents: String): JvmCompilationResult {
+    protected fun compile(@Language("kotlin") contents: String, vararg additionalProviders: SymbolProcessorProvider): JvmCompilationResult {
         val sourceFile = SourceFile.kotlin("source.kt", contents)
+        val providers = providers.toList() + additionalProviders
         val compilation = KotlinCompilation()
             .apply {
                 useKsp2()
@@ -32,5 +37,16 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
                 kspIncremental = false
             }
         return compilation.compile()
+    }
+
+    protected fun compile(@Language("kotlin") contents: String, block: (SymbolProcessorEnvironment, Resolver) -> List<KSAnnotated>): JvmCompilationResult {
+        val provider = SymbolProcessorProvider { env ->
+            object : SymbolProcessor {
+                override fun process(resolver: Resolver): List<KSAnnotated> {
+                    return block(env, resolver)
+                }
+            }
+        }
+        return compile(contents, provider)
     }
 }

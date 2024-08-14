@@ -6,13 +6,12 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
-import org.komapper.template.expression.ExprContext
-import org.komapper.template.expression.ExprEvaluator
-import org.komapper.template.expression.ExprException
-import org.komapper.template.sql.SqlException
-import org.komapper.template.sql.SqlLocation
-import org.komapper.template.sql.SqlNode
-import org.komapper.template.sql.SqlNodeFactory
+import org.komapper.core.template.expression.ExprContext
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.sql.SqlException
+import org.komapper.core.template.sql.SqlLocation
+import org.komapper.core.template.sql.SqlNode
+import org.komapper.core.template.sql.SqlNodeFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createType
@@ -159,6 +158,9 @@ internal class TwoWayTemplateStatementBuilder(
             }
             state
         }
+        is SqlNode.PartialDirective -> {
+            error("PartialDirective \"${node.token}\" is not supported in this builder. Use @KomapperCommand.")
+        }
         is SqlNode.LiteralValueDirective -> {
             val (obj, type) = eval(node.location, node.expression, state.asExprContext())
             val literal = dialect.formatValue(obj, type, false)
@@ -179,8 +181,9 @@ internal class TwoWayTemplateStatementBuilder(
                     if (elseIfDirective != null) {
                         return elseIfDirective.nodeList
                     } else {
-                        if (node.elseDirective != null) {
-                            return node.elseDirective.nodeList
+                        val elseDirective = node.elseDirective
+                        if (elseDirective != null) {
+                            return elseDirective.nodeList
                         } else {
                             return emptyList()
                         }

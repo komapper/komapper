@@ -1,2 +1,3 @@
 org.komapper.processor.EntityProcessorProvider
 org.komapper.processor.EntityMetamodelFactoryProcessorProvider
+org.komapper.processor.command.CommandProcessorProvider

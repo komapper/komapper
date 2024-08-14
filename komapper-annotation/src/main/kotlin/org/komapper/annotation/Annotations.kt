@@ -2,6 +2,7 @@
 
 package org.komapper.annotation
 
+import org.intellij.lang.annotations.Language
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import kotlin.reflect.KClass
@@ -273,6 +274,45 @@ annotation class KomapperProjectionDef(
     val projection: KClass<*>,
     val function: String = "",
 )
+
+/**
+ * The annotated class is a command that encapsulates an SQL template, SQL parameters, and SQL execution into a single unit.
+ *
+ * The annotated class must inherit from one of the following classes: `One`, `Many`, `Exec`, `ExecReturnOne`, or `ExecReturnMany`.
+ * @property sql the SQL template
+ * @property functionName the function name for the command. The default function name is "execute".
+ * @property disableValidation if `true`, SQL validation at compile time will be disabled
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperCommand(
+    @Language("sql") val sql: String,
+    val functionName: String = FUNCTION_NAME,
+    val disableValidation: Boolean = DISABLE_VALIDATION,
+) {
+    companion object {
+        const val FUNCTION_NAME = "execute"
+        const val DISABLE_VALIDATION: Boolean = false
+    }
+}
+
+/**
+ * Indicates that the annotated property is a partial SQL fragment.
+ *
+ * @property sql the SQL fragment
+ */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperPartial(
+    @Language("sql") val sql: String,
+)
+
+/**
+ * Indicates that the annotated property is not used within [KomapperCommand.sql].
+ */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperUnused
 
 /**
  * Indicates an association link.
