@@ -99,7 +99,11 @@ internal class TwoWayTemplateStatementBuilder(
             if (node is SqlNode.Token.Word || node is SqlNode.Token.Other) {
                 state.available = true
             }
-            state.append(node.token)
+            if (node is SqlNode.Blank) {
+                state.append(node)
+            } else {
+                state.append(node.token)
+            }
         }
         is SqlNode.Paren -> {
             state.available = true
@@ -268,6 +272,9 @@ internal class TwoWayTemplateStatementBuilder(
 
     inner class State(private val ctx: ExprContext) {
 
+        private val blankNodes = mutableListOf<SqlNode.Blank>()
+        private var eolNodeCount = 0
+
         private val buf = StatementBuffer()
         val valueMap: MutableMap<String, Value<*>> = HashMap(ctx.valueMap)
         var available: Boolean = false
@@ -277,26 +284,68 @@ internal class TwoWayTemplateStatementBuilder(
         }
 
         fun append(state: State): State {
+            flushBlankNodes()
+            state.flushBlankNodes()
+
             buf.parts.addAll(state.buf.parts)
             return this
         }
 
         fun append(s: CharSequence): State {
+            flushBlankNodes()
             buf.append(s)
             return this
         }
 
+        fun append(blank: SqlNode.Blank): State {
+            blankNodes.add(blank)
+            if (blank is SqlNode.Token.Eol) {
+                eolNodeCount++
+            }
+            return this
+        }
+
         fun bind(value: Value<*>): State {
+            flushBlankNodes()
             buf.bind(value)
             return this
         }
 
         fun startsWithClause(): Boolean {
+            flushBlankNodes()
             val s = buf.toString().trim()
             return clauseRegex.containsMatchIn(s)
         }
 
-        fun toStatement() = buf.toStatement()
+        fun flushBlankNodes() {
+            if (blankNodes.isEmpty()) return
+            val blank = convertBlankNodesToString()
+            buf.append(blank)
+            blankNodes.clear()
+            eolNodeCount = 0
+        }
+
+        private fun convertBlankNodesToString(): String {
+            if (eolNodeCount > 0) {
+                var seenEolNodeCount = 0
+                val iterator: MutableListIterator<SqlNode.Blank> = blankNodes.listIterator()
+                while (iterator.hasNext()) {
+                    val node = iterator.next()
+                    if (node is SqlNode.Token.Eol) {
+                        seenEolNodeCount++
+                        if (seenEolNodeCount >= eolNodeCount) {
+                            break
+                        }
+                    }
+                    iterator.remove()
+                }
+            }
+            return blankNodes.joinToString(separator = "") { it.token }
+        }
+
+        fun toStatement(): Statement {
+            return buf.toStatement()
+        }
 
         override fun toString() = buf.toString()
     }
