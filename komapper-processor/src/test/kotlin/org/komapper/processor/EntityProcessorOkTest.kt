@@ -1,9 +1,11 @@
 package org.komapper.processor
 
 import com.tschuchort.compiletesting.KotlinCompilation
+import org.junit.jupiter.api.Tag
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Tag("slow")
 class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
 
     @Test
