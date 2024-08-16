@@ -1,6 +1,5 @@
-package org.komapper.template.sql
+package org.komapper.core.template.sql
 
-import org.komapper.core.template.sql.SqlException
 import org.komapper.core.template.sql.SqlTokenType.AND
 import org.komapper.core.template.sql.SqlTokenType.BIND_VALUE_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.DELIMITER
@@ -31,7 +30,6 @@ import org.komapper.core.template.sql.SqlTokenType.SPACE
 import org.komapper.core.template.sql.SqlTokenType.UNION
 import org.komapper.core.template.sql.SqlTokenType.WHERE
 import org.komapper.core.template.sql.SqlTokenType.WORD
-import org.komapper.core.template.sql.SqlTokenizer
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -44,7 +42,7 @@ class SqlTokenizerTest {
 
     @BeforeTest
     fun setUp() {
-        lineSeparator = System.getProperty("line.separator")
+        lineSeparator = System.lineSeparator()
         System.setProperty("line.separator", "\r\n")
     }
 

@@ -1,6 +1,5 @@
-package org.komapper.template.expression
+package org.komapper.core.template.expression
 
-import org.komapper.core.template.expression.ExprException
 import org.komapper.core.template.expression.ExprTokenType.AND
 import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.core.template.expression.ExprTokenType.CLASS_REF
@@ -17,7 +16,6 @@ import org.komapper.core.template.expression.ExprTokenType.STRING
 import org.komapper.core.template.expression.ExprTokenType.TRUE
 import org.komapper.core.template.expression.ExprTokenType.VALUE
 import org.komapper.core.template.expression.ExprTokenType.WHITESPACE
-import org.komapper.core.template.expression.ExprTokenizer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
