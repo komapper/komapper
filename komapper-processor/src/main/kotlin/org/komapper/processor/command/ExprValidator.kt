@@ -1,5 +1,6 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -89,6 +90,7 @@ internal class ExprValidator(private val context: Context) {
 
         is ExprNode.ClassRef -> visitClassRef(node, paramMap)
         is ExprNode.Value -> visitValue(node, paramMap)
+        is ExprNode.CallableValue -> visitCallableValue(node, paramMap)
         is ExprNode.Property -> visitProperty(node, paramMap)
         is ExprNode.Function -> visitFunction(node, paramMap)
         is ExprNode.Empty -> context.resolver.builtIns.unitType
@@ -170,9 +172,38 @@ internal class ExprValidator(private val context: Context) {
     }
 
     private fun visitValue(node: ExprNode.Value, paramMap: Map<String, KSType>): KSType {
-        referencedParams.add(node.name)
-        return paramMap[node.name]
-            ?: throw ExprException("The variable \"${node.name}\" is not found at ${node.location}. Available variables are: ${paramMap.keys}.")
+        return getParamType(node.name, node.location, paramMap)
+    }
+
+    private fun visitCallableValue(node: ExprNode.CallableValue, paramMap: Map<String, KSType>): KSType {
+        val type = getParamType(node.name, node.location, paramMap)
+        // kotlin.Function
+        val classDeclaration = type.declaration as? KSClassDeclaration
+            ?: throw ExprException("The variable \"${node.name}\" is not a class at ${node.location}.")
+        val functionDeclaration = classDeclaration.getDeclaredFunctions()
+            .filter {
+                it.simpleName.asString() == "invoke"
+            }.firstOrNull()
+            ?: throw ExprException("The variable \"${node.name}\" does not have a invoke function at ${node.location}.")
+        val argList = when (val args = visit(node.args, paramMap)) {
+            is KSTypeList -> args.argList
+            else -> if (args == unitType) {
+                emptyList()
+            } else {
+                listOf(args)
+            }
+        }
+        if (functionDeclaration.parameters.size != argList.size) {
+            throw ExprException("The number of arguments is not matched at ${node.location}")
+        }
+        return functionDeclaration.returnType?.resolve()
+            ?: throw ExprException("The return type is not found at ${node.location}")
+    }
+
+    private fun getParamType(name: String, location: ExprLocation, paramMap: Map<String, KSType>): KSType {
+        referencedParams.add(name)
+        return paramMap[name]
+            ?: throw ExprException("The variable \"${name}\" is not found at $location. Available variables are: ${paramMap.keys}.")
     }
 
     private fun visitProperty(node: ExprNode.Property, paramMap: Map<String, KSType>): KSType {

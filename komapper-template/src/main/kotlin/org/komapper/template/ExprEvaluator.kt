@@ -73,6 +73,7 @@ internal class DefaultExprEvaluator(
 
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
         is ExprNode.Value -> visitValue(node, ctx)
+        is ExprNode.CallableValue -> visitCallableValue(node, ctx)
         is ExprNode.Property -> visitProperty(node, ctx)
         is ExprNode.Function -> visitFunction(node, ctx)
         is ExprNode.Empty -> Value(Unit, typeOf<Unit>())
@@ -194,8 +195,31 @@ internal class DefaultExprEvaluator(
     }
 
     private fun visitValue(node: ExprNode.Value, ctx: ExprContext): Value<*> {
-        return ctx.valueMap[node.name] ?: exprEnvironment.ctx[node.name]
-            ?: throw ExprException("The template variable \"${node.name}\" is not bound to a value. Make sure the variable name is correct. ${node.location}")
+        return getValue(node.name, node.location, ctx)
+    }
+
+    private fun visitCallableValue(node: ExprNode.CallableValue, ctx: ExprContext): Value<*> {
+        val value = getValue(node.name, node.location, ctx)
+        val function = value.any as? Function<*>
+            ?: throw ExprException("The value \"${node.name}\" is not a kotlin.Function at ${node.location}")
+        val (args) = visit(node.args, ctx)
+        val arguments = when (args) {
+            Unit -> listOf()
+            is ExprArgList -> args
+            else -> listOf(args)
+        }
+        val method = function::class.java.methods.find { it.name == "invoke" }
+            ?: throw ExprException("The invoke method cannot be resolved from the value \"${node.name}\" at ${node.location}")
+        method.trySetAccessible()
+        val resultValue = method.invoke(function, *arguments.toTypedArray())
+        val resultType = value.type.arguments.firstOrNull()?.type
+            ?: throw ExprException("The return type for the execution of the value \"${node.name}\" cannot be determined at ${node.location}")
+        return Value(resultValue, resultType)
+    }
+
+    private fun getValue(name: String, location: ExprLocation, ctx: ExprContext): Value<*> {
+        return ctx.valueMap[name] ?: exprEnvironment.ctx[name]
+            ?: throw ExprException("The template variable \"${name}\" is not bound to a value. Make sure the variable name is correct. $location")
     }
 
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value<*> {

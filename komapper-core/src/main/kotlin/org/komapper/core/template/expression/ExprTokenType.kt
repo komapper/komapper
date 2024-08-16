@@ -5,6 +5,7 @@ enum class ExprTokenType {
     OPEN_PAREN,
     CLOSE_PAREN,
     VALUE,
+    CALLABLE_VALUE,
     CHAR,
     STRING,
     INT,

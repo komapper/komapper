@@ -2,6 +2,7 @@ package org.komapper.core.template.expression
 
 import org.komapper.core.template.expression.ExprTokenType.AND
 import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
+import org.komapper.core.template.expression.ExprTokenType.CALLABLE_VALUE
 import org.komapper.core.template.expression.ExprTokenType.CHAR
 import org.komapper.core.template.expression.ExprTokenType.CLASS_REF
 import org.komapper.core.template.expression.ExprTokenType.CLOSE_PAREN
@@ -265,6 +266,15 @@ class ExprTokenizer(private val expression: String) {
                     buf.reset()
                     break
                 }
+            }
+            if (buf.hasRemaining()) {
+                buf.mark()
+                val c1 = buf.get()
+                if (c1 == '(') {
+                    type = CALLABLE_VALUE
+                    binaryOpAvailable = false
+                }
+                buf.reset()
             }
         } else if (c == '.') {
             type = PROPERTY

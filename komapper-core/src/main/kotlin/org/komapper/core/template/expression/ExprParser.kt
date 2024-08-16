@@ -2,6 +2,7 @@ package org.komapper.core.template.expression
 
 import org.komapper.core.template.expression.ExprTokenType.AND
 import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
+import org.komapper.core.template.expression.ExprTokenType.CALLABLE_VALUE
 import org.komapper.core.template.expression.ExprTokenType.CHAR
 import org.komapper.core.template.expression.ExprTokenType.CLASS_REF
 import org.komapper.core.template.expression.ExprTokenType.CLOSE_PAREN
@@ -61,6 +62,7 @@ internal class ExprParser(
                 }
                 CLASS_REF -> parseClassRef()
                 VALUE -> parseValue()
+                CALLABLE_VALUE -> parseCallableValue()
                 CHAR -> parseCharLiteral()
                 STRING -> parseStringLiteral()
                 INT -> parseIntLiteral()
@@ -107,6 +109,13 @@ internal class ExprParser(
     private fun parseValue() {
         val node = ExprNode.Value(location, token)
         nodes.push(node)
+    }
+
+    private fun parseCallableValue() {
+        val reducer = CallableValueReducer(location, token)
+        pushReducer(reducer)
+        tokenType = tokenizer.next()
+        parseParen()
     }
 
     private fun parseParen() {

@@ -420,6 +420,36 @@ class ExprEvaluatorTest {
         }
 
         @Test
+        fun callable0() {
+            val ctx = ExprContext(
+                mapOf("h" to Value(::hello0, typeOf<Function<String>>())),
+                extensions,
+            )
+            val result = evaluator.eval("h()", ctx)
+            assertEquals(Value("hello world", typeOf<String>()), result)
+        }
+
+        @Test
+        fun callable1() {
+            val ctx = ExprContext(
+                mapOf("h" to Value(::hello1, typeOf<Function<String>>())),
+                extensions,
+            )
+            val result = evaluator.eval("h(\"WORLD\")", ctx)
+            assertEquals(Value("hello WORLD", typeOf<String>()), result)
+        }
+
+        @Test
+        fun callable2() {
+            val ctx = ExprContext(
+                mapOf("add" to Value(::add, typeOf<Function<Int>>())),
+                extensions,
+            )
+            val result = evaluator.eval("add(1, 2)", ctx)
+            assertEquals(Value(3, typeOf<Int>()), result)
+        }
+
+        @Test
         fun `The template variable is not bound to a value`() {
             val ctx = ExprContext(emptyMap(), extensions)
             val ex = assertFailsWith<ExprException> {
@@ -611,4 +641,16 @@ class ExprEvaluatorTest {
             assertEquals(Value(1u, typeOf<UInt>()), result)
         }
     }
+}
+
+fun hello0(): String {
+    return "hello world"
+}
+
+fun hello1(name: String): String {
+    return "hello $name"
+}
+
+fun add(a: Int, b: Int): Int {
+    return a + b
 }

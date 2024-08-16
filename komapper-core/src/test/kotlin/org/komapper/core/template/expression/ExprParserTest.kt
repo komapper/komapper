@@ -83,6 +83,19 @@ class ExprParserTest {
     }
 
     @Test
+    fun topLevelFunction() {
+        when (val expr = ExprParser("hello()").parse()) {
+            is ExprNode.CallableValue -> {
+                assertEquals("hello", expr.name)
+                assertTrue(expr.args is ExprNode.Empty)
+            }
+            else -> {
+                throw AssertionError()
+            }
+        }
+    }
+
+    @Test
     fun nestedFunction() {
         when (val expr = ExprParser("aaa.hello(1, 2, 3).bye(4)").parse()) {
             is ExprNode.Function -> {

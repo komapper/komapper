@@ -26,6 +26,17 @@ internal class FunctionReducer(location: ExprLocation, val name: String, private
     }
 }
 
+/**
+ * Callable value is a function that has no receiver.
+ */
+internal class CallableValueReducer(location: ExprLocation, val name: String) :
+    ExprReducer(100, location) {
+    override fun reduce(deque: Deque<ExprNode>): ExprNode {
+        val args = pop(deque)
+        return ExprNode.CallableValue(location, name, args)
+    }
+}
+
 internal class NotReducer(location: ExprLocation) : ExprReducer(50, location) {
     override fun reduce(deque: Deque<ExprNode>): ExprNode {
         val expr = pop(deque)
