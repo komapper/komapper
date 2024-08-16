@@ -35,4 +35,10 @@ sealed class ExprNode {
         val receiver: ExprNode,
         val args: ExprNode,
     ) : ExprNode()
+
+    data class CallableValue(
+        override val location: Loc,
+        val name: String,
+        val args: ExprNode,
+    ) : ExprNode()
 }

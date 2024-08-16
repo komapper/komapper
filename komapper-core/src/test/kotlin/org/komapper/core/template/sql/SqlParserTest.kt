@@ -1,8 +1,6 @@
-package org.komapper.template.sql
+package org.komapper.core.template.sql
 
-import org.komapper.core.template.sql.SqlException
-import org.komapper.core.template.sql.SqlNode
-import org.komapper.core.template.sql.SqlParser
+import org.junit.jupiter.api.Nested
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -44,7 +42,8 @@ class SqlParserTest {
         assertEquals(sql, node.toText())
     }
 
-    class ClauseTest {
+    @Nested
+    inner class ClauseTest {
         @Test
         fun select() {
             val sql = "select name, age"
@@ -88,7 +87,8 @@ class SqlParserTest {
         }
     }
 
-    class LogicalOperatorTest {
+    @Nested
+    inner class LogicalOperatorTest {
         @Test
         fun and() {
             val sql = "and age > 1"
@@ -104,7 +104,8 @@ class SqlParserTest {
         }
     }
 
-    class BindValueDirectiveTest {
+    @Nested
+    inner class BindValueDirectiveTest {
         @Test
         fun bindValue() {
             val sql = "/* age */1"
@@ -182,7 +183,8 @@ class SqlParserTest {
         }
     }
 
-    class CommentTest {
+    @Nested
+    inner class CommentTest {
         @Test
         fun multiLineComment() {
             val sql = """
@@ -210,7 +212,8 @@ class SqlParserTest {
         }
     }
 
-    class SetTest {
+    @Nested
+    inner class SetTest {
 
         @Test
         fun simple() {
@@ -233,7 +236,8 @@ class SqlParserTest {
         }
     }
 
-    class ParenTest {
+    @Nested
+    inner class ParenTest {
 
         @Test
         fun empty() {
@@ -257,7 +261,8 @@ class SqlParserTest {
         }
     }
 
-    class IfBlockTest {
+    @Nested
+    inner class IfBlockTest {
 
         @Test
         fun `if`() {
@@ -358,7 +363,8 @@ class SqlParserTest {
         }
     }
 
-    class ForBlockTest {
+    @Nested
+    inner class ForBlockTest {
 
         @Test
         fun simple() {

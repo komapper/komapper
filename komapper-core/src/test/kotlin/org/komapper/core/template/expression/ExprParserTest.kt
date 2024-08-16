@@ -1,8 +1,5 @@
-package org.komapper.template.expression
+package org.komapper.core.template.expression
 
-import org.komapper.core.template.expression.ExprException
-import org.komapper.core.template.expression.ExprNode
-import org.komapper.core.template.expression.ExprParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -16,6 +13,7 @@ class ExprParserTest {
             is ExprNode.ClassRef -> {
                 assertEquals("aaa.bbb.Ccc", expr.name)
             }
+
             else -> throw AssertionError(expr)
         }
     }
@@ -27,6 +25,7 @@ class ExprParserTest {
                 assertTrue(expr.left is ExprNode.Value)
                 assertTrue(expr.right is ExprNode.Literal)
             }
+
             else -> throw AssertionError()
         }
     }
@@ -38,6 +37,7 @@ class ExprParserTest {
                 assertTrue(expr.left is ExprNode.Gt)
                 assertTrue(expr.right is ExprNode.Literal)
             }
+
             else -> throw AssertionError()
         }
     }
@@ -48,8 +48,9 @@ class ExprParserTest {
             is ExprNode.Property -> {
                 assertEquals("age", expr.name)
                 assertTrue(expr.receiver is ExprNode.Value)
-                assertEquals("aaa", expr.receiver.name)
+                assertEquals("aaa", (expr.receiver as ExprNode.Value).name)
             }
+
             else -> throw AssertionError()
         }
     }
@@ -66,6 +67,7 @@ class ExprParserTest {
                 assertTrue(grandParent is ExprNode.Value)
                 assertEquals("aaa", grandParent.name)
             }
+
             else -> throw AssertionError()
         }
     }
@@ -76,9 +78,24 @@ class ExprParserTest {
             is ExprNode.Function -> {
                 assertEquals("hello", expr.name)
                 assertTrue(expr.receiver is ExprNode.Value)
-                assertEquals("aaa", expr.receiver.name)
+                assertEquals("aaa", (expr.receiver as ExprNode.Value).name)
             }
+
             else -> throw AssertionError()
+        }
+    }
+
+    @Test
+    fun topLevelFunction() {
+        when (val expr = ExprParser("hello()").parse()) {
+            is ExprNode.CallableValue -> {
+                assertEquals("hello", expr.name)
+                assertTrue(expr.args is ExprNode.Empty)
+            }
+
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -88,16 +105,17 @@ class ExprParserTest {
             is ExprNode.Function -> {
                 assertEquals("bye", expr.name)
                 assertTrue(expr.args is ExprNode.Literal)
-                assertEquals(4, expr.args.value)
+                assertEquals(4, (expr.args as ExprNode.Literal).value)
                 val parent = expr.receiver
                 assertTrue(parent is ExprNode.Function)
                 assertEquals("hello", parent.name)
                 assertTrue(parent.args is ExprNode.Comma)
-                assertEquals(3, parent.args.nodeList.size)
+                assertEquals(3, (parent.args as ExprNode.Comma).nodeList.size)
                 val grandParent = parent.receiver
                 assertTrue(grandParent is ExprNode.Value)
                 assertEquals("aaa", grandParent.name)
             }
+
             else -> throw AssertionError()
         }
     }
@@ -108,6 +126,7 @@ class ExprParserTest {
             is ExprNode.Comma -> {
                 assertEquals(3, expr.nodeList.size)
             }
+
             else -> throw AssertionError()
         }
     }

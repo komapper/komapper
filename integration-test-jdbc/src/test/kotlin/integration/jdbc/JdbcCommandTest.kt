@@ -718,7 +718,6 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             QueryDsl.execute(UsePartial(Pagination(2, 3)))
         }
         assertEquals(2, addresses.size)
-        println(addresses)
         assertEquals(listOf(4, 5), addresses.map { it.addressId })
     }
 
@@ -746,30 +745,28 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         )
     }
 
-    /* TODO
     @KomapperCommand(
         """
         insert into address
             (address_id, street, version)
         values
-            (/* id */0, /* f() */'', /* id */0)
+            (/* id() */0, /* hello("world") */'', /* add(1, 2) */0)
         """,
     )
-    class FunctionPassing(val id: Int, val f: () -> String) : Exec
+    class CallableValue(val id: () -> Int, val hello: (String) -> String, val add: (Int, Int) -> Int) : Exec()
 
     @Test
-    fun functionPassing() {
+    fun callableValue() {
         val count = db.runQuery {
-            QueryDsl.execute(FunctionPassing(16, {"good"}))
+            QueryDsl.execute(CallableValue({ 16 }, { "hello $it" }, { a, b -> a + b }))
         }
         assertEquals(1, count)
         val a = Meta.address
         val address = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 16 }.single()
         }
-        assertEquals("good", address.street)
+        assertEquals(Address(16, "hello world", 3), address)
     }
-     */
 }
 
 @Suppress("UNUSED")
