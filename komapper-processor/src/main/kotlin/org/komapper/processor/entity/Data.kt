@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.KSAnnotation
@@ -10,6 +10,12 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
+import org.komapper.processor.Config
+import org.komapper.processor.EnumStrategy
+import org.komapper.processor.backquotedName
+import org.komapper.processor.createBackquotedName
+import org.komapper.processor.name
+import org.komapper.processor.toCamelCase
 
 internal data class EntityDefinitionSource(
     val defDeclaration: KSClassDeclaration,
@@ -22,6 +28,17 @@ internal data class EntityDefinitionSource(
     val projection: Projection?,
     val stubAnnotation: KSAnnotation?,
 )
+
+internal val EntityDefinitionSource.names: List<String>
+    get() = this.aliases.ifEmpty {
+        val alias = toCamelCase(this.entityDeclaration.simpleName.asString())
+        listOf(alias)
+    }
+
+internal val EntityDefinitionSource.typeName get() = createBackquotedName(entityDeclaration)
+
+internal fun EntityDefinitionSource.createUnitTypeName(config: Config) =
+    this.unitDeclaration?.qualifiedName?.asString() ?: config.metaObject
 
 internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
@@ -193,26 +210,6 @@ internal data class PlainClass(
             type
         }
     }
-}
-
-sealed interface EnumStrategy {
-
-    object Name : EnumStrategy {
-        const val propertyName: String = "name"
-        const val typeName: String = "String"
-    }
-
-    object Ordinal : EnumStrategy {
-        const val propertyName: String = "ordinal"
-        const val typeName: String = "Int"
-    }
-
-    data class Property(
-        val propertyName: String,
-        val annotation: KSAnnotation,
-    ) : EnumStrategy
-
-    object Type : EnumStrategy
 }
 
 internal data class ValueClassProperty(

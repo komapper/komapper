@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.factory
 
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
@@ -6,6 +6,7 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFile
+import org.komapper.processor.ClassDeclarationVisitor
 import org.komapper.processor.Symbols.EntityMetamodelFactory
 import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
 import java.io.PrintWriter

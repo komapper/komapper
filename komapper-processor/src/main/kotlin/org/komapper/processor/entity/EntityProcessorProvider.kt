@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -9,6 +9,9 @@ import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperProjectionDef
 import org.komapper.core.ThreadSafe
+import org.komapper.processor.Config
+import org.komapper.processor.Context
+import org.komapper.processor.ContextFactory
 
 @ThreadSafe
 class EntityProcessorProvider : SymbolProcessorProvider {

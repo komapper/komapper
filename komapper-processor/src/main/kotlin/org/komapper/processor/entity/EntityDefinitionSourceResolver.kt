@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
@@ -8,9 +8,15 @@ import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperProjectionDef
+import org.komapper.processor.ClassDeclarationVisitor
+import org.komapper.processor.Context
 import org.komapper.processor.Symbols.KomapperStub
 import org.komapper.processor.Symbols.ProjectionMeta
 import org.komapper.processor.Symbols.Void
+import org.komapper.processor.findAnnotation
+import org.komapper.processor.findValue
+import org.komapper.processor.report
+import org.komapper.processor.validateContainerClass
 
 internal interface EntityDefinitionSourceResolver {
     fun resolve(symbol: KSAnnotated): EntityDefinitionSource?

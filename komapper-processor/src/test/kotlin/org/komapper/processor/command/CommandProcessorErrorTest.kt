@@ -1,7 +1,7 @@
-package org.komapper.processor
+package org.komapper.processor.command
 
 import com.tschuchort.compiletesting.KotlinCompilation
-import org.komapper.processor.command.CommandProcessorProvider
+import org.komapper.processor.AbstractKspTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

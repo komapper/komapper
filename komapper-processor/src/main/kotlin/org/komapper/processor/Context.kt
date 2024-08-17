@@ -15,6 +15,10 @@ internal data class Context(
     val codeGenerator get() = environment.codeGenerator
 }
 
+internal interface ContextFactory {
+    fun create(resolver: Resolver): Context
+}
+
 internal fun Context.getClassDeclaration(name: String, onNotFound: (String) -> Nothing): KSClassDeclaration {
     val ksName = resolver.getKSNameFromString(name)
     return resolver.getClassDeclarationByName(ksName) ?: onNotFound(name)

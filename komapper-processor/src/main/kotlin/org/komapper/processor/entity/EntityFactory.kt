@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
@@ -17,11 +17,23 @@ import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperEnum
 import org.komapper.annotation.KomapperEnumOverride
 import org.komapper.annotation.KomapperVersion
+import org.komapper.processor.ClassDeclarationVisitor
+import org.komapper.processor.Context
+import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Symbols.Instant
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.LocalDateTime
 import org.komapper.processor.Symbols.OffsetDateTime
+import org.komapper.processor.TypeArgumentResolver
+import org.komapper.processor.backquotedName
+import org.komapper.processor.hasAnnotation
+import org.komapper.processor.isValueClass
+import org.komapper.processor.name
+import org.komapper.processor.normalize
+import org.komapper.processor.report
+import org.komapper.processor.resolveLiteralTag
+import org.komapper.processor.validateContainerClass
 
 internal class EntityFactory(
     private val context: Context,

@@ -1,10 +1,12 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelImplementor
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelStub
 import org.komapper.processor.BackquotedSymbols.PropertyMetamodel
 import org.komapper.processor.BackquotedSymbols.PropertyMetamodelStub
+import org.komapper.processor.Context
+import org.komapper.processor.Symbols
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 

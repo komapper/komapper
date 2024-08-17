@@ -1,8 +1,11 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.symbol.KSAnnotated
 import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperId
+import org.komapper.processor.Context
+import org.komapper.processor.Exit
+import org.komapper.processor.report
 
 internal class EntityAnalyzer(
     private val context: Context,

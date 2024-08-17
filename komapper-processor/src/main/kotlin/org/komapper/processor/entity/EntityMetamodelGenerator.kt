@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.symbol.Nullability
 import org.komapper.processor.BackquotedSymbols.Argument
@@ -37,6 +37,8 @@ import org.komapper.processor.BackquotedSymbols.TemplateSelectQuery
 import org.komapper.processor.BackquotedSymbols.TemplateSelectQueryBuilder
 import org.komapper.processor.BackquotedSymbols.UUID
 import org.komapper.processor.BackquotedSymbols.typeOf
+import org.komapper.processor.Context
+import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.checkMetamodelVersion
@@ -199,7 +201,7 @@ internal class EntityMetamodelGenerator(
                             "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${
                                 throwException(
                                     "it",
-                                    "\"${strategy.propertyName}\"",
+                                    "\"${EnumStrategy.Name.propertyName}\"",
                                     "e",
                                 )
                             } } }"
@@ -208,7 +210,7 @@ internal class EntityMetamodelGenerator(
                             "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${
                                 throwException(
                                     "it",
-                                    "\"${strategy.propertyName}\"",
+                                    "\"${EnumStrategy.Ordinal.propertyName}\"",
                                     "e",
                                 )
                             } } }"
@@ -249,8 +251,8 @@ internal class EntityMetamodelGenerator(
                 is EnumClass -> {
                     when (val strategy = p.kotlinClass.strategy) {
                         is EnumStrategy.Type -> "{ it }"
-                        is EnumStrategy.Name -> "{ it.${strategy.propertyName} }"
-                        is EnumStrategy.Ordinal -> "{ it.${strategy.propertyName} }"
+                        is EnumStrategy.Name -> "{ it.${EnumStrategy.Name.propertyName} }"
+                        is EnumStrategy.Ordinal -> "{ it.${EnumStrategy.Ordinal.propertyName} }"
                         is EnumStrategy.Property -> "{ it.${strategy.propertyName} }"
                     }
                 }

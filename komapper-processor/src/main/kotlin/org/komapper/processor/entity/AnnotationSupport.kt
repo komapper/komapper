@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
@@ -22,6 +22,20 @@ import org.komapper.annotation.KomapperOneToOne
 import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperTable
 import org.komapper.core.NamingStrategy
+import org.komapper.processor.AnnotationVisitor
+import org.komapper.processor.ClassDeclarationVisitor
+import org.komapper.processor.Context
+import org.komapper.processor.EnumStrategy
+import org.komapper.processor.Exit
+import org.komapper.processor.Symbols
+import org.komapper.processor.backquotedName
+import org.komapper.processor.findAnnotation
+import org.komapper.processor.findAnnotations
+import org.komapper.processor.findValue
+import org.komapper.processor.isValueClass
+import org.komapper.processor.name
+import org.komapper.processor.report
+import org.komapper.processor.resolveLiteralTag
 
 internal class AnnotationSupport(
     private val context: Context,
