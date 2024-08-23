@@ -90,7 +90,7 @@ internal class TypeArgumentResolver(
         val typeArgument = context[declaration.simpleName.asString()]
         return if (typeArgument != null) {
             if (parent != null) {
-                val typeParameter = typeArgument.type?.resolve()?.declaration?.accept(TypeParameterVisitor(), Unit)
+                val typeParameter = typeArgument.type?.resolve()?.declaration as? KSTypeParameter
                 if (typeParameter != null) {
                     parent.resolve(typeParameter) ?: typeArgument
                 } else {

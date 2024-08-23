@@ -22,8 +22,6 @@ import org.komapper.annotation.KomapperOneToOne
 import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperTable
 import org.komapper.core.NamingStrategy
-import org.komapper.processor.AnnotationVisitor
-import org.komapper.processor.ClassDeclarationVisitor
 import org.komapper.processor.Context
 import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Exit
@@ -111,7 +109,7 @@ internal class AnnotationSupport(
         val link = annotation.findValue("link")?.let { node ->
             when (node) {
                 is KSNode -> {
-                    val linkAnnotation = node.accept(AnnotationVisitor(), Unit)
+                    val linkAnnotation = node as? KSAnnotation
                     linkAnnotation?.let { annotation ->
                         val source = annotation.findValue("source")?.toString().let {
                             when (it) {
@@ -192,7 +190,7 @@ internal class AnnotationSupport(
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
         val alternateType = columnAnnotation?.findValue("alternateType")?.let { type ->
             if (type !is KSType) report("The alternateType is not KSType.", columnAnnotation)
-            val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+            val classDeclaration = type.declaration as? KSClassDeclaration
             when {
                 classDeclaration == null ->
                     report("The alternateType property is illegal.", columnAnnotation)
@@ -251,8 +249,7 @@ internal class AnnotationSupport(
             .filter { it.shortName.asString() == KomapperColumnOverride::class.simpleName }
             .map {
                 val name = it.findValue("name")?.toString()
-                val columnNode = it.findValue("column") as? KSNode
-                val columnAnnotation = columnNode?.accept(AnnotationVisitor(), Unit)
+                val columnAnnotation = it.findValue("column") as? KSAnnotation
                 Triple(name, columnAnnotation, it)
             }.filter {
                 it.first != null && it.second != null
@@ -297,8 +294,7 @@ internal class AnnotationSupport(
             .filter { it.shortName.asString() == KomapperEnumOverride::class.simpleName }
             .map {
                 val name = it.findValue("name")?.toString()
-                val enumNode = it.findValue("enum") as? KSNode
-                val enumAnnotation = enumNode?.accept(AnnotationVisitor(), Unit)
+                val enumAnnotation = it.findValue("enum") as? KSAnnotation
                 Triple(name, enumAnnotation, it)
             }.filter {
                 it.first != null && it.second != null

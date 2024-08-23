@@ -5,8 +5,8 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
-import org.komapper.processor.ClassDeclarationVisitor
 import org.komapper.processor.Symbols.EntityMetamodelFactory
 import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
 import java.io.PrintWriter
@@ -20,7 +20,7 @@ internal class EntityMetamodelFactoryProcessor(
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver.getSymbolsWithAnnotation(EntityMetamodelFactory)
-        val declarations = symbols.map { it.accept(ClassDeclarationVisitor(), Unit) }.filterNotNull().toList()
+        val declarations = symbols.map { it as? KSClassDeclaration }.filterNotNull().toList()
         declarations
             .map { it.qualifiedName to it.containingFile }
             .filter { it.first != null && it.second != null }

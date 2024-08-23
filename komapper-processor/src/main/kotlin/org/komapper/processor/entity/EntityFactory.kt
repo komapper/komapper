@@ -17,7 +17,6 @@ import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperEnum
 import org.komapper.annotation.KomapperEnumOverride
 import org.komapper.annotation.KomapperVersion
-import org.komapper.processor.ClassDeclarationVisitor
 import org.komapper.processor.Context
 import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Symbols.Instant
@@ -123,7 +122,7 @@ internal class EntityFactory(
     ): CompositeProperty {
         val parameterType = parameter.type.resolve()
         val (type, typeArgumentResolver) = parameterType.normalize()
-        val embeddableDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+        val embeddableDeclaration = type.declaration as? KSClassDeclaration
             ?: report("${type.name} must be a data class.", parameter)
         val embeddable = createEmbeddable(
             parent = parameter,
@@ -226,7 +225,7 @@ internal class EntityFactory(
     }
 
     private fun createEnumClass(enumStrategy: EnumStrategy?, type: KSType): EnumClass? {
-        val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+        val classDeclaration = type.declaration as? KSClassDeclaration
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
             when (val strategy = enumStrategy ?: context.config.enumStrategy) {
                 EnumStrategy.Name -> EnumClass(type, EnumStrategy.Name.typeName, strategy)
@@ -252,7 +251,7 @@ internal class EntityFactory(
     }
 
     private fun createValueClass(type: KSType, alternateType: ValueClass?): ValueClass? {
-        val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+        val classDeclaration = type.declaration as? KSClassDeclaration
         return if (classDeclaration != null) {
             val constructor = classDeclaration.primaryConstructor
             val isPublic = constructor?.isPublic() ?: false
