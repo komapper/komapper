@@ -78,7 +78,7 @@ data class Statement(val parts: List<StatementPart>) {
     }
 }
 
-data class DryRunStatement internal constructor(
+data class DryRunStatement(
     val sql: String = "",
     val sqlWithArgs: String = "",
     val args: List<Value<*>> = emptyList(),
