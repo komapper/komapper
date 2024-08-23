@@ -12,8 +12,6 @@ import kotlin.test.assertEquals
 @Tag("slow")
 internal class ProcessorUtilityTest : AbstractKspTest() {
 
-    annotation class TestAnnotation
-
     @Test
     fun toPropertyNameFormat() {
         assertEquals("aaaBbbCcc", toCamelCase("AaaBbbCcc"))
