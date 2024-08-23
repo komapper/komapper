@@ -26,23 +26,14 @@ internal class SqlValidator(context: Context, val command: Command) {
     }
 
     private fun visit(paramMap: Map<String, KSType>, node: SqlNode): Map<String, KSType> = when (node) {
-        is SqlNode.Statement -> node.nodeList.fold(paramMap, ::visit)
+        is SqlNode.Statement -> {
+            node.nodeList.fold(paramMap, ::visit)
+        }
+
         is SqlNode.Set -> {
             visit(paramMap, node.left).let {
                 visit(it, node.right)
             }
-        }
-
-        is SqlNode.Clause.Select -> {
-            node.nodeList.fold(paramMap, ::visit)
-        }
-
-        is SqlNode.Clause.From -> {
-            node.nodeList.fold(paramMap, ::visit)
-        }
-
-        is SqlNode.Clause.ForUpdate -> {
-            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.Clause -> {

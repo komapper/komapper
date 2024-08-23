@@ -17,7 +17,10 @@ internal class SqlAssembler(context: Context, private val command: Command) {
     }
 
     private fun visit(buf: StringBuilder, node: SqlNode): StringBuilder = when (node) {
-        is SqlNode.Statement -> node.nodeList.fold(buf, ::visit)
+        is SqlNode.Statement -> {
+            node.nodeList.fold(buf, ::visit)
+        }
+
         is SqlNode.Set -> {
             visit(buf, node.left)
                 .let {
@@ -25,24 +28,6 @@ internal class SqlAssembler(context: Context, private val command: Command) {
                 }.let {
                     visit(it, node.right)
                 }
-        }
-
-        is SqlNode.Clause.Select -> {
-            buf.append(node.keyword).let {
-                node.nodeList.fold(it, ::visit)
-            }
-        }
-
-        is SqlNode.Clause.From -> {
-            buf.append(node.keyword).let {
-                node.nodeList.fold(it, ::visit)
-            }
-        }
-
-        is SqlNode.Clause.ForUpdate -> {
-            buf.append(node.keyword).let {
-                node.nodeList.fold(it, ::visit)
-            }
         }
 
         is SqlNode.Clause -> {
