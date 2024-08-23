@@ -73,10 +73,10 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform {
-                val excludeTags = project.properties["excludeTags"]?.toString() ?: "slow"
-                if (excludeTags.isNotEmpty()) {
-                    excludeTags(excludeTags)
-                }
+                val tags = (project.properties["excludeTags"] ?: "").toString()
+                    .split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    .toTypedArray()
+                excludeTags(*tags)
             }
             jvmArgs("-Xmx2g")
         }
