@@ -5,9 +5,11 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Variance
 import com.tschuchort.compiletesting.KotlinCompilation
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Tag
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Tag("slow")
 internal class ProcessorUtilityTest : AbstractKspTest() {
 
     annotation class TestAnnotation

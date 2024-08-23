@@ -1,11 +1,13 @@
 package org.komapper.processor.command
 
 import com.tschuchort.compiletesting.KotlinCompilation
+import org.junit.jupiter.api.Tag
 import org.komapper.processor.AbstractKspTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Tag("slow")
 class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
 
     @Test
