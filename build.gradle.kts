@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
     signing
     kotlin("jvm")
-    id("com.diffplug.spotless")version "6.25.0"
+    id("com.diffplug.spotless") version "6.25.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("net.researchgate.release") version "3.0.2"
 }
@@ -73,10 +73,10 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform {
-                val excludeTags = project.properties["excludeTags"]?.toString() ?: "slow"
-                if (excludeTags.isNotEmpty()) {
-                    excludeTags(excludeTags)
-                }
+                val tags = (project.properties["excludeTags"] ?: "").toString()
+                    .split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    .toTypedArray()
+                excludeTags(*tags)
             }
             jvmArgs("-Xmx2g")
         }

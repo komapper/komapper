@@ -1,5 +1,6 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
+import org.komapper.processor.Context
 import kotlin.reflect.KClass
 
 internal data class ProcessingAnnotation(

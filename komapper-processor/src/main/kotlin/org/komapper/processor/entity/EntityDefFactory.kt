@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
@@ -12,6 +12,10 @@ import org.komapper.annotation.KomapperIgnore
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
+import org.komapper.processor.Context
+import org.komapper.processor.findValue
+import org.komapper.processor.hasDuplicates
+import org.komapper.processor.report
 
 internal class EntityDefFactory(
     private val context: Context,

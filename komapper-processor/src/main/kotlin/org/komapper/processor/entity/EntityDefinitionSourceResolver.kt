@@ -1,4 +1,4 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
@@ -8,9 +8,14 @@ import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperProjectionDef
+import org.komapper.processor.Context
 import org.komapper.processor.Symbols.KomapperStub
 import org.komapper.processor.Symbols.ProjectionMeta
 import org.komapper.processor.Symbols.Void
+import org.komapper.processor.findAnnotation
+import org.komapper.processor.findValue
+import org.komapper.processor.report
+import org.komapper.processor.validateContainerClass
 
 internal interface EntityDefinitionSourceResolver {
     fun resolve(symbol: KSAnnotated): EntityDefinitionSource?
@@ -18,7 +23,7 @@ internal interface EntityDefinitionSourceResolver {
 
 internal class SeparateDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
     override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
-        val defDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
+        val defDeclaration = symbol as? KSClassDeclaration
             ?: report("@${KomapperEntityDef::class.simpleName} cannot be applied to this element.", symbol)
         val defAnnotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
         val entity = defAnnotation?.findValue("entity")
@@ -37,7 +42,7 @@ internal class SeparateDefinitionSourceResolver(private val context: Context) : 
             )
         }
         val unitTypeName = createUnitTypeName(context, unitDeclaration)
-        val entityDeclaration = entity.declaration.accept(ClassDeclarationVisitor(), Unit)
+        val entityDeclaration = entity.declaration as? KSClassDeclaration
             ?: report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
         validateContainerClass(entityDeclaration, defAnnotation)
         val stubAnnotation = defDeclaration.findAnnotation(KomapperStub)
@@ -58,7 +63,7 @@ internal class SeparateDefinitionSourceResolver(private val context: Context) : 
 
 internal class SelfDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
     override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
-        val entityDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
+        val entityDeclaration = symbol as? KSClassDeclaration
             ?: report("@${KomapperEntity::class.simpleName} cannot be applied to this element.", symbol)
         val annotation = entityDeclaration.findAnnotation(KomapperEntity::class)
         val aliases = annotation?.findValue("aliases")
@@ -92,8 +97,8 @@ internal class SelfDefinitionSourceResolver(private val context: Context) : Enti
 
 internal class SeparateProjectionDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
 
-    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource? {
-        val defDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
+    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
+        val defDeclaration = symbol as? KSClassDeclaration
             ?: report("@${KomapperProjectionDef::class.simpleName} cannot be applied to this element.", symbol)
 
         val defAnnotation = defDeclaration.findAnnotation(KomapperProjectionDef::class)
@@ -104,7 +109,7 @@ internal class SeparateProjectionDefinitionSourceResolver(private val context: C
         val unitName = context.resolver.getKSNameFromString(ProjectionMeta)
         val unitDeclaration = context.resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
         val unitTypeName = createUnitTypeName(context, unitDeclaration)
-        val entityDeclaration = projectionType.declaration.accept(ClassDeclarationVisitor(), Unit)
+        val entityDeclaration = projectionType.declaration as? KSClassDeclaration
             ?: report("The projection value of @${KomapperProjectionDef::class.simpleName} is not found.", defDeclaration)
         validateContainerClass(entityDeclaration, defAnnotation)
         val projection = AnnotationSupport.createProjection(defAnnotation, entityDeclaration)
@@ -125,8 +130,8 @@ internal class SeparateProjectionDefinitionSourceResolver(private val context: C
 }
 
 internal class SelfProjectionDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
-    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource? {
-        val entityDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
+    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
+        val entityDeclaration = symbol as? KSClassDeclaration
             ?: report("@${KomapperProjection::class.simpleName} cannot be applied to this element.", symbol)
 
         val unitName = context.resolver.getKSNameFromString(ProjectionMeta)
@@ -153,7 +158,7 @@ internal class SelfProjectionDefinitionSourceResolver(private val context: Conte
 
 private fun toUnitDeclaration(symbol: Any?, errorHandler: () -> Nothing): KSClassDeclaration? {
     return when (symbol) {
-        is KSType -> symbol.declaration.accept(ClassDeclarationVisitor(), Unit)?.let {
+        is KSType -> (symbol.declaration as? KSClassDeclaration)?.let {
             when {
                 it.qualifiedName?.asString() == Void -> null
                 it.classKind == ClassKind.OBJECT -> it

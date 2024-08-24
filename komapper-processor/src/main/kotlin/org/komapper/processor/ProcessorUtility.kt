@@ -90,7 +90,7 @@ internal class TypeArgumentResolver(
         val typeArgument = context[declaration.simpleName.asString()]
         return if (typeArgument != null) {
             if (parent != null) {
-                val typeParameter = typeArgument.type?.resolve()?.declaration?.accept(TypeParameterVisitor(), Unit)
+                val typeParameter = typeArgument.type?.resolve()?.declaration as? KSTypeParameter
                 if (typeParameter != null) {
                     parent.resolve(typeParameter) ?: typeArgument
                 } else {
@@ -123,7 +123,7 @@ internal val KSType.backquotedName: String
         return createTypeName(this, asString())
     }
 
-private fun createBackquotedName(declaration: KSDeclaration): String {
+internal fun createBackquotedName(declaration: KSDeclaration): String {
     val qualifiedName = declaration.qualifiedName?.asString()
     return if (qualifiedName == null) {
         declaration.simpleName.asString()
@@ -156,17 +156,6 @@ private fun createTypeName(type: KSType, baseName: String): String {
     }
     return buf.toString()
 }
-
-internal val EntityDefinitionSource.names: List<String>
-    get() = this.aliases.ifEmpty {
-        val alias = toCamelCase(this.entityDeclaration.simpleName.asString())
-        listOf(alias)
-    }
-
-internal val EntityDefinitionSource.typeName get() = createBackquotedName(entityDeclaration)
-
-internal fun EntityDefinitionSource.createUnitTypeName(config: Config) =
-    this.unitDeclaration?.qualifiedName?.asString() ?: config.metaObject
 
 internal fun toCamelCase(text: String): String {
     val builder = StringBuilder()

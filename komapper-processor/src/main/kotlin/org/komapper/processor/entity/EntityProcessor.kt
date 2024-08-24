@@ -1,9 +1,12 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
+import org.komapper.processor.Context
+import org.komapper.processor.ContextFactory
+import org.komapper.processor.Exit
 import java.io.PrintWriter
 
 internal class EntityProcessor(

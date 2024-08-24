@@ -1,7 +1,8 @@
-package org.komapper.processor
+package org.komapper.processor.entity
 
 import com.tschuchort.compiletesting.KotlinCompilation
 import org.junit.jupiter.api.Tag
+import org.komapper.processor.AbstractKspTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
