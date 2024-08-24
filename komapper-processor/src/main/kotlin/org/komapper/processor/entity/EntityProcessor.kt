@@ -14,10 +14,9 @@ internal class EntityProcessor(
     private val processingAnnotations: List<ProcessingAnnotation>,
 ) : SymbolProcessor {
 
-    private val processedSymbols = mutableSetOf<KSAnnotated>()
-
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val context = contextFactory.create(resolver)
+        val processedSymbols = mutableSetOf<KSAnnotated>()
         for (annotation in processingAnnotations) {
             val annotationName = annotation.annotationClass.qualifiedName!!
             val symbols = resolver.getSymbolsWithAnnotation(annotationName)
