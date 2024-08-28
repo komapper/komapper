@@ -1,17 +1,21 @@
-package org.komapper.processor.command
+package org.komapper.core.template.sql
 
-import org.komapper.core.template.sql.NoCacheSqlNodeFactory
-import org.komapper.core.template.sql.SqlException
-import org.komapper.core.template.sql.SqlNode
-import org.komapper.processor.Context
-
-internal class SqlAssembler(context: Context, private val command: Command) {
+/**
+ * A class responsible for reassembling SQL template from partial SQL fragments.
+ *
+ * @property sql the initial SQL template
+ * @property sqlPartialMap a map containing SQL partials identified by their names
+ */
+class SqlReassembler(private val sql: String, private val sqlPartialMap: Map<String, String>) {
 
     private val nodeFactory = NoCacheSqlNodeFactory()
 
+    /**
+     * @throws SqlPartialNotFoundException if the sql partial is not found.
+     */
     fun assemble(): String {
-        val node = nodeFactory.get(command.sql)
-        val buf = StringBuilder(command.sql.length + 100)
+        val node = nodeFactory.get(sql)
+        val buf = StringBuilder(sql.length + 100)
         visit(buf, node)
         return buf.toString()
     }
@@ -67,17 +71,15 @@ internal class SqlAssembler(context: Context, private val command: Command) {
         }
 
         is SqlNode.PartialDirective -> {
-            val partial = command.sqlPartialMap[node.expression]
-                ?: throw SqlException(
-                    "The const \"${node.expression}\" is not found " +
-                        "in the file \"${command.classDeclaration.containingFile?.fileName}\". " +
-                        "The const must be annotated with @KomapperPartial.",
-                )
+            val expression = node.expression
+            val partial = sqlPartialMap[expression] ?: throw SqlPartialNotFoundException(expression)
             buf.append(partial)
         }
 
         is SqlNode.LiteralValueDirective -> {
             buf.append(node.token).let {
+                visit(it, node.node)
+            }.let {
                 node.nodeList.fold(it, ::visit)
             }
         }
@@ -116,4 +118,11 @@ internal class SqlAssembler(context: Context, private val command: Command) {
         is SqlNode.ForDirective,
         -> error("unreachable")
     }
+
+    /**
+     * Thrown to indicate that the sql partial is not found.
+     *
+     * @property name the partial name
+     */
+    class SqlPartialNotFoundException(val name: String) : SqlException("The sql partial \"$name\" is not found.")
 }
