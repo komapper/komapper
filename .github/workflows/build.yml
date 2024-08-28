@@ -25,7 +25,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4.0.1
 
       - name: Check
-        run: ./gradlew javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check -PexcludeTags=
+        run: ./gradlew javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
       - name: Upload reports
         if: failure()
