@@ -1,6 +1,5 @@
 package org.komapper.processor.command
 
-import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
@@ -13,11 +12,7 @@ import org.komapper.processor.ContextFactory
 internal class CommandProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         val config = Config.create(environment.options)
-        val factory = object : ContextFactory {
-            override fun create(resolver: Resolver): Context {
-                return Context(environment, config, resolver)
-            }
-        }
+        val factory = ContextFactory { resolver -> Context(environment, config, resolver) }
         return CommandProcessor(factory)
     }
 }

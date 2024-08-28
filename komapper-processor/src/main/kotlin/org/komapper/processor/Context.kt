@@ -15,7 +15,7 @@ internal data class Context(
     val codeGenerator get() = environment.codeGenerator
 }
 
-internal interface ContextFactory {
+internal fun interface ContextFactory {
     fun create(resolver: Resolver): Context
 }
 

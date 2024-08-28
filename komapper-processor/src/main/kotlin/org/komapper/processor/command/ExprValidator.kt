@@ -103,7 +103,7 @@ internal class ExprValidator(private val context: Context) {
     ): KSType {
         val result = visit(operand, paramMap)
         if (result != booleanType) {
-            throw ExprException(
+            throw NonBooleanTypeException(
                 "Cannot perform the logical operator because the operand is not Boolean at $location",
             )
         }
@@ -119,7 +119,7 @@ internal class ExprValidator(private val context: Context) {
         val left = visit(leftNode, paramMap)
         val right = visit(rightNode, paramMap)
         if (left != booleanType || right != booleanType) {
-            throw ExprException(
+            throw EitherOperandNonBooleanException(
                 "Cannot perform the logical operator because either operands is not Boolean at $location",
             )
         }
@@ -144,16 +144,16 @@ internal class ExprValidator(private val context: Context) {
         rightNode: ExprNode,
         paramMap: Map<String, KSType>,
     ): KSType {
-        val left = visit(leftNode, paramMap).makeNullable()
-        val right = visit(rightNode, paramMap).makeNullable()
+        val left = visit(leftNode, paramMap)
+        val right = visit(rightNode, paramMap)
         if (left != right) {
-            throw ExprException(
-                "Cannot compare because the operands are not the same type at $location",
+            throw NonSameTypeException(
+                "Cannot compare because the operands(left=$left, right=$right) are not the same type at $location",
             )
         }
         if (!comparableType.isAssignableFrom(left)) {
-            throw ExprException(
-                "Cannot compare because operands are not Comparable type at $location",
+            throw NonComparableTypeException(
+                "Cannot compare because operands(left=$left, right=$right) are not Comparable type at $location",
             )
         }
         return booleanType
@@ -161,7 +161,7 @@ internal class ExprValidator(private val context: Context) {
 
     private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>): KSType {
         val classDeclaration = context.getClassDeclaration(node.name) {
-            throw ExprException("The class \"${node.name}\" is not found at ${node.location}")
+            throw ClassNotFoundException("The class \"${node.name}\" is not found at ${node.location}")
         }
         val companionObject = classDeclaration.declarations
             .mapNotNull { it as? KSClassDeclaration }
@@ -184,7 +184,7 @@ internal class ExprValidator(private val context: Context) {
             .filter {
                 it.simpleName.asString() == "invoke"
             }.firstOrNull()
-            ?: throw ExprException("The variable \"${node.name}\" does not have a invoke function at ${node.location}.")
+            ?: throw InvokeFunctionNotFoundException("The variable \"${node.name}\" does not have a invoke function at ${node.location}.")
         val argList = when (val args = visit(node.args, paramMap)) {
             is KSTypeList -> args.argList
             else -> if (args == unitType) {
@@ -194,23 +194,23 @@ internal class ExprValidator(private val context: Context) {
             }
         }
         if (functionDeclaration.parameters.size != argList.size) {
-            throw ExprException("The number of arguments is not matched at ${node.location}")
+            throw ArgumentCountMismatchException("The number of arguments is not matched at ${node.location}")
         }
-        return functionDeclaration.returnType?.resolve()
-            ?: throw ExprException("The return type is not found at ${node.location}")
+        return type.arguments.firstOrNull()?.type?.resolve()
+            ?: throw ReturnTypeNotFoundException("The return type is not found at ${node.location}")
     }
 
     private fun getParamType(name: String, location: ExprLocation, paramMap: Map<String, KSType>): KSType {
         referencedParams.add(name)
         return paramMap[name]
-            ?: throw ExprException("The variable \"${name}\" is not found at $location. Available variables are: ${paramMap.keys}.")
+            ?: throw ParameterNotFoundException("The parameter \"${name}\" is not found at $location. Available parameters are: ${paramMap.keys}.")
     }
 
     private fun visitProperty(node: ExprNode.Property, paramMap: Map<String, KSType>): KSType {
         val receiver = visit(node.receiver, paramMap)
         return findProperty(node.name, receiver)
             ?: findExtensionProperty(node.name, receiver)
-            ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location}")
+            ?: throw PropertyNotFoundException("The property \"${node.name}\" is not found at ${node.location}")
     }
 
     private fun findProperty(name: String, receiver: KSType): KSType? {
@@ -244,7 +244,7 @@ internal class ExprValidator(private val context: Context) {
         }
         return findFunction(node.name, receiver, argList)
             ?: findExtensionFunction(node.name, receiver, argList)
-            ?: throw ExprException("The function \"${node.name}\" is not found at ${node.location}")
+            ?: throw FunctionNotFoundException("The function \"${node.name}\" (parameter size is ${argList.size}) is not found at ${node.location}")
     }
 
     private fun findFunction(
@@ -343,4 +343,16 @@ internal class ExprValidator(private val context: Context) {
             throw UnsupportedOperationException()
         }
     }
+
+    class EitherOperandNonBooleanException(message: String) : ExprException(message)
+    class NonBooleanTypeException(message: String) : ExprException(message)
+    class NonSameTypeException(message: String) : ExprException(message)
+    class NonComparableTypeException(message: String) : ExprException(message)
+    class InvokeFunctionNotFoundException(message: String) : ExprException(message)
+    class ArgumentCountMismatchException(message: String) : ExprException(message)
+    class ReturnTypeNotFoundException(message: String) : ExprException(message)
+    class FunctionNotFoundException(message: String) : ExprException(message)
+    class PropertyNotFoundException(message: String) : ExprException(message)
+    class ParameterNotFoundException(message: String) : ExprException(message)
+    class ClassNotFoundException(message: String) : ExprException(message)
 }

@@ -1,0 +1,290 @@
+package org.komapper.processor.command
+
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.Variance
+import com.tschuchort.compiletesting.KotlinCompilation
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.assertThrows
+import org.komapper.processor.AbstractKspTest
+import org.komapper.processor.Config
+import org.komapper.processor.Context
+import org.komapper.processor.ContextFactory
+import org.komapper.processor.getClassDeclaration
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+@Tag("slow")
+class ExprValidatorTest : AbstractKspTest() {
+
+    @Test
+    fun `perform logical operator - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.booleanType)
+            val result = validator.validate("!a", paramMap)
+            assertEquals(resolver.builtIns.booleanType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `perform logical operator - NonBooleanTypeException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.intType)
+            val ex = assertThrows<ExprValidator.NonBooleanTypeException> {
+                validator.validate("!a", paramMap)
+            }
+            println(ex)
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `perform binary logical operator - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf(
+                "a" to resolver.builtIns.booleanType,
+                "b" to resolver.builtIns.booleanType,
+                "c" to resolver.builtIns.booleanType,
+            )
+            val result = validator.validate("(a || b) && c", paramMap)
+            assertEquals(resolver.builtIns.booleanType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `perform binary logical operator - EitherOperandNonBooleanException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf(
+                "a" to resolver.builtIns.booleanType,
+                "b" to resolver.builtIns.booleanType,
+                "c" to resolver.builtIns.stringType,
+            )
+            val ex = assertThrows<ExprValidator.EitherOperandNonBooleanException> {
+                validator.validate("(a || b) && c", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `compare - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.intType)
+            val result = validator.validate("a < 0", paramMap)
+            assertEquals(resolver.builtIns.booleanType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `compare - NonSameTypeException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.intType.makeNullable())
+            val ex = assertThrows<ExprValidator.NonSameTypeException> {
+                validator.validate("1 < a", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `compare - NonComparableTypeException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.intType.makeNullable())
+            val ex = assertThrows<ExprValidator.NonComparableTypeException> {
+                validator.validate("a < a", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `classRef - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = emptyMap<String, KSType>()
+            val result = validator.validate("@kotlin.collections.Iterable@", paramMap)
+            assertEquals(resolver.builtIns.iterableType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `classRef - ClassNotFoundException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = emptyMap<String, KSType>()
+            val ex = assertThrows<ExprValidator.ClassNotFoundException> {
+                validator.validate("@kotlin.collections.Unknown@", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `value - ParameterNotFoundException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = emptyMap<String, KSType>()
+            val ex = assertThrows<ExprValidator.ParameterNotFoundException> {
+                validator.validate("unknown", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `callableValue - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val typeRef = context.resolver.createKSTypeReferenceFromKSType(context.resolver.builtIns.stringType)
+            val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
+            val function0Type = context.getClassDeclaration("kotlin.Function0") { error(it) }.asType(listOf(typeArg))
+            val paramMap = mapOf("a" to function0Type)
+            val result = validator.validate("a()", paramMap)
+            assertEquals(context.resolver.builtIns.stringType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `callableValue - InvokeFunctionNotFoundException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to context.resolver.builtIns.intType)
+            val ex = assertThrows<ExprValidator.InvokeFunctionNotFoundException> {
+                validator.validate("a()", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `callableValue - ArgumentCountMismatchException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val typeRef = context.resolver.createKSTypeReferenceFromKSType(context.resolver.builtIns.stringType)
+            val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
+            val function0Type = context.getClassDeclaration("kotlin.Function0") { error(it) }.asType(listOf(typeArg))
+            val paramMap = mapOf("a" to function0Type)
+            val ex = assertThrows<ExprValidator.ArgumentCountMismatchException> {
+                validator.validate("a(1)", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `property - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.stringType)
+            val result = validator.validate("a.length", paramMap)
+            assertEquals(resolver.builtIns.intType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `property - PropertyNotFoundException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.stringType)
+            val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
+                validator.validate("a.unknown", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `function - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.stringType)
+            val result = validator.validate("a.subSequence(0, 1)", paramMap)
+            val charSequenceType = context.getClassDeclaration("kotlin.CharSequence") { error(it) }.asType(emptyList())
+            assertEquals(charSequenceType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `function - FunctionNotFoundException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to resolver.builtIns.stringType)
+            val ex = assertThrows<ExprValidator.FunctionNotFoundException> {
+                validator.validate("a.subSequence(0)", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+}
