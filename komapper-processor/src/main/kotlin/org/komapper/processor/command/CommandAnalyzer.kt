@@ -49,7 +49,7 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
 
     private fun validateCommand(command: Command) {
         val usedParams = try {
-            SqlValidator(context, command).validate()
+            SqlValidator(context, command.sql, command.paramMap).validate()
         } catch (e: SqlException) {
             report("SQL validation error: ${e.message}", command.annotation)
         }
