@@ -69,7 +69,7 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The expression eval result must be a Boolean"))
+        assertTrue(result.messages.contains("The expression must be a Boolean"))
     }
 
     @Test
@@ -84,7 +84,7 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The expression eval result must be a Boolean"))
+        assertTrue(result.messages.contains("The expression must be a Boolean"))
     }
 
     @Test
@@ -174,7 +174,7 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("Cannot compare because the operands are not the same type"))
+        assertTrue(result.messages.contains("Cannot compare because the operands(left=String, right=Boolean) are not the same type"))
     }
 
     @Test
@@ -190,11 +190,11 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("Cannot compare because operands are not Comparable type"))
+        assertTrue(result.messages.contains("Cannot compare because operands(left=User, right=User) are not Comparable type"))
     }
 
     @Test
-    fun `The variable is not found`() {
+    fun `The parameter is not found`() {
         val result = compile(
             """
             package test
@@ -205,7 +205,7 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The variable \"d\" is not found at <d>:1. Available variables are: [a, b, c]"))
+        assertTrue(result.messages.contains("The parameter \"d\" is not found at <d>:1. Available parameters are: [a, b, c]"))
     }
 
     @Test
@@ -235,6 +235,6 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The function \"unknown\" is not found"))
+        assertTrue(result.messages.contains("The function \"unknown\" (parameter size is 1) is not found"))
     }
 }
