@@ -33,6 +33,10 @@ class SqlReassemblerTest {
                 name = /*^ name */'foo'
             /*%if orderBy != null*/
             /*# orderBy */
+            /*%elseif orderBy == "hoge" */
+            order by hoge
+            /*%elseif orderBy == "foo" */
+            order by foo
             /*%else */
             order by id
             /*%end */
