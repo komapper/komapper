@@ -10,7 +10,7 @@ import org.komapper.core.template.sql.SqlNode
 import org.komapper.processor.Context
 import org.komapper.processor.resolveTypeArgumentsOfAncestor
 
-internal class SqlValidator(context: Context, val command: Command) {
+internal class SqlValidator(context: Context, private val sql: String, private val paramMap: Map<String, KSType>) {
 
     private val intType = context.resolver.builtIns.intType
     private val booleanType = context.resolver.builtIns.booleanType
@@ -20,8 +20,8 @@ internal class SqlValidator(context: Context, val command: Command) {
     private val exprValidator = ExprValidator(context)
 
     fun validate(): Set<String> {
-        val node = nodeFactory.get(command.sql)
-        visit(command.paramMap, node)
+        val node = nodeFactory.get(sql)
+        visit(paramMap, node)
         return exprValidator.usedParams
     }
 
@@ -57,7 +57,7 @@ internal class SqlValidator(context: Context, val command: Command) {
             when (node.node) {
                 is SqlNode.Paren -> {
                     if (!iterableType.isAssignableFrom(evalResult.type)) {
-                        throw SqlException("The expression must be Iterable at ${evalResult.location} at ${node.location}")
+                        throw ExprMustBeIterableException("The expression must be Iterable at ${evalResult.location} at ${node.location}")
                     }
                 }
 
@@ -79,14 +79,14 @@ internal class SqlValidator(context: Context, val command: Command) {
         is SqlNode.IfBlock -> {
             val ifEvalResult = validateExpression(node.ifDirective.location, node.ifDirective.expression, paramMap)
             if (ifEvalResult.type != booleanType) {
-                throw SqlException("The expression eval result must be a Boolean at ${ifEvalResult.location} at ${node.ifDirective.location}.")
+                throw ExprMustBeBooleanException("The expression must be a Boolean at ${ifEvalResult.location} at ${node.ifDirective.location}.")
             }
             val ifParamMap = node.ifDirective.nodeList.fold(paramMap, ::visit)
 
             val elseifParamMap = node.elseifDirectives.fold(ifParamMap) { map, elseifDirective ->
                 val elseifEvalResult = validateExpression(elseifDirective.location, elseifDirective.expression, map)
                 if (elseifEvalResult.type != booleanType) {
-                    throw SqlException("The expression eval result must be a Boolean at ${elseifEvalResult.location} at ${elseifDirective.location}.")
+                    throw ExprMustBeBooleanException("The expression must be a Boolean at ${elseifEvalResult.location} at ${elseifDirective.location}.")
                 }
                 elseifDirective.nodeList.fold(map, ::visit)
             }
@@ -102,14 +102,14 @@ internal class SqlValidator(context: Context, val command: Command) {
 
             val typeArgs = resolveTypeArgumentsOfAncestor(evalResult.type, iterableType)
             if (typeArgs.isEmpty()) {
-                throw SqlException("The expression must be Iterable at ${evalResult.location} at ${forDirective.location}.")
+                throw ExprMustBeIterableException("The expression must be Iterable at ${evalResult.location} at ${forDirective.location}.")
             }
             val typeArg = typeArgs.first()
             if (typeArg.variance == Variance.STAR) {
-                throw SqlException("Specifying a star projection for Iterable is not supported at ${evalResult.location} at ${forDirective.location}.")
+                throw StarProjectionNotSupportedException("Specifying a star projection for Iterable is not supported at ${evalResult.location} at ${forDirective.location}.")
             }
             val type = typeArg.type?.resolve()
-                ?: throw SqlException("Cannot resolve type argument of Iterable at ${evalResult.location} at ${forDirective.location}.")
+                ?: throw CannotResolveTypeArgumentException("Cannot resolve type argument of Iterable at ${evalResult.location} at ${forDirective.location}.")
             val newParamMap = paramMap + mapOf(
                 id to type,
                 id + "_index" to intType,
@@ -134,4 +134,9 @@ internal class SqlValidator(context: Context, val command: Command) {
             throw SqlException("The expression evaluation was failed. ${e.message} at $location. ", e)
         }
     }
+
+    class ExprMustBeIterableException(message: String) : SqlException(message)
+    class ExprMustBeBooleanException(message: String) : SqlException(message)
+    class StarProjectionNotSupportedException(message: String) : SqlException(message)
+    class CannotResolveTypeArgumentException(message: String) : SqlException(message)
 }

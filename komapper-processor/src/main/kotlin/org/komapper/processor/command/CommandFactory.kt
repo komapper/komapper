@@ -1,8 +1,11 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
@@ -40,13 +43,7 @@ internal class CommandFactory(
     fun create(): Command {
         val classDeclaration = symbol as? KSClassDeclaration
             ?: report("The annotated element is not a class.", symbol)
-        when (classDeclaration.classKind) {
-            ClassKind.CLASS -> Unit
-            else -> report("The annotated element must be a class.", symbol)
-        }
-        if (classDeclaration.typeParameters.isNotEmpty()) {
-            report("The class with type parameters is not supported.", symbol)
-        }
+        validateCommandClass(classDeclaration, symbol)
         val properties = classDeclaration.getAllProperties()
             .filterNot { Modifier.PRIVATE in it.modifiers }
             .toList()
@@ -81,6 +78,29 @@ internal class CommandFactory(
             packageName = packageName,
             fileName = fileName,
         )
+    }
+
+    private fun validateCommandClass(classDeclaration: KSClassDeclaration, recipient: KSNode) {
+        if (classDeclaration.classKind != ClassKind.CLASS) {
+            report("The annotated element must be a class.", recipient)
+        }
+        if (classDeclaration.typeParameters.isNotEmpty()) {
+            report("The class \"${classDeclaration.simpleName.asString()}\" must not have type parameters.", recipient)
+        }
+        if (classDeclaration.isPrivate()) {
+            report("The class \"${classDeclaration.simpleName.asString()}\" must not be private.", recipient)
+        }
+        validateEnclosingDeclaration(classDeclaration, classDeclaration.parentDeclaration, recipient)
+    }
+
+    private fun validateEnclosingDeclaration(enclosed: KSDeclaration, enclosing: KSDeclaration?, recipient: KSNode) {
+        if (enclosing == null) return
+        if (enclosing.isPrivate()) {
+            val enclosingName = enclosing.simpleName.asString()
+            val enclosedName = enclosed.simpleName.asString()
+            report("The enclosing declaration \"$enclosingName\" of the class \"$enclosedName\" must not be private.", recipient)
+        }
+        validateEnclosingDeclaration(enclosed, enclosing.parentDeclaration, recipient)
     }
 
     private fun buildSqlPartialMap(classDeclaration: KSClassDeclaration): Map<String, String> {
