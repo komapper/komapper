@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
 
     @Test
-    fun `The class with type parameters is not supported`() {
+    fun `The class must not have type parameters`() {
         val result = compile(
             """
             package test
@@ -22,7 +22,7 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The class with type parameters is not supported."))
+        assertTrue(result.messages.contains("The class \"Execute\" must not have type parameters."))
     }
 
     @Test
@@ -236,5 +236,37 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The function \"unknown\" (parameter size is 1) is not found"))
+    }
+
+    @Test
+    fun `The class must not be private`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            import org.komapper.core.*
+            @KomapperCommand("/* a */'' /* b */''")
+            private class Execute(val a: String, val b: Int): Exec()
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The class \"Execute\" must not be private."))
+    }
+
+    @Test
+    fun `The enclosing declaration must not be private`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            import org.komapper.core.*
+            private class MyClass {
+                @KomapperCommand("/* a */'' /* b */''")
+                class Execute(val a: String, val b: Int): Exec()
+            }
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The enclosing declaration \"MyClass\" of the class \"Execute\" must not be private."))
     }
 }
