@@ -1,5 +1,7 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.symbol.ClassKind
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Variance
 import com.tschuchort.compiletesting.KotlinCompilation
@@ -249,6 +251,116 @@ class ExprValidatorTest : AbstractKspTest() {
             val paramMap = mapOf("a" to resolver.builtIns.stringType)
             val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
                 validator.validate("a.unknown", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Enum property - success`() {
+        val result = compile(
+            """
+            package test
+            enum class MyEnum(val value: String) {
+                A("a"), B("b"), C("c")
+            }
+            class MyClass {
+                val myEnum = MyEnum.A
+            }
+            """.trimIndent(),
+        ) { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val decl = context.getClassDeclaration("test.MyClass") { error(it) }
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to decl.asType(emptyList()))
+            val result = validator.validate("a.myEnum.value", paramMap)
+            assertEquals(resolver.builtIns.stringType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Enum property - PropertyNotFoundException`() {
+        val result = compile(
+            """
+            package test
+            enum class MyEnum(val value: String) {
+                A("a"), B("b"), C("c")
+            }
+            class MyClass {
+                val myEnum = MyEnum.A
+            }
+            """.trimIndent(),
+        ) { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val decl = context.getClassDeclaration("test.MyClass") { error(it) }
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to decl.asType(emptyList()))
+            val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
+                validator.validate("a.myEnum.unknown", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Enum entry - success`() {
+        val result = compile(
+            """
+            package test
+            enum class MyEnum(val value: String) {
+                A("a"), B("b"), C("c")
+            }
+            class MyClass {
+                val myEnum = MyEnum.A
+            }
+            """.trimIndent(),
+        ) { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val classDecl = context.getClassDeclaration("test.MyClass") { error(it) }
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to classDecl.asType(emptyList()))
+            val result = validator.validate("a.myEnum.C", paramMap)
+            val enumDecl = context.getClassDeclaration("test.MyEnum") { error(it) }
+            val enumEntryType = enumDecl.declarations
+                .filterIsInstance<KSClassDeclaration>()
+                .filter { it.classKind == ClassKind.ENUM_ENTRY }
+                .filter { it.simpleName.asString() == "C" }
+                .single().asType(emptyList())
+            assertEquals(enumEntryType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Enum entry - PropertyNotFoundException`() {
+        val result = compile(
+            """
+            package test
+            enum class MyEnum(val value: String) {
+                A("a"), B("b"), C("c")
+            }
+            class MyClass {
+                val myEnum = MyEnum.A
+            }
+            """.trimIndent(),
+        ) { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val classDecl = context.getClassDeclaration("test.MyClass") { error(it) }
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to classDecl.asType(emptyList()))
+            val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
+                validator.validate("a.myEnum.D", paramMap)
             }
             println(ex)
 
