@@ -216,13 +216,18 @@ internal class ExprValidator(private val context: Context) {
     private fun findProperty(name: String, receiver: KSType): KSType? {
         val receiverDeclaration = receiver.declaration as? KSClassDeclaration
             ?: throw ExprException("The receiver type is not a class: ${receiver.declaration}")
-        return if (receiverDeclaration.classKind == ClassKind.ENUM_CLASS) {
-            val entryDeclaration = receiverDeclaration.declarations.firstOrNull { it.simpleName.asString() == name }
-            (entryDeclaration as? KSClassDeclaration)?.asType(emptyList())
-        } else {
-            receiverDeclaration.getAllProperties()
-                .firstOrNull { it.simpleName.asString() == name }?.type?.resolve()
-        }
+        val propertyType = receiverDeclaration.getAllProperties()
+            .firstOrNull { it.simpleName.asString() == name }?.type?.resolve()
+        return propertyType
+            ?: if (receiverDeclaration.classKind == ClassKind.ENUM_CLASS) {
+                receiverDeclaration.declarations
+                    .filterIsInstance<KSClassDeclaration>()
+                    .filter { it.classKind == ClassKind.ENUM_ENTRY }
+                    .firstOrNull { it.simpleName.asString() == name }
+                    ?.asType(emptyList())
+            } else {
+                null
+            }
     }
 
     private fun findExtensionProperty(name: String, receiver: KSType): KSType? {
