@@ -9,7 +9,6 @@ import org.komapper.processor.BackquotedSymbols.ConcurrentHashMap
 import org.komapper.processor.BackquotedSymbols.EmbeddableMetamodel
 import org.komapper.processor.BackquotedSymbols.EmbeddedMetamodel
 import org.komapper.processor.BackquotedSymbols.EntityDescriptor
-import org.komapper.processor.BackquotedSymbols.EntityMetamodel
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelDeclaration
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelFactory
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelFactorySpi
@@ -39,6 +38,7 @@ import org.komapper.processor.BackquotedSymbols.UUID
 import org.komapper.processor.BackquotedSymbols.typeOf
 import org.komapper.processor.Context
 import org.komapper.processor.EnumStrategy
+import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.checkMetamodelVersion
