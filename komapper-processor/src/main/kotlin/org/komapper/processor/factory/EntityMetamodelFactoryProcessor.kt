@@ -19,7 +19,12 @@ internal class EntityMetamodelFactoryProcessor(
     private val fileMap: MutableMap<String, KSFile> = mutableMapOf()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        environment.logger.warn("Running org.komapper.processor.factory.EntityMetamodelFactoryProcessor")
+
         val symbols = resolver.getSymbolsWithAnnotation(EntityMetamodelFactory)
+        
+        environment.logger.warn("Symbols: ${symbols.toList()}")
+        
         val declarations = symbols.map { it as? KSClassDeclaration }.filterNotNull().toList()
         declarations
             .map { it.qualifiedName to it.containingFile }
