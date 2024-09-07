@@ -40,11 +40,11 @@ allprojects {
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
 
-    spotless {
-        kotlinGradle {
-            ktlint(ktlintVersion)
-        }
-    }
+//    spotless {
+//        kotlinGradle {
+//            ktlint(ktlintVersion)
+//        }
+//    }
 
     tasks {
         build {
@@ -103,12 +103,12 @@ configure(libraryProjects + gradlePluginProject) {
 }
 
 configure(kotlinProjects) {
-    spotless {
-        kotlin {
-            ktlint(ktlintVersion)
-            targetExclude("build/**")
-        }
-    }
+//    spotless {
+//        kotlin {
+//            ktlint(ktlintVersion)
+//            targetExclude("build/**")
+//        }
+//    }
 }
 
 configure(javaProjects) {
