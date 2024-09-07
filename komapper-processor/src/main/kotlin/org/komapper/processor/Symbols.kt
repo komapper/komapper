@@ -2,6 +2,7 @@ package org.komapper.processor
 
 internal object Symbols {
     // types
+    const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
     const val EntityMetamodelDeclaration = "org.komapper.core.dsl.metamodel.EntityMetamodelDeclaration"
     const val EntityMetamodelFactory = "org.komapper.core.dsl.metamodel.EntityMetamodelFactory"
     const val EntityMetamodelFactorySpi = "org.komapper.core.spi.EntityMetamodelFactory"
@@ -36,7 +37,6 @@ internal object BackquotedSymbols {
     const val EmbeddableMetamodel = "`org.komapper.core.dsl.metamodel`.EmbeddableMetamodel"
     const val EmbeddedMetamodel = "`org.komapper.core.dsl.metamodel`.EmbeddedMetamodel"
     const val EntityDescriptor = "__EntityDescriptor"
-    const val EntityMetamodel = "`org.komapper.core.dsl.metamodel`.EntityMetamodel"
     const val EntityMetamodelDeclaration = "`org.komapper.core.dsl.metamodel`.EntityMetamodelDeclaration"
     const val EntityMetamodelFactory = "`org.komapper.core.dsl.metamodel`.EntityMetamodelFactory"
     const val EntityMetamodelFactorySpi = "`org.komapper.core.spi`.EntityMetamodelFactory"
