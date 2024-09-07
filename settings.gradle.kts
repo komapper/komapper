@@ -101,3 +101,5 @@ include("example-starter-r2dbc")
 include("integration-test-core")
 include("integration-test-jdbc")
 include("integration-test-r2dbc")
+
+include("test-ksp-2.0.20-1.0.25")
