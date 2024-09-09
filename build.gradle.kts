@@ -78,7 +78,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
                     .toTypedArray()
                 excludeTags(*tags)
             }
-            jvmArgs("-Xmx2g")
+            jvmArgs("-Xmx4g")
         }
 
         withType<JavaCompile>().configureEach {

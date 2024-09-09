@@ -6,12 +6,10 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
-import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.symbol.Variance
-import org.komapper.annotation.KomapperPartial
 import org.komapper.annotation.KomapperUnused
 import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
@@ -62,7 +60,6 @@ internal class CommandFactory(
             "${classDeclaration.qualifiedName?.asString()} must extend one of the following classes: One, Many, Exec, ExecReturnOne, or ExecReturnMany.",
             symbol,
         )
-        val sqlPartialMap = buildSqlPartialMap(classDeclaration)
         val (packageName, fileName) = createFileName(context, classDeclaration)
         return Command(
             kind = kind,
@@ -74,7 +71,6 @@ internal class CommandFactory(
             paramMap = paramMap,
             unusedParams = unusedParams,
             returnType = returnType,
-            sqlPartialMap = sqlPartialMap,
             packageName = packageName,
             fileName = fileName,
         )
@@ -101,21 +97,6 @@ internal class CommandFactory(
             report("The enclosing declaration \"$enclosingName\" of the class \"$enclosedName\" must not be private.", recipient)
         }
         validateEnclosingDeclaration(enclosed, enclosing.parentDeclaration, recipient)
-    }
-
-    private fun buildSqlPartialMap(classDeclaration: KSClassDeclaration): Map<String, String> {
-        val file = classDeclaration.containingFile ?: return emptyMap()
-        return file.declarations
-            .mapNotNull { it as? KSPropertyDeclaration }
-            .filter { Modifier.CONST in it.modifiers }
-            .map {
-                val value = it.findAnnotation(KomapperPartial::class)
-                    ?.findValue("sql")
-                    ?.toString()
-                    ?.trimIndent() ?: ""
-                it.simpleName.asString() to value
-            }
-            .toMap()
     }
 
     private fun findKindAndReturnType(classDeclaration: KSClassDeclaration): Pair<CommandKind, KSType>? {

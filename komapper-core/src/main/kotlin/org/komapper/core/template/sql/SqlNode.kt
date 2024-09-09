@@ -108,6 +108,13 @@ sealed class SqlNode {
         override fun toText(): String = forDirective.toText() + endDirective.toText()
     }
 
+    data class WithBlock(
+        val withDirective: WithDirective,
+        val endDirective: EndDirective,
+    ) : SqlNode() {
+        override fun toText(): String = withDirective.toText() + endDirective.toText()
+    }
+
     data class IfDirective(
         val location: Loc,
         val token: String,
@@ -138,6 +145,15 @@ sealed class SqlNode {
         val location: Loc,
         val token: String,
         val identifier: String,
+        val expression: String,
+        val nodeList: List<SqlNode>,
+    ) : SqlNode() {
+        override fun toText(): String = token + nodeList.toText()
+    }
+
+    data class WithDirective(
+        val location: Loc,
+        val token: String,
         val expression: String,
         val nodeList: List<SqlNode>,
     ) : SqlNode() {

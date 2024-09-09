@@ -1,18 +1,27 @@
-package org.komapper.core.template.sql
+package org.komapper.processor.command
+
+import com.google.devtools.ksp.symbol.KSType
+import org.komapper.annotation.KomapperPartial
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.sql.NoCacheSqlNodeFactory
+import org.komapper.core.template.sql.SqlException
+import org.komapper.core.template.sql.SqlLocation
+import org.komapper.core.template.sql.SqlNode
+import org.komapper.processor.Context
+import org.komapper.processor.findAnnotation
+import org.komapper.processor.findValue
 
 /**
  * A class responsible for reassembling SQL template from partial SQL fragments.
  *
  * @property sql the initial SQL template
- * @property sqlPartialMap a map containing SQL partials identified by their names
+ * @property paramMap the parameter map
  */
-class SqlReassembler(private val sql: String, private val sqlPartialMap: Map<String, String>) {
+internal class SqlReassembler(context: Context, private val sql: String, private val paramMap: Map<String, KSType>) {
 
     private val nodeFactory = NoCacheSqlNodeFactory()
+    private val exprValidator = ExprValidator(context)
 
-    /**
-     * @throws SqlPartialNotFoundException if the sql partial is not found.
-     */
     fun assemble(): String {
         val node = nodeFactory.get(sql)
         val buf = StringBuilder(sql.length + 100)
@@ -72,8 +81,12 @@ class SqlReassembler(private val sql: String, private val sqlPartialMap: Map<Str
 
         is SqlNode.PartialDirective -> {
             val expression = node.expression
-            val partial = sqlPartialMap[expression] ?: throw SqlPartialNotFoundException(expression)
-            buf.append(partial)
+            val evalResult = validateExpression(node.location, expression, paramMap)
+            val partial = evalResult.type.declaration.findAnnotation(KomapperPartial::class)
+                ?: throw SqlPartialAnnotationNotFoundException("The declaration of expression \"$expression\" must be annotated with @KomapperPartial at ${node.location}")
+            val sql = partial.findValue("sql")?.toString()
+                ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperCommand is not found at ${node.location}")
+            buf.append("/*%if $expression != null *//*%with $expression */$sql/*%end *//*%end */")
         }
 
         is SqlNode.LiteralValueDirective -> {
@@ -111,18 +124,33 @@ class SqlReassembler(private val sql: String, private val sqlPartialMap: Map<Str
             }
         }
 
+        is SqlNode.WithBlock -> {
+            val withDirective = node.withDirective
+            buf.append(withDirective.token).let {
+                withDirective.nodeList.fold(it, ::visit)
+            }.let {
+                it.append(node.endDirective.token)
+            }
+        }
+
         is SqlNode.IfDirective,
         is SqlNode.ElseifDirective,
         is SqlNode.ElseDirective,
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
+        is SqlNode.WithDirective,
         -> error("unreachable")
     }
 
-    /**
-     * Thrown to indicate that the sql partial is not found.
-     *
-     * @property name the partial name
-     */
-    class SqlPartialNotFoundException(val name: String) : SqlException("The sql partial \"$name\" is not found.")
+    private fun validateExpression(location: SqlLocation, expression: String, paramMap: Map<String, KSType>): ExprEvalResult {
+        return try {
+            exprValidator.validate(expression, paramMap)
+        } catch (e: ExprException) {
+            throw SqlPartialEvaluationException("The expression evaluation was failed. ${e.message} at $location. ", e)
+        }
+    }
+
+    class SqlPartialEvaluationException(message: String, cause: Throwable) : SqlException(message, cause)
+    class SqlPartialAnnotationNotFoundException(message: String) : SqlException(message)
+    class SqlPartialAnnotationElementNotFoundException(message: String) : SqlException(message)
 }

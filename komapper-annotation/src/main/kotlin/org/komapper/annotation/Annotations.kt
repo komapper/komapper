@@ -3,6 +3,7 @@
 package org.komapper.annotation
 
 import org.intellij.lang.annotations.Language
+import org.komapper.annotation.KomapperCommand.Companion.DISABLE_VALIDATION
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import kotlin.reflect.KClass
@@ -300,12 +301,18 @@ annotation class KomapperCommand(
  * Indicates that the annotated property is a partial SQL fragment.
  *
  * @property sql the SQL fragment
+ * @property disableValidation if `true`, SQL validation at compile time will be disabled
  */
-@Target(AnnotationTarget.PROPERTY)
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperPartial(
     @Language("sql") val sql: String,
-)
+    val disableValidation: Boolean = DISABLE_VALIDATION,
+) {
+    companion object {
+        const val DISABLE_VALIDATION: Boolean = false
+    }
+}
 
 /**
  * Indicates that the annotated property is not used within [KomapperCommand.sql].

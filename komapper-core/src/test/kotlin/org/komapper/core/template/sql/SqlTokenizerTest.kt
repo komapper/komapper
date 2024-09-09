@@ -29,6 +29,7 @@ import org.komapper.core.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
 import org.komapper.core.template.sql.SqlTokenType.SPACE
 import org.komapper.core.template.sql.SqlTokenType.UNION
 import org.komapper.core.template.sql.SqlTokenType.WHERE
+import org.komapper.core.template.sql.SqlTokenType.WITH_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.WORD
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -478,6 +479,21 @@ class SqlTokenizerTest {
         assertEquals(" ", tokenizer.token)
         assertEquals(FOR_DIRECTIVE, tokenizer.next())
         assertEquals("/*%for element : list*/", tokenizer.token)
+        assertEquals(WORD, tokenizer.next())
+        assertEquals("bbb", tokenizer.token)
+        assertEquals(EOF, tokenizer.next())
+        assertEquals("", tokenizer.token)
+    }
+
+    @Test
+    fun testWithBlockComment() {
+        val tokenizer = SqlTokenizer("where /*%with element */bbb")
+        assertEquals(WHERE, tokenizer.next())
+        assertEquals("where", tokenizer.token)
+        assertEquals(SPACE, tokenizer.next())
+        assertEquals(" ", tokenizer.token)
+        assertEquals(WITH_DIRECTIVE, tokenizer.next())
+        assertEquals("/*%with element */", tokenizer.token)
         assertEquals(WORD, tokenizer.next())
         assertEquals("bbb", tokenizer.token)
         assertEquals(EOF, tokenizer.next())

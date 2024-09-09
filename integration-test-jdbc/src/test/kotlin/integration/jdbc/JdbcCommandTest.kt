@@ -33,12 +33,10 @@ import kotlin.test.assertTrue
 
 @KomapperPartial(
     """
-    /*%if pagination != null */
-    limit /* pagination.limit */0 offset /*pagination.offset*/0
-    /*%end*/
+    limit /* limit */0 offset /* offset */0
     """,
 )
-private const val paginationPartial = ""
+data class Pagination(val limit: Int, val offset: Int)
 
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
@@ -701,12 +699,10 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals("hi world!", address.street)
     }
 
-    data class Pagination(val limit: Int, val offset: Int)
-
     @KomapperCommand(
         """
         select * from address order by address_id
-        /*> paginationPartial */
+        /*> pagination */
         """,
     )
     class UsePartial(val pagination: Pagination?) : Many<Address>({ selectAsAddress() })

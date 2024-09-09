@@ -3,7 +3,6 @@ package org.komapper.processor.command
 import com.google.devtools.ksp.symbol.KSAnnotated
 import org.komapper.core.ThreadSafe
 import org.komapper.core.template.sql.SqlException
-import org.komapper.core.template.sql.SqlReassembler
 import org.komapper.processor.Context
 import org.komapper.processor.Exit
 import org.komapper.processor.report
@@ -15,11 +14,7 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
     fun analyze(symbol: KSAnnotated): CommandAnalysisResult {
         val command = try {
             CommandFactory(context, annotationClass, symbol).create().let {
-                if (it.sqlPartialMap.isNotEmpty()) {
-                    reassembleSql(it)
-                } else {
-                    it
-                }
+                reassembleSql(it)
             }
         } catch (e: Exit) {
             return CommandAnalysisResult.Error(e)
@@ -37,12 +32,9 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
     private fun reassembleSql(command: Command): Command {
         val sql =
             try {
-                SqlReassembler(command.sql, command.sqlPartialMap).assemble()
-            } catch (e: SqlReassembler.SqlPartialNotFoundException) {
-                val message = "SQL reassembly error: The const \"${e.name}\" is not found " +
-                    "in the file \"${command.classDeclaration.containingFile?.fileName}\". " +
-                    "The const must be annotated with @KomapperPartial."
-                report(message, command.annotation)
+                SqlReassembler(context, command.sql, command.paramMap).assemble()
+            } catch (e: SqlException) {
+                report("SQL reassembly error: ${e.message}", command.annotation)
             }
         return command.copy(sql = sql)
     }

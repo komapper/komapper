@@ -1,6 +1,7 @@
 package org.komapper.template
 
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.assertThrows
 import org.komapper.core.BuilderDialect
 import org.komapper.core.DryRunDataOperator
 import org.komapper.core.DryRunDialect
@@ -285,6 +286,51 @@ class TwoWayTemplateStatementBuilderTest {
             assertEquals("Item2", statement.args[3].any)
             assertEquals(3, statement.args[4].any)
             assertEquals("Item3", statement.args[5].any)
+        }
+    }
+
+    @Nested
+    inner class WithBlockTest {
+        @Test
+        fun test() {
+            val template =
+                "select name, age from person where /*%with item*/name = /*description*/'' and age = /*a.b.c*/0 and weight = /*weight*/0/*%end*/ and location = /*description*/''"
+            val statement =
+                statementBuilder.build(
+                    template,
+                    mapOf(
+                        "item" to Value(Item(Product1(Product2(1)), "Item1"), typeOf<Item>()),
+                        "description" to Value("Hello", typeOf<String>()),
+                        "weight" to Value(58, typeOf<Int>()),
+                    ),
+                    extensions,
+                )
+            assertEquals("select name, age from person where name = ? and age = ? and weight = ? and location = ?", statement.toSql())
+            assertEquals(
+                listOf(
+                    Value("Item1", typeOf<String>()),
+                    Value(1, typeOf<Int>()),
+                    Value(58, typeOf<Int>()),
+                    Value("Hello", typeOf<String>()),
+                ),
+                statement.args,
+            )
+        }
+
+        @Test
+        fun test_null() {
+            val template =
+                "select name, age from person where /*%with item*/name = /*description*/'' and age = /*a.b.c*/0/*%end*/"
+            val e = assertThrows<SqlException> {
+                statementBuilder.build(
+                    template,
+                    mapOf(
+                        "item" to Value(null, typeOf<Item>()),
+                    ),
+                    extensions,
+                )
+            }
+            println(e)
         }
     }
 

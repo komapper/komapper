@@ -1,5 +1,7 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.isPublic
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Variance
 import org.komapper.core.template.expression.ExprException
@@ -118,12 +120,29 @@ internal class SqlValidator(context: Context, private val sql: String, private v
             forDirective.nodeList.fold(newParamMap, ::visit)
         }
 
+        is SqlNode.WithBlock -> {
+            val withDirective = node.withDirective
+            val expression = withDirective.expression
+            val evalResult = validateExpression(withDirective.location, expression, paramMap)
+            val classDeclaration = evalResult.type.declaration as? KSClassDeclaration
+                ?: error("The expression must be a class at ${evalResult.location}.")
+            val propertyMap = classDeclaration.getAllProperties()
+                .filter { it.isPublic() }
+                .associate { it.simpleName.asString() to it.type.resolve() }
+            val newParamMap = paramMap + propertyMap
+            withDirective.nodeList.fold(newParamMap, ::visit)
+        }
+
+        is SqlNode.PartialDirective -> {
+            throw PartialDirectiveNotSupportedException("The partial directive \"${node.token}\" is not supported at ${node.location}.")
+        }
+
         is SqlNode.IfDirective,
         is SqlNode.ElseifDirective,
         is SqlNode.ElseDirective,
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
-        is SqlNode.PartialDirective,
+        is SqlNode.WithDirective,
         -> error("unreachable")
     }
 
@@ -139,4 +158,5 @@ internal class SqlValidator(context: Context, private val sql: String, private v
     class ExprMustBeBooleanException(message: String) : SqlException(message)
     class StarProjectionNotSupportedException(message: String) : SqlException(message)
     class CannotResolveTypeArgumentException(message: String) : SqlException(message)
+    class PartialDirectiveNotSupportedException(message: String) : SqlException(message)
 }

@@ -16,6 +16,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.typeOf
@@ -67,18 +68,22 @@ internal class TwoWayTemplateStatementBuilder(
             }
             state
         }
+
         is SqlNode.Clause.Select -> {
             state.append(node.keyword)
             node.nodeList.fold(state, ::visit)
         }
+
         is SqlNode.Clause.From -> {
             state.append(node.keyword)
             node.nodeList.fold(state, ::visit)
         }
+
         is SqlNode.Clause.ForUpdate -> {
             state.append(node.keyword)
             node.nodeList.fold(state, ::visit)
         }
+
         is SqlNode.Clause -> {
             val childState = node.nodeList.fold(State(state.asExprContext()), ::visit)
             if (childState.available) {
@@ -89,12 +94,14 @@ internal class TwoWayTemplateStatementBuilder(
             }
             state
         }
+
         is SqlNode.BiLogicalOp -> {
             if (state.available) {
                 state.append(node.keyword)
             }
             node.nodeList.fold(state, ::visit)
         }
+
         is SqlNode.Token -> {
             if (node is SqlNode.Token.Word || node is SqlNode.Token.Other) {
                 state.available = true
@@ -105,11 +112,13 @@ internal class TwoWayTemplateStatementBuilder(
                 state.append(node.token)
             }
         }
+
         is SqlNode.Paren -> {
             state.available = true
             state.append("(")
             visit(state, node.node).append(")")
         }
+
         is SqlNode.BindValueDirective -> {
             val result = eval(node.location, node.expression, state.asExprContext())
             when (val obj = result.any) {
@@ -128,6 +137,7 @@ internal class TwoWayTemplateStatementBuilder(
                                     .bind(newValue(f)).append(", ")
                                     .bind(newValue(s)).append(")")
                             }
+
                             is Triple<*, *, *> -> {
                                 if (!dialect.supportsMultipleColumnsInInPredicate()) {
                                     throw UnsupportedOperationException("Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate.")
@@ -138,6 +148,7 @@ internal class TwoWayTemplateStatementBuilder(
                                     .bind(newValue(s)).append(", ")
                                     .bind(newValue(t)).append(")")
                             }
+
                             else -> state.bind(newValue(o))
                         }
                     }
@@ -146,6 +157,7 @@ internal class TwoWayTemplateStatementBuilder(
                     }
                     state.append(")")
                 }
+
                 else -> {
                     val value = rebuildValue(result)
                     state.bind(value)
@@ -153,6 +165,7 @@ internal class TwoWayTemplateStatementBuilder(
             }
             node.nodeList.fold(state, ::visit)
         }
+
         is SqlNode.EmbeddedValueDirective -> {
             val (obj) = eval(node.location, node.expression, state.asExprContext())
             val s = obj?.toString()
@@ -162,15 +175,18 @@ internal class TwoWayTemplateStatementBuilder(
             }
             state
         }
+
         is SqlNode.PartialDirective -> {
             error("PartialDirective \"${node.token}\" is not supported in this builder. Use @KomapperCommand.")
         }
+
         is SqlNode.LiteralValueDirective -> {
             val (obj, type) = eval(node.location, node.expression, state.asExprContext())
             val literal = dialect.formatValue(obj, type, false)
             state.append(literal)
             node.nodeList.fold(state, ::visit)
         }
+
         is SqlNode.IfBlock -> {
             fun chooseNodeList(): List<SqlNode> {
                 val (result) = eval(node.ifDirective.location, node.ifDirective.expression, state.asExprContext())
@@ -198,6 +214,7 @@ internal class TwoWayTemplateStatementBuilder(
             val nodeList = chooseNodeList()
             nodeList.fold(state, ::visit)
         }
+
         is SqlNode.ForBlock -> {
             val forDirective = node.forDirective
             val id = forDirective.identifier
@@ -224,11 +241,31 @@ internal class TwoWayTemplateStatementBuilder(
             s.valueMap.remove(idHasNext)
             s
         }
+
+        is SqlNode.WithBlock -> {
+            val withDirective = node.withDirective
+            val (receiver, type) = eval(withDirective.location, withDirective.expression, state.asExprContext())
+            if (receiver == null) {
+                throw SqlException("The expression \"${withDirective.expression}\" is null at ${withDirective.location}")
+            }
+            val klass = type.classifier as KClass<*>
+            val preserved = HashMap(state.valueMap)
+            for (property in klass.memberProperties) {
+                val v = property.call(receiver)
+                state.valueMap[property.name] = Value(v, property.returnType)
+            }
+            withDirective.nodeList.fold(state, ::visit)
+            state.valueMap.clear()
+            state.valueMap.putAll(preserved)
+            state
+        }
+
         is SqlNode.IfDirective,
         is SqlNode.ElseifDirective,
         is SqlNode.ElseDirective,
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
+        is SqlNode.WithDirective,
         -> error("unreachable")
     }
 
