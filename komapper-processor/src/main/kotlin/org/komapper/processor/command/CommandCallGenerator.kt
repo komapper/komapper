@@ -49,7 +49,7 @@ internal class CommandCallGenerator(
             ""
         }
         w.println("public fun $QueryDsl.`${command.functionName}`(command: $parameterTypeName) : $returnTypeName {")
-        w.println("    val sql = \"\"\"${command.sql}\"\"\".trimIndent()")
+        w.println("    val sql = \"\"\"${command.sql.replace("$", "\${'$'}") }\"\"\".trimIndent()")
         w.println("    val binding = $templateCall$returningCall$bindCalls")
         w.println("    return with(command) {")
         w.println("        binding.execute()")

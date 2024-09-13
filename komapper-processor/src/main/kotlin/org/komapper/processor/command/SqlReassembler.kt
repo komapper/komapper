@@ -1,6 +1,8 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.Modifier
 import org.komapper.annotation.KomapperPartial
 import org.komapper.core.template.expression.ExprException
 import org.komapper.core.template.sql.NoCacheSqlNodeFactory
@@ -82,11 +84,19 @@ internal class SqlReassembler(context: Context, private val sql: String, private
         is SqlNode.PartialDirective -> {
             val expression = node.expression
             val evalResult = validateExpression(node.location, expression, paramMap)
-            val partial = evalResult.type.declaration.findAnnotation(KomapperPartial::class)
-                ?: throw SqlPartialAnnotationNotFoundException("The declaration of expression \"$expression\" must be annotated with @KomapperPartial at ${node.location}")
-            val sql = partial.findValue("sql")?.toString()
-                ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperCommand is not found at ${node.location}")
-            buf.append("/*%if $expression != null *//*%with $expression */$sql/*%end *//*%end */")
+            val classDeclaration = evalResult.type.declaration as? KSClassDeclaration
+                ?: throw SqlException("The declaration of expression \"$expression\" must be a class at ${node.location}")
+            if (classDeclaration.modifiers.contains(Modifier.SEALED)) {
+                buf.append("/*%if $expression != null */")
+                processSealedSubclasses(buf, node, classDeclaration)
+                buf.append("/*%end */")
+            } else {
+                val partial = classDeclaration.findAnnotation(KomapperPartial::class)
+                    ?: throw SqlPartialAnnotationNotFoundException("The declaration of expression \"$expression\" must be annotated with @KomapperPartial at ${node.location}")
+                val sql = partial.findValue("sql")?.toString()
+                    ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
+                buf.append("/*%if $expression != null *//*%with $expression */$sql/*%end *//*%end */")
+            }
         }
 
         is SqlNode.LiteralValueDirective -> {
@@ -140,6 +150,26 @@ internal class SqlReassembler(context: Context, private val sql: String, private
         is SqlNode.ForDirective,
         is SqlNode.WithDirective,
         -> error("unreachable")
+    }
+
+    private fun processSealedSubclasses(buf: StringBuilder, node: SqlNode.PartialDirective, classDeclaration: KSClassDeclaration) {
+        for (subclassDeclaration in classDeclaration.getSealedSubclasses()) {
+            if (subclassDeclaration.modifiers.contains(Modifier.SEALED)) {
+                processSealedSubclasses(buf, node, subclassDeclaration)
+            } else {
+                val packageName = subclassDeclaration.packageName.asString()
+                val qualifiedName = subclassDeclaration.qualifiedName?.asString() ?: subclassDeclaration.simpleName.asString()
+                val packageRemovedName = qualifiedName.removePrefix("$packageName.")
+                val packageRemovedBinaryName = packageRemovedName.replace(".", "$")
+                val binaryName = "$packageName.$packageRemovedBinaryName"
+
+                val partial = subclassDeclaration.findAnnotation(KomapperPartial::class)
+                    ?: throw SqlPartialAnnotationNotFoundException("The declaration \"${qualifiedName}\" of expression \"${node.expression}\" must be annotated with @KomapperPartial at ${node.location}")
+                val sql = partial.findValue("sql")?.toString()
+                    ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
+                buf.append("/*%if ${node.expression} is @$binaryName@ *//*%with ${node.expression} as @$binaryName@ */$sql/*%end *//*%end */")
+            }
+        }
     }
 
     private fun validateExpression(location: SqlLocation, expression: String, paramMap: Map<String, KSType>): ExprEvalResult {

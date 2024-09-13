@@ -154,7 +154,8 @@ sealed class SqlNode {
     data class WithDirective(
         val location: Loc,
         val token: String,
-        val expression: String,
+        val leftExpression: String,
+        val rightExpression: String?,
         val nodeList: List<SqlNode>,
     ) : SqlNode() {
         override fun toText(): String = token + nodeList.toText()

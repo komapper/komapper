@@ -318,6 +318,26 @@ class TwoWayTemplateStatementBuilderTest {
         }
 
         @Test
+        fun cast() {
+            val template =
+                "select a from b where /*%with shape as @org.komapper.template.Circle@ */c = /*radius*/1.0/*%end*/"
+            val statement = statementBuilder.build(
+                template,
+                mapOf(
+                    "shape" to Value(Circle(1.0), typeOf<Shape>()),
+                ),
+                extensions,
+            )
+            assertEquals("select a from b where c = ?", statement.toSql())
+            assertEquals(
+                listOf(
+                    Value(1.0, typeOf<Double>()),
+                ),
+                statement.args,
+            )
+        }
+
+        @Test
         fun test_null() {
             val template =
                 "select name, age from person where /*%with item*/name = /*description*/'' and age = /*a.b.c*/0/*%end*/"
@@ -416,3 +436,12 @@ data class Product1(
 data class Product2(
     val c: Int,
 )
+
+sealed interface Color {
+    object Red : Color
+    object Blue : Color
+}
+
+sealed interface Shape
+data class Rectangle(val width: Double, val height: Double) : Shape
+data class Circle(val radius: Double) : Shape

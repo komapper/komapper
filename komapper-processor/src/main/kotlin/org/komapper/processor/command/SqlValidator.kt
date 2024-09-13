@@ -122,7 +122,7 @@ internal class SqlValidator(context: Context, private val sql: String, private v
 
         is SqlNode.WithBlock -> {
             val withDirective = node.withDirective
-            val expression = withDirective.expression
+            val expression = withDirective.rightExpression ?: withDirective.leftExpression
             val evalResult = validateExpression(withDirective.location, expression, paramMap)
             val classDeclaration = evalResult.type.declaration as? KSClassDeclaration
                 ?: error("The expression must be a class at ${evalResult.location}.")

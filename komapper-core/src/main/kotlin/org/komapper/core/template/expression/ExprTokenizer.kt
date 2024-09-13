@@ -17,6 +17,7 @@ import org.komapper.core.template.expression.ExprTokenType.GE
 import org.komapper.core.template.expression.ExprTokenType.GT
 import org.komapper.core.template.expression.ExprTokenType.ILLEGAL_NUMBER
 import org.komapper.core.template.expression.ExprTokenType.INT
+import org.komapper.core.template.expression.ExprTokenType.IS
 import org.komapper.core.template.expression.ExprTokenType.LE
 import org.komapper.core.template.expression.ExprTokenType.LONG
 import org.komapper.core.template.expression.ExprTokenType.LT
@@ -131,6 +132,10 @@ class ExprTokenizer(private val expression: String) {
                 return
             } else if (c[0] == '<' && c[1] == '=') {
                 type = LE
+                binaryOpAvailable = false
+                return
+            } else if (c[0] == 'i' && c[1] == 's') {
+                type = IS
                 binaryOpAvailable = false
                 return
             }

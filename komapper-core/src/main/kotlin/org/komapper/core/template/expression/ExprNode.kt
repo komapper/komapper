@@ -15,6 +15,7 @@ sealed class ExprNode {
     data class Le(override val location: Loc, val left: ExprNode, val right: ExprNode) : ExprNode()
     data class Gt(override val location: Loc, val left: ExprNode, val right: ExprNode) : ExprNode()
     data class Lt(override val location: Loc, val left: ExprNode, val right: ExprNode) : ExprNode()
+    data class Is(override val location: Loc, val left: ExprNode, val right: ExprNode) : ExprNode()
     data class Comma(override val location: Loc, val nodeList: List<ExprNode>) : ExprNode()
     data class ClassRef(override val location: Loc, val name: String) : ExprNode()
     data class Value(override val location: Loc, val name: String) : ExprNode()

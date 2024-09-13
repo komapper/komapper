@@ -32,6 +32,7 @@ enum class ExprTokenType {
     LT,
     GE,
     LE,
+    IS,
     OTHER,
     EOE,
 }

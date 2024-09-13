@@ -31,6 +31,18 @@ class ExprParserTest {
     }
 
     @Test
+    fun `is`() {
+        when (val expr = ExprParser("aaa is @bbb.Ccc@").parse()) {
+            is ExprNode.Is -> {
+                assertTrue(expr.left is ExprNode.Value)
+                assertTrue(expr.right is ExprNode.ClassRef)
+            }
+
+            else -> throw AssertionError()
+        }
+    }
+
+    @Test
     fun and() {
         when (val expr = ExprParser("aaa > 1 && true").parse()) {
             is ExprNode.And -> {

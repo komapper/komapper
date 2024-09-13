@@ -61,6 +61,12 @@ class ExprEvaluatorTest {
         NORTH, SOUTH, WEST, EAST
     }
 
+    sealed interface Color {
+        object Red : Color
+        object Green : Color
+        object Blue : Color
+    }
+
     @Nested
     inner class LiteralTest {
         @Test
@@ -205,6 +211,30 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(mapOf("a" to Value(0, typeOf<Int>())), extensions)
             val result = evaluator.eval("a < 1", ctx)
             assertEquals(Value(true, typeOf<Boolean>()), result)
+        }
+
+        @Test
+        fun is1() {
+            val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
+            val result = evaluator.eval("a is @org.komapper.template.ExprEvaluatorTest\$Color@", ctx)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
+        }
+
+        @Test
+        fun is2() {
+            val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
+            val result = evaluator.eval("a is @org.komapper.template.ExprEvaluatorTest@", ctx)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
+        }
+
+        @Test
+        fun `The right operand must be a class reference`() {
+            val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("a is 1", ctx)
+            }
+            println(exception)
         }
 
         @Test
