@@ -159,7 +159,7 @@ internal class SqlReassembler(
     private fun getPartialSql(classDeclaration: KSClassDeclaration, qualifiedName: String, node: SqlNode.PartialDirective): String {
         val partial = classDeclaration.findAnnotation(KomapperPartial::class)
             ?: throw SqlPartialAnnotationNotFoundException("The declaration \"${qualifiedName}\" of expression \"${node.expression}\" must be annotated with @KomapperPartial at ${node.location}")
-        return partial.findValue("sql")?.toString()
+        return partial.findValue("sql")?.toString()?.trimIndent()
             ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
     }
 
