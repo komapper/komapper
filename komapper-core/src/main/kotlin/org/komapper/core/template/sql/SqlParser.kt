@@ -129,7 +129,8 @@ internal class SqlParser constructor(
     }
 
     private fun parseIfDirective() {
-        val expression = token.substring(5, token.length - 2).trim()
+        val statement = token.substring(3, token.length - 2).trim()
+        val expression = statement.substring("if".length).trim()
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the if directive at $location")
         }
@@ -138,7 +139,8 @@ internal class SqlParser constructor(
     }
 
     private fun parseElseifDirective() {
-        val expression = token.substring(9, token.length - 2).trim()
+        val statement = token.substring(3, token.length - 2).trim()
+        val expression = statement.substring("elseif".length).trim()
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the elseif directive at $location")
         }
@@ -168,28 +170,30 @@ internal class SqlParser constructor(
     }
 
     private fun parseForDirective() {
-        val statement = token.substring(6, token.length - 2).trim()
-        if (statement.isEmpty()) {
-            throw SqlException("The statement is not found in the for directive at $location")
+        val statement = token.substring(3, token.length - 2).trim()
+        val iterationExpression = statement.substring("for".length).trim()
+        if (iterationExpression.isEmpty()) {
+            throw SqlException("The iteration expression is not found in the for directive at $location")
         }
-        val pos = statement.indexOf("in")
+        val pos = iterationExpression.indexOf("in")
         if (pos == -1) {
-            throw SqlException("The keyword \"in\" is not found in the statement in the for directive at $location")
+            throw SqlException("The keyword \"in\" is not found in the iteration expression in the for directive at $location")
         }
-        val identifier = statement.substring(0, pos).trim()
+        val identifier = iterationExpression.substring(0, pos).trim()
         if (identifier.isEmpty()) {
-            throw SqlException("The identifier is not found in the statement in the for directive at $location")
+            throw SqlException("The identifier is not found in the iteration expression in the for directive at $location")
         }
-        val expression = statement.substring(pos + 2).trim()
-        if (expression.isEmpty()) {
-            throw SqlException("The expression is not found in the statement in the for directive at $location")
+        val iterableExpression = iterationExpression.substring(pos + 2).trim()
+        if (iterableExpression.isEmpty()) {
+            throw SqlException("The iterable expression is not found in the iteration expression in the for directive at $location")
         }
         reducers.push(ForBlockReducer(location))
-        reducers.push(ForDirectiveReducer(location, token, identifier, expression))
+        reducers.push(ForDirectiveReducer(location, token, identifier, iterableExpression))
     }
 
     private fun parseWithDirective() {
-        val expression = token.substring(7, token.length - 2).trim()
+        val statement = token.substring(3, token.length - 2).trim()
+        val expression = statement.substring("with".length).trim()
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the with directive at $location")
         }

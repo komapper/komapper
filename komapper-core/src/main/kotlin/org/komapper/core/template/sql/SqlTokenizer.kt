@@ -296,6 +296,14 @@ internal class SqlTokenizer(private val sql: String) {
                 } else if (c2 == '>') {
                     type = PARTIAL_DIRECTIVE
                 } else if (c2 == '%') {
+                    while (buf.hasRemaining()) {
+                        buf.mark()
+                        val c3 = buf.get()
+                        if (!c3.isWhitespace()) {
+                            buf.reset()
+                            break
+                        }
+                    }
                     if (buf.hasRemaining()) {
                         val c3 = buf.get()
                         if (c3 == '!') {
