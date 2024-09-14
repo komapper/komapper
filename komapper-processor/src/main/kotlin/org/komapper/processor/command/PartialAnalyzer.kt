@@ -1,14 +1,12 @@
 package org.komapper.processor.command
 
 import com.google.devtools.ksp.symbol.KSAnnotated
-import org.komapper.core.ThreadSafe
 import org.komapper.core.template.sql.SqlException
 import org.komapper.processor.Context
 import org.komapper.processor.Exit
 import org.komapper.processor.report
 import kotlin.reflect.KClass
 
-@ThreadSafe
 internal class PartialAnalyzer(private val context: Context, private val annotationClass: KClass<*>) {
 
     fun analyze(symbol: KSAnnotated): PartialAnalysisResult {

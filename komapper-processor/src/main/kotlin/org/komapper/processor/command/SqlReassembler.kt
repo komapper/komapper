@@ -9,6 +9,7 @@ import org.komapper.core.template.sql.NoCacheSqlNodeFactory
 import org.komapper.core.template.sql.SqlException
 import org.komapper.core.template.sql.SqlLocation
 import org.komapper.core.template.sql.SqlNode
+import org.komapper.core.template.sql.SqlNodeFactory
 import org.komapper.processor.Context
 import org.komapper.processor.findAnnotation
 import org.komapper.processor.findValue
@@ -18,11 +19,16 @@ import org.komapper.processor.findValue
  *
  * @property sql the initial SQL template
  * @property paramMap the parameter map
+ * @property nodeFactory the SQL node factory
+ * @property exprValidator the expression validator
  */
-internal class SqlReassembler(context: Context, private val sql: String, private val paramMap: Map<String, KSType>) {
-
-    private val nodeFactory = NoCacheSqlNodeFactory()
-    private val exprValidator = ExprValidator(context)
+internal class SqlReassembler(
+    context: Context,
+    private val sql: String,
+    private val paramMap: Map<String, KSType>,
+    private val nodeFactory: SqlNodeFactory = NoCacheSqlNodeFactory(),
+    private val exprValidator: ExprValidator = ExprValidator(context),
+) {
 
     fun assemble(): String {
         val node = nodeFactory.get(sql)

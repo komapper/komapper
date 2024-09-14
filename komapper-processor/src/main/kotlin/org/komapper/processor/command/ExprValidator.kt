@@ -19,7 +19,10 @@ import org.komapper.processor.getClassDeclaration
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
-internal class ExprValidator(private val context: Context) {
+internal class ExprValidator(
+    private val context: Context,
+    private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory(),
+) {
 
     private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType
@@ -38,8 +41,6 @@ internal class ExprValidator(private val context: Context) {
     private val arrayDeclaration by lazy {
         context.getClassDeclaration(Array::class) { throw ExprException("Class not found: $it") }
     }
-
-    private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
 
     private val referencedParams: MutableSet<String> = mutableSetOf()
 

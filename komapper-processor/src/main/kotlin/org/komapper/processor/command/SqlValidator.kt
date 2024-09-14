@@ -9,17 +9,21 @@ import org.komapper.core.template.sql.NoCacheSqlNodeFactory
 import org.komapper.core.template.sql.SqlException
 import org.komapper.core.template.sql.SqlLocation
 import org.komapper.core.template.sql.SqlNode
+import org.komapper.core.template.sql.SqlNodeFactory
 import org.komapper.processor.Context
 import org.komapper.processor.resolveTypeArgumentsOfAncestor
 
-internal class SqlValidator(context: Context, private val sql: String, private val paramMap: Map<String, KSType>) {
+internal class SqlValidator(
+    context: Context,
+    private val sql: String,
+    private val paramMap: Map<String, KSType>,
+    private val nodeFactory: SqlNodeFactory = NoCacheSqlNodeFactory(),
+    private val exprValidator: ExprValidator = ExprValidator(context),
+) {
 
     private val intType = context.resolver.builtIns.intType
     private val booleanType = context.resolver.builtIns.booleanType
     private val iterableType = context.resolver.builtIns.iterableType
-
-    private val nodeFactory = NoCacheSqlNodeFactory()
-    private val exprValidator = ExprValidator(context)
 
     fun validate(): Set<String> {
         val node = nodeFactory.get(sql)

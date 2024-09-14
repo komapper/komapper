@@ -18,9 +18,9 @@ internal class PartialProcessor(
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val context = contextFactory.create(resolver)
-        val analyzer = PartialAnalyzer(context, annotationClass)
         val symbols = resolver.getSymbolsWithAnnotation(annotationClass.qualifiedName!!)
         for (symbol in symbols) {
+            val analyzer = PartialAnalyzer(context, annotationClass)
             when (val result = analyzer.analyze(symbol)) {
                 is PartialAnalysisResult.Success -> {}
 
