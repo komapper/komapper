@@ -244,19 +244,11 @@ internal class TwoWayTemplateStatementBuilder(
 
         is SqlNode.WithBlock -> {
             val withDirective = node.withDirective
-            val (receiver, leftType) = eval(withDirective.location, withDirective.leftExpression, state.asExprContext())
+            val (receiver, type) = eval(withDirective.location, withDirective.expression, state.asExprContext())
             if (receiver == null) {
-                throw SqlException("The expression \"${withDirective.leftExpression}\" is null at ${withDirective.location}")
+                throw SqlException("The expression \"${withDirective.expression}\" is null at ${withDirective.location}")
             }
-            val rightExpression = withDirective.rightExpression
-            val rightType = if (rightExpression != null) {
-                val (_, rightType) = eval(withDirective.location, rightExpression, state.asExprContext())
-                rightType
-            } else {
-                null
-            }
-
-            val klass = rightType?.classifier as? KClass<*> ?: leftType.classifier as KClass<*>
+            val klass = type.classifier as? KClass<*> ?: throw SqlException("The expression \"${withDirective.expression}\" is not a class at ${withDirective.location}")
             val preserved = HashMap(state.valueMap)
             for (property in klass.memberProperties) {
                 val v = property.call(receiver)

@@ -100,6 +100,14 @@ internal class IsReducer(location: ExprLocation) : ExprReducer(40, location) {
     }
 }
 
+internal class AsReducer(location: ExprLocation) : ExprReducer(40, location) {
+    override fun reduce(deque: Deque<ExprNode>): ExprNode {
+        val right = pop(deque)
+        val left = pop(deque)
+        return ExprNode.As(location, left, right)
+    }
+}
+
 internal class AndReducer(location: ExprLocation) : ExprReducer(20, location) {
     override fun reduce(deque: Deque<ExprNode>): ExprNode {
         val right = pop(deque)

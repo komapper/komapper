@@ -193,22 +193,8 @@ internal class SqlParser constructor(
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the with directive at $location")
         }
-        val pos = expression.indexOf("as")
-        val (left, right) = if (pos == -1) {
-            expression to null
-        } else {
-            val left = expression.substring(0, pos).trim()
-            if (left.isEmpty()) {
-                throw SqlException("The left operand is not found in the expression in the with directive at $location")
-            }
-            val right = expression.substring(pos + 2).trim()
-            if (right.isEmpty()) {
-                throw SqlException("The right operand is not found in the expression in the for directive at $location")
-            }
-            left to right
-        }
         reducers.push(WithBlockReducer(location))
-        reducers.push(WithDirectiveReducer(location, token, left, right))
+        reducers.push(WithDirectiveReducer(location, token, expression))
     }
 
     private fun parsePartialDirective() {

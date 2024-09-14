@@ -1,6 +1,7 @@
 package org.komapper.core.template.expression
 
 import org.komapper.core.template.expression.ExprTokenType.AND
+import org.komapper.core.template.expression.ExprTokenType.AS
 import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.core.template.expression.ExprTokenType.CALLABLE_VALUE
 import org.komapper.core.template.expression.ExprTokenType.CHAR
@@ -136,6 +137,10 @@ class ExprTokenizer(private val expression: String) {
                 return
             } else if (c[0] == 'i' && c[1] == 's') {
                 type = IS
+                binaryOpAvailable = false
+                return
+            } else if (c[0] == 'a' && c[1] == 's') {
+                type = AS
                 binaryOpAvailable = false
                 return
             }

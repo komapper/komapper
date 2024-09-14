@@ -1,6 +1,7 @@
 package org.komapper.template
 
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.assertThrows
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
 import org.komapper.core.template.expression.ExprContext
@@ -215,8 +216,9 @@ class ExprEvaluatorTest {
 
         @Test
         fun is1() {
-            val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
-            val result = evaluator.eval("a is @org.komapper.template.ExprEvaluatorTest\$Color@", ctx)
+            val red: Color = Color.Red
+            val ctx = ExprContext(mapOf("a" to Value(red, typeOf<Color>())), extensions)
+            val result = evaluator.eval("a is @org.komapper.template.ExprEvaluatorTest\$Color\$Red@", ctx)
             assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
@@ -228,11 +230,38 @@ class ExprEvaluatorTest {
         }
 
         @Test
-        fun `The right operand must be a class reference`() {
+        fun as1() {
+            val red: Color = Color.Red
+            val ctx = ExprContext(mapOf("a" to Value(red, typeOf<Color>())), extensions)
+            val result = evaluator.eval("a as @org.komapper.template.ExprEvaluatorTest\$Color\$Red@", ctx)
+            assertEquals(Value(Color.Red, typeOf<Color.Red>()), result)
+        }
+
+        @Test
+        fun as2() {
+            val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
+            val ex = assertThrows<TypeCastException> {
+                evaluator.eval("a as @org.komapper.template.ExprEvaluatorTest@", ctx)
+            }
+            println(ex)
+        }
+
+        @Test
+        fun `is - The right operand must be a class reference`() {
             val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a is 1", ctx)
+            }
+            println(exception)
+        }
+
+        @Test
+        fun `as - The right operand must be a class reference`() {
+            val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("a as 1", ctx)
             }
             println(exception)
         }

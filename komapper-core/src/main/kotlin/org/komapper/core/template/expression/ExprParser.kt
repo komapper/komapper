@@ -1,6 +1,7 @@
 package org.komapper.core.template.expression
 
 import org.komapper.core.template.expression.ExprTokenType.AND
+import org.komapper.core.template.expression.ExprTokenType.AS
 import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.core.template.expression.ExprTokenType.CALLABLE_VALUE
 import org.komapper.core.template.expression.ExprTokenType.CHAR
@@ -85,6 +86,7 @@ internal class ExprParser(
                 GT -> pushReducer(GtReducer(location))
                 LT -> pushReducer(LtReducer(location))
                 IS -> pushReducer(IsReducer(location))
+                AS -> pushReducer(AsReducer(location))
                 SAFE_CALL_FUNCTION -> parseFunction(true)
                 SAFE_CALL_PROPERTY -> parseProperty(true)
                 FUNCTION -> parseFunction()

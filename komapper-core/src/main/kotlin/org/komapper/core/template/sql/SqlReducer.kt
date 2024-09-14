@@ -248,10 +248,9 @@ internal class ForDirectiveReducer(
 internal class WithDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
-    private val leftExpression: String,
-    private val rightExpression: String?,
+    private val expression: String,
 ) :
     SqlReducer() {
     override fun reduce(): SqlNode =
-        SqlNode.WithDirective(location, token, leftExpression, rightExpression, nodeList)
+        SqlNode.WithDirective(location, token, expression, nodeList)
 }
