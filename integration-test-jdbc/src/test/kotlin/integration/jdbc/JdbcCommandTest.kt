@@ -760,6 +760,15 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals(listOf(4, 5), addresses.map { it.addressId })
     }
 
+    @Test
+    @Run(unless = [Dbms.SQLSERVER, Dbms.ORACLE])
+    fun usePartial_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UsePartial(null))
+        }
+        assertEquals(15, addresses.size)
+    }
+
     @KomapperCommand(
         """
         select * from address
@@ -784,6 +793,14 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         }
         assertEquals(1, addresses.size)
         assertEquals(2, addresses.single().addressId)
+    }
+
+    @Test
+    fun useSealedPartial_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseSealedPartial(null))
+        }
+        assertEquals(15, addresses.size)
     }
 
     @KomapperCommand(
