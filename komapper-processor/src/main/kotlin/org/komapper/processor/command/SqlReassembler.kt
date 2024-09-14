@@ -97,10 +97,8 @@ internal class SqlReassembler(
                 processSealedSubclasses(buf, node, classDeclaration)
                 buf.append("/*%end */")
             } else {
-                val partial = classDeclaration.findAnnotation(KomapperPartial::class)
-                    ?: throw SqlPartialAnnotationNotFoundException("The declaration of expression \"$expression\" must be annotated with @KomapperPartial at ${node.location}")
-                val sql = partial.findValue("sql")?.toString()
-                    ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
+                val qualifiedName = classDeclaration.qualifiedName?.asString() ?: classDeclaration.simpleName.asString()
+                val sql = getPartialSql(classDeclaration, qualifiedName, node)
                 buf.append("/*%if $expression != null *//*%with $expression */$sql/*%end *//*%end */")
             }
         }
@@ -158,6 +156,13 @@ internal class SqlReassembler(
         -> error("unreachable")
     }
 
+    private fun getPartialSql(classDeclaration: KSClassDeclaration, qualifiedName: String, node: SqlNode.PartialDirective): String {
+        val partial = classDeclaration.findAnnotation(KomapperPartial::class)
+            ?: throw SqlPartialAnnotationNotFoundException("The declaration \"${qualifiedName}\" of expression \"${node.expression}\" must be annotated with @KomapperPartial at ${node.location}")
+        return partial.findValue("sql")?.toString()
+            ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
+    }
+
     private fun processSealedSubclasses(buf: StringBuilder, node: SqlNode.PartialDirective, classDeclaration: KSClassDeclaration) {
         for (subclassDeclaration in classDeclaration.getSealedSubclasses()) {
             if (subclassDeclaration.modifiers.contains(Modifier.SEALED)) {
@@ -169,10 +174,7 @@ internal class SqlReassembler(
                 val packageRemovedBinaryName = packageRemovedName.replace(".", "$")
                 val binaryName = "$packageName.$packageRemovedBinaryName"
 
-                val partial = subclassDeclaration.findAnnotation(KomapperPartial::class)
-                    ?: throw SqlPartialAnnotationNotFoundException("The declaration \"${qualifiedName}\" of expression \"${node.expression}\" must be annotated with @KomapperPartial at ${node.location}")
-                val sql = partial.findValue("sql")?.toString()
-                    ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
+                val sql = getPartialSql(subclassDeclaration, qualifiedName, node)
                 buf.append("/*%if ${node.expression} is @$binaryName@ *//*%with ${node.expression} as @$binaryName@ */$sql/*%end *//*%end */")
             }
         }
