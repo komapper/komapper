@@ -182,7 +182,7 @@ class SqlParserTest {
             println(exception)
         }
     }
-    
+
     @Nested
     inner class CommentTest {
         @Test
