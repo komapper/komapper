@@ -105,7 +105,7 @@ internal class SqlParser constructor(
     }
 
     private fun parseBindValueDirective() {
-        val expression = token.substring(2, token.length - 2).trim()
+        val expression = token.strip("/*", "*/")
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the bind value directive at $location")
         }
@@ -113,7 +113,7 @@ internal class SqlParser constructor(
     }
 
     private fun parseLiteralValueDirective() {
-        val expression = token.substring(3, token.length - 2).trim()
+        val expression = token.strip("/*^", "*/")
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the literal value directive at $location")
         }
@@ -121,7 +121,7 @@ internal class SqlParser constructor(
     }
 
     private fun parseEmbeddedValueDirective() {
-        val expression = token.substring(3, token.length - 2).trim()
+        val expression = token.strip("/*#", "*/")
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the embedded value directive at $location")
         }
@@ -129,8 +129,8 @@ internal class SqlParser constructor(
     }
 
     private fun parseIfDirective() {
-        val statement = token.substring(3, token.length - 2).trim()
-        val expression = statement.substring("if".length).trim()
+        val statement = token.strip("/*%", "*/")
+        val expression = statement.strip("if", "")
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the if directive at $location")
         }
@@ -139,8 +139,8 @@ internal class SqlParser constructor(
     }
 
     private fun parseElseifDirective() {
-        val statement = token.substring(3, token.length - 2).trim()
-        val expression = statement.substring("elseif".length).trim()
+        val statement = token.strip("/*%", "*/")
+        val expression = statement.strip("elseif", "")
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the elseif directive at $location")
         }
@@ -170,8 +170,8 @@ internal class SqlParser constructor(
     }
 
     private fun parseForDirective() {
-        val statement = token.substring(3, token.length - 2).trim()
-        val iterationExpression = statement.substring("for".length).trim()
+        val statement = token.strip("/*%", "*/")
+        val iterationExpression = statement.strip("for", "")
         if (iterationExpression.isEmpty()) {
             throw SqlException("The iteration expression is not found in the for directive at $location")
         }
@@ -192,8 +192,8 @@ internal class SqlParser constructor(
     }
 
     private fun parseWithDirective() {
-        val statement = token.substring(3, token.length - 2).trim()
-        val expression = statement.substring("with".length).trim()
+        val statement = token.strip("/*%", "*/")
+        val expression = statement.strip("with", "").trim()
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the with directive at $location")
         }
@@ -202,9 +202,9 @@ internal class SqlParser constructor(
     }
 
     private fun parsePartialDirective() {
-        val expression = token.substring(4, token.length - 2).trim()
+        val expression = token.strip("/*>", "*/")
         if (expression.isEmpty()) {
-            throw SqlException("The expression is not found in the compile-time embedded value directive at $location")
+            throw SqlException("The expression is not found in the partial directive at $location")
         }
         pushNode(SqlNode.PartialDirective(location, token, expression))
     }
@@ -237,4 +237,8 @@ internal class SqlParser constructor(
     private fun pushNode(node: SqlNode) {
         reducers.peek()?.addNode(node)
     }
+}
+
+private fun String.strip(prefix: String, suffix: String): String {
+    return this.substring(prefix.length, this.length - suffix.length).trim()
 }

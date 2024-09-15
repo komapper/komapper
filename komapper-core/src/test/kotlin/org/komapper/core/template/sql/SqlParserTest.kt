@@ -182,7 +182,7 @@ class SqlParserTest {
             println(exception)
         }
     }
-
+    
     @Nested
     inner class CommentTest {
         @Test
@@ -527,6 +527,23 @@ class SqlParserTest {
         @Test
         fun `The right operand is not found`() {
             val sql = "/*%with a as */"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+    }
+
+    @Nested
+    inner class PartialTest {
+        @Test
+        fun simple() {
+            val sql = "/*> a */"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun `The expression is not found in the partial directive`() {
+            val sql = "/*>   */"
             val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
