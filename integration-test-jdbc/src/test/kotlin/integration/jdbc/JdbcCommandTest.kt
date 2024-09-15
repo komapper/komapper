@@ -81,6 +81,24 @@ sealed interface Condition {
     class Default(val limit: Int = 0) : Condition
 }
 
+sealed interface Condition2 {
+    sealed interface FilterBy: Condition2
+
+    @KomapperPartial(
+        """
+        where street = /* street */''
+        """,
+    )
+    class Street(val street: String) : FilterBy
+}
+
+@KomapperPartial(
+    """
+    order by address_id desc
+    """,
+)
+object OrderBy
+
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
 
@@ -844,6 +862,48 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             QueryDsl.execute(UseNestedSealedPartial(null))
         }
         assertEquals(15, addresses.size)
+    }
+
+    @KomapperCommand(
+        """
+        select * from address
+        /*> condition */
+        """,
+    )
+    class UseNestedSealedPartial2(val condition: Condition2?) : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun useNestedSealedPartial2_street() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial2(Condition2.Street("STREET 10")))
+        }
+        assertEquals(1, addresses.size)
+        assertEquals(10, addresses.single().addressId)
+    }
+
+    @Test
+    fun useNestedSealedPartial2_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial2(null))
+        }
+        assertEquals(15, addresses.size)
+    }
+
+    @KomapperCommand(
+        """
+        select * from address
+        /*> @integration.jdbc.OrderBy@ */
+        """,
+    )
+    class UsePartialWithClassReference : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun usePartialWithClassReference() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UsePartialWithClassReference())
+        }
+        assertEquals(15, addresses.size)
+        assertEquals(15, addresses.first().addressId)
     }
 
     abstract class GetSingleAddress(@KomapperUnused val unknown: Int) : One<Address>({ select(asAddress).single() })
