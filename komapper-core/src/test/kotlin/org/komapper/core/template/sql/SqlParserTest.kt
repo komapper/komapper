@@ -422,4 +422,71 @@ class SqlParserTest {
             println(exception)
         }
     }
+
+    @Nested
+    inner class WithBlockTest {
+
+        @Test
+        fun simple() {
+            val sql = "/*%with a */ b /*%end*/ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun nested() {
+            val sql = "/*%with a */ b /*%with c */ d /*%end*/ e /*%end*/"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun simple_as() {
+            val sql = "/*%with a as x */ b /*%end*/ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun nested_as() {
+            val sql = "/*%with a as x */ b /*%with c as y */ d /*%end*/ e /*%end*/"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun `The corresponding end directive is not found`() {
+            val sql = "/*%with a */ b"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+
+        @Test
+        fun `The corresponding with directive is not found`() {
+            val sql = "/*%end*/ a"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+
+        @Test
+        fun `The expression is not found`() {
+            val sql = "/*%with */"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+
+        @Test
+        fun `The left operand is not found`() {
+            val sql = "/*%with as x */"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+
+        @Test
+        fun `The right operand is not found`() {
+            val sql = "/*%with a as */"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+    }
 }

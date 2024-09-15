@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @Tag("slow")
-class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
+class PartialProcessorErrorTest : AbstractKspTest(PartialProcessorProvider()) {
 
     @Test
     fun `The class must not have type parameters`() {
@@ -17,27 +17,12 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("")
-            class Execute<T>(val id: Int): Exec()
+            @KomapperPartial("")
+            class Execute<T>(val id: Int)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Execute\" must not have type parameters."))
-    }
-
-    @Test
-    fun `must extend one of the following classes, One, Many, Exec, ExecReturnOne, or ExecReturnMany`() {
-        val result = compile(
-            """
-            package test
-            import org.komapper.annotation.*
-            import org.komapper.core.*
-            @KomapperCommand("")
-            class Execute(val id: Int)
-            """,
-        )
-        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("must extend one of the following classes: One, Many, Exec, ExecReturnOne, or ExecReturnMany"))
     }
 
     @Test
@@ -47,8 +32,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/*%if 1 *//*%end*/")
-            class Execute(val id: Int): Exec()
+            @KomapperPartial("/*%if 1 *//*%end*/")
+            class Execute(val id: Int)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -62,8 +47,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/*%if true *//*%elseif 1 *//*%end*/")
-            class Execute(val id: Int): Exec()
+            @KomapperPartial("/*%if true *//*%elseif 1 *//*%end*/")
+            class Execute(val id: Int)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -77,8 +62,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* value */('a', 'b')")
-            class Execute(val value: String): Exec()
+            @KomapperPartial("/* value */('a', 'b')")
+            class Execute(val value: String)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -92,8 +77,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/*%for each in s *//*%end*/")
-            class Execute(val s: String): Exec()
+            @KomapperPartial("/*%for each in s *//*%end*/")
+            class Execute(val s: String)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -107,8 +92,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/*%for each in list *//*%end*/")
-            class Execute(val list: List<*>): Exec()
+            @KomapperPartial("/*%for each in list *//*%end*/")
+            class Execute(val list: List<*>)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -122,8 +107,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* !value */'a'")
-            class Execute(val value: String): Exec()
+            @KomapperPartial("/* !value */'a'")
+            class Execute(val value: String)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -137,8 +122,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* a && b */'a'")
-            class Execute(val a: String, val b: Boolean): Exec()
+            @KomapperPartial("/* a && b */'a'")
+            class Execute(val a: String, val b: Boolean)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -152,8 +137,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* a < b */'a'")
-            class Execute(val a: String, val b: Boolean): Exec()
+            @KomapperPartial("/* a < b */'a'")
+            class Execute(val a: String, val b: Boolean)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -168,8 +153,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             import org.komapper.annotation.*
             import org.komapper.core.*
             data class User(val id: Int)
-            @KomapperCommand("/* a < b */'a'")
-            class Execute(val a: User, val b: User): Exec()
+            @KomapperPartial("/* a < b */'a'")
+            class Execute(val a: User, val b: User)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -183,8 +168,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* a */'' /* d */''")
-            class Execute(val a: String, val b: String, val c: String): Exec()
+            @KomapperPartial("/* a */'' /* d */''")
+            class Execute(val a: String, val b: String, val c: String)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -198,8 +183,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* a.unknown */''")
-            class Execute(val a: String): Exec()
+            @KomapperPartial("/* a.unknown */''")
+            class Execute(val a: String)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -213,8 +198,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* a.unknown(b) */''")
-            class Execute(val a: String, val b: Int): Exec()
+            @KomapperPartial("/* a.unknown(b) */''")
+            class Execute(val a: String, val b: Int)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -228,8 +213,8 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             package test
             import org.komapper.annotation.*
             import org.komapper.core.*
-            @KomapperCommand("/* a */'' /* b */''")
-            private class Execute(val a: String, val b: Int): Exec()
+            @KomapperPartial("/* a */'' /* b */''")
+            private class Execute(val a: String, val b: Int)
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -244,12 +229,40 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             import org.komapper.annotation.*
             import org.komapper.core.*
             private class MyClass {
-                @KomapperCommand("/* a */'' /* b */''")
-                class Execute(val a: String, val b: Int): Exec()
+                @KomapperPartial("/* a */'' /* b */''")
+                class Execute(val a: String, val b: Int)
             }
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The enclosing declaration \"MyClass\" of the class \"Execute\" must not be private."))
+    }
+
+    @Test
+    fun `The corresponding end directive is not found`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.KomapperPartial
+            @KomapperPartial("order by id, name /*%if true */")
+            object OrderBy
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The corresponding end directive is not found"))
+    }
+
+    @Test
+    fun `The partial directive is not supported`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.KomapperPartial
+            @KomapperPartial("order by id, name /*> nestedPartial */")
+            object OrderBy
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The partial directive \"/*> nestedPartial */\" is not supported"))
     }
 }

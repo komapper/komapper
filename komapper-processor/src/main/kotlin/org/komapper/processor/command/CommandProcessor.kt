@@ -20,9 +20,9 @@ internal class CommandProcessor(
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val context = contextFactory.create(resolver)
-        val analyzer = CommandAnalyzer(context, annotationClass)
         val symbols = resolver.getSymbolsWithAnnotation(annotationClass.qualifiedName!!)
         for (symbol in symbols) {
+            val analyzer = CommandAnalyzer(context, annotationClass)
             when (val result = analyzer.analyze(symbol)) {
                 is CommandAnalysisResult.Success ->
                     generateMetamodel(context, result.command)

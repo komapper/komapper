@@ -297,15 +297,21 @@ annotation class KomapperCommand(
 }
 
 /**
- * Indicates that the annotated property is a partial SQL fragment.
+ * Indicates that the annotated class is a partial that encapsulates an SQL template and SQL parameters.
  *
- * @property sql the SQL fragment
+ * @property sql the SQL template
+ * @property disableValidation if `true`, SQL validation at compile time will be disabled
  */
-@Target(AnnotationTarget.PROPERTY)
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperPartial(
     @Language("sql") val sql: String,
-)
+    val disableValidation: Boolean = DISABLE_VALIDATION,
+) {
+    companion object {
+        const val DISABLE_VALIDATION: Boolean = false
+    }
+}
 
 /**
  * Indicates that the annotated property is not used within [KomapperCommand.sql].

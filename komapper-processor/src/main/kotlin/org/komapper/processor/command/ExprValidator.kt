@@ -19,7 +19,10 @@ import org.komapper.processor.getClassDeclaration
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
-internal class ExprValidator(private val context: Context) {
+internal class ExprValidator(
+    private val context: Context,
+    private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory(),
+) {
 
     private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType
@@ -38,8 +41,6 @@ internal class ExprValidator(private val context: Context) {
     private val arrayDeclaration by lazy {
         context.getClassDeclaration(Array::class) { throw ExprException("Class not found: $it") }
     }
-
-    private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
 
     private val referencedParams: MutableSet<String> = mutableSetOf()
 
@@ -61,6 +62,8 @@ internal class ExprValidator(private val context: Context) {
         is ExprNode.Gt -> compare(node.location, node.left, node.right, paramMap)
         is ExprNode.Le -> compare(node.location, node.left, node.right, paramMap)
         is ExprNode.Lt -> compare(node.location, node.left, node.right, paramMap)
+        is ExprNode.Is -> visitIs(node.location, node.left, node.right, paramMap)
+        is ExprNode.As -> visitAs(node.location, node.left, node.right, paramMap)
         is ExprNode.Literal -> {
             when (node.type) {
                 typeOf<Byte>() -> context.resolver.builtIns.byteType
@@ -159,8 +162,38 @@ internal class ExprValidator(private val context: Context) {
         return booleanType
     }
 
+    private fun visitIs(
+        location: ExprLocation,
+        leftNode: ExprNode,
+        rightNode: ExprNode,
+        paramMap: Map<String, KSType>,
+    ): KSType {
+        @Suppress("UNUSED_VARIABLE")
+        val left = visit(leftNode, paramMap)
+        rightNode as? ExprNode.ClassRef
+            ?: throw NotClassRefNodeException("The right operand of the \"is\" operator must be a class reference at $location")
+        // validate the rightNode
+        visitClassRef(rightNode, paramMap)
+        return booleanType
+    }
+
+    private fun visitAs(
+        location: ExprLocation,
+        leftNode: ExprNode,
+        rightNode: ExprNode,
+        paramMap: Map<String, KSType>,
+    ): KSType {
+        @Suppress("UNUSED_VARIABLE")
+        val left = visit(leftNode, paramMap)
+        rightNode as? ExprNode.ClassRef
+            ?: throw NotClassRefNodeException("The right operand of the \"as\" operator must be a class reference at $location")
+        return visitClassRef(rightNode, paramMap)
+    }
+
     private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>): KSType {
-        val classDeclaration = context.getClassDeclaration(node.name) {
+        // convert the binary class name to the kotlin class name
+        val name = node.name.replace("$", ".")
+        val classDeclaration = context.getClassDeclaration(name) {
             throw ClassNotFoundException("The class \"${node.name}\" is not found at ${node.location}")
         }
         val companionObject = classDeclaration.declarations
@@ -360,4 +393,5 @@ internal class ExprValidator(private val context: Context) {
     class PropertyNotFoundException(message: String) : ExprException(message)
     class ParameterNotFoundException(message: String) : ExprException(message)
     class ClassNotFoundException(message: String) : ExprException(message)
+    class NotClassRefNodeException(message: String) : ExprException(message)
 }

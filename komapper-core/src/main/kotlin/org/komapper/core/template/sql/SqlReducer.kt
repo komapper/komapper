@@ -1,6 +1,6 @@
 package org.komapper.core.template.sql
 
-import java.util.LinkedList
+import java.util.*
 
 internal abstract class SqlReducer {
     protected val nodeList = LinkedList<SqlNode>()
@@ -84,6 +84,7 @@ internal class BindValueDirectiveReducer(
             node,
             nodeList,
         )
+
         else -> throw SqlException("The test value must follow the bind value directive at $location. node=$node")
     }
 }
@@ -101,6 +102,7 @@ internal class LiteralValueDirectiveReducer(
             node,
             nodeList,
         )
+
         else -> throw SqlException("The test value must follow the literal value directive at $location")
     }
 }
@@ -115,6 +117,7 @@ internal class IfBlockReducer(private val location: SqlLocation) : BlockReducer(
         is SqlNode.ElseDirective,
         is SqlNode.EndDirective,
         -> super.addNode(node)
+
         else -> error(node)
     }
 
@@ -186,6 +189,30 @@ internal class ForBlockReducer(private val location: SqlLocation) : BlockReducer
     }
 }
 
+internal class WithBlockReducer(private val location: SqlLocation) : BlockReducer() {
+
+    override fun addNode(node: SqlNode) = when (node) {
+        is SqlNode.WithDirective, is SqlNode.EndDirective -> super.addNode(node)
+        else -> error(node)
+    }
+
+    override fun reduce(): SqlNode {
+        val withDirective = getWithDirective()
+        val endDirective = getEndDirective()
+        return SqlNode.WithBlock(withDirective, endDirective)
+    }
+
+    private fun getWithDirective(): SqlNode.WithDirective {
+        val node = nodeList.poll() as? SqlNode.WithDirective
+        return node ?: error("WithDirective is not found.")
+    }
+
+    private fun getEndDirective(): SqlNode.EndDirective = when (val node = nodeList.poll()) {
+        is SqlNode.EndDirective -> node
+        else -> throw throw SqlException("The corresponding end directive is not found at $location")
+    }
+}
+
 internal class IfDirectiveReducer(private val location: SqlLocation, private val token: String, private val expression: String) :
     SqlReducer() {
     override fun reduce(): SqlNode =
@@ -216,4 +243,14 @@ internal class ForDirectiveReducer(
     SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.ForDirective(location, token, identifier, expression, nodeList)
+}
+
+internal class WithDirectiveReducer(
+    private val location: SqlLocation,
+    private val token: String,
+    private val expression: String,
+) :
+    SqlReducer() {
+    override fun reduce(): SqlNode =
+        SqlNode.WithDirective(location, token, expression, nodeList)
 }

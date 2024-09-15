@@ -34,6 +34,7 @@ import org.komapper.core.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
 import org.komapper.core.template.sql.SqlTokenType.SPACE
 import org.komapper.core.template.sql.SqlTokenType.UNION
 import org.komapper.core.template.sql.SqlTokenType.WHERE
+import org.komapper.core.template.sql.SqlTokenType.WITH_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.WORD
 import java.nio.CharBuffer
 
@@ -337,6 +338,10 @@ internal class SqlTokenizer(private val sql: String) {
                                                 }
                                             }
                                         }
+                                    } else if (c3 == 'w' && c4 == 'i' && c5 == 't' && c6 == 'h') {
+                                        if (isDirectiveTerminated()) {
+                                            type = WITH_DIRECTIVE
+                                        }
                                     } else {
                                         buf.position(buf.position() - 4)
                                     }
@@ -353,6 +358,7 @@ internal class SqlTokenizer(private val sql: String) {
                     if (type !== PARSER_LEVEL_COMMENT_DIRECTIVE &&
                         type !== IF_DIRECTIVE &&
                         type !== FOR_DIRECTIVE &&
+                        type !== WITH_DIRECTIVE &&
                         type !== END_DIRECTIVE &&
                         type !== ELSE_DIRECTIVE &&
                         type !== ELSEIF_DIRECTIVE &&

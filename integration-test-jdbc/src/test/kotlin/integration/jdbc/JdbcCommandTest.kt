@@ -33,12 +33,71 @@ import kotlin.test.assertTrue
 
 @KomapperPartial(
     """
-    /*%if pagination != null */
-    limit /* pagination.limit */0 offset /*pagination.offset*/0
-    /*%end*/
+    limit /* limit */0 offset /* offset */0
     """,
 )
-private const val paginationPartial = ""
+data class Pagination(val limit: Int, val offset: Int)
+
+sealed interface FilterBy {
+    @KomapperPartial(
+        """
+        where street = /* street */''
+        """,
+    )
+    class Street(val street: String) : FilterBy
+
+    @KomapperPartial(
+        """
+        where address_id = /* id */0
+        """,
+    )
+    class Id(val id: Int) : FilterBy
+}
+
+sealed interface Condition {
+    sealed class Where : Condition {
+        @KomapperPartial(
+            """
+            where street = /* street */''
+            """,
+        )
+        class Street(val street: String) : Where()
+    }
+
+    sealed class OrderBy : Condition {
+        @KomapperPartial(
+            """
+            order by street
+            """,
+        )
+        class Street() : OrderBy()
+    }
+
+    @KomapperPartial(
+        """
+        limit /* limit */0
+        """,
+    )
+    class Default(val limit: Int = 0) : Condition
+}
+
+sealed interface Condition2 {
+    sealed interface FilterBy: Condition2
+
+    @KomapperPartial(
+        """
+        where street = /* street */''
+        """,
+    )
+    class Street(val street: String) : FilterBy
+}
+
+@KomapperPartial(
+    """
+    order by address_id desc
+    """,
+)
+object OrderBy
 
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
@@ -701,12 +760,10 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals("hi world!", address.street)
     }
 
-    data class Pagination(val limit: Int, val offset: Int)
-
     @KomapperCommand(
         """
         select * from address order by address_id
-        /*> paginationPartial */
+        /*> pagination */
         """,
     )
     class UsePartial(val pagination: Pagination?) : Many<Address>({ selectAsAddress() })
@@ -719,6 +776,134 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         }
         assertEquals(2, addresses.size)
         assertEquals(listOf(4, 5), addresses.map { it.addressId })
+    }
+
+    @Test
+    @Run(unless = [Dbms.SQLSERVER, Dbms.ORACLE])
+    fun usePartial_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UsePartial(null))
+        }
+        assertEquals(15, addresses.size)
+    }
+
+    @KomapperCommand(
+        """
+        select * from address
+        /*> filterBy */
+        """,
+    )
+    class UseSealedPartial(val filterBy: FilterBy?) : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun useSealedPartial_street() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseSealedPartial(FilterBy.Street("STREET 10")))
+        }
+        assertEquals(1, addresses.size)
+        assertEquals(10, addresses.single().addressId)
+    }
+
+    @Test
+    fun useSealedPartial_id() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseSealedPartial(FilterBy.Id(2)))
+        }
+        assertEquals(1, addresses.size)
+        assertEquals(2, addresses.single().addressId)
+    }
+
+    @Test
+    fun useSealedPartial_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseSealedPartial(null))
+        }
+        assertEquals(15, addresses.size)
+    }
+
+    @KomapperCommand(
+        """
+        select * from address
+        /*> condition */
+        """,
+    )
+    class UseNestedSealedPartial(val condition: Condition?) : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun useNestedSealedPartial_where_street() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial(Condition.Where.Street("STREET 10")))
+        }
+        assertEquals(1, addresses.size)
+        assertEquals(10, addresses.single().addressId)
+    }
+
+    @Test
+    fun useNestedSealedPartial_orderBy_street() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial(Condition.OrderBy.Street()))
+        }
+        assertEquals(15, addresses.size)
+        assertEquals(1, addresses.first().addressId)
+    }
+
+    @Test
+    @Run(unless = [Dbms.SQLSERVER, Dbms.ORACLE])
+    fun useNestedSealedPartial_default() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial(Condition.Default(5)))
+        }
+        assertEquals(5, addresses.size)
+    }
+
+    @Test
+    fun useNestedSealedPartial_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial(null))
+        }
+        assertEquals(15, addresses.size)
+    }
+
+    @KomapperCommand(
+        """
+        select * from address
+        /*> condition */
+        """,
+    )
+    class UseNestedSealedPartial2(val condition: Condition2?) : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun useNestedSealedPartial2_street() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial2(Condition2.Street("STREET 10")))
+        }
+        assertEquals(1, addresses.size)
+        assertEquals(10, addresses.single().addressId)
+    }
+
+    @Test
+    fun useNestedSealedPartial2_null() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UseNestedSealedPartial2(null))
+        }
+        assertEquals(15, addresses.size)
+    }
+
+    @KomapperCommand(
+        """
+        select * from address
+        /*> @integration.jdbc.OrderBy@ */
+        """,
+    )
+    class UsePartialWithClassReference : Many<Address>({ selectAsAddress() })
+
+    @Test
+    fun usePartialWithClassReference() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(UsePartialWithClassReference())
+        }
+        assertEquals(15, addresses.size)
+        assertEquals(15, addresses.first().addressId)
     }
 
     abstract class GetSingleAddress(@KomapperUnused val unknown: Int) : One<Address>({ select(asAddress).single() })

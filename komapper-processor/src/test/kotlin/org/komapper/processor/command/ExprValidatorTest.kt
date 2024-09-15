@@ -18,6 +18,12 @@ import kotlin.test.assertEquals
 @Tag("slow")
 class ExprValidatorTest : AbstractKspTest() {
 
+    sealed interface Color {
+        object Red : Color
+        object Green : Color
+        object Blue : Color
+    }
+
     @Test
     fun `perform logical operator - success`() {
         val result = compile("") { env, resolver ->
@@ -123,6 +129,38 @@ class ExprValidatorTest : AbstractKspTest() {
             val paramMap = mapOf("a" to resolver.builtIns.intType.makeNullable())
             val ex = assertThrows<ExprValidator.NonComparableTypeException> {
                 validator.validate("a < a", paramMap)
+            }
+            println(ex)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `is - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val classDeclaration = context.getClassDeclaration("org.komapper.processor.command.ExprValidatorTest.Color.Red") { error(it) }
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to classDeclaration.asType(emptyList()))
+            val result = validator.validate("a is @org.komapper.processor.command.ExprValidatorTest\$Color@", paramMap)
+            assertEquals(resolver.builtIns.booleanType, result.type)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `is - NotClassRefNodeException`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val classDeclaration = context.getClassDeclaration("org.komapper.processor.command.ExprValidatorTest.Color.Red") { error(it) }
+            val validator = ExprValidator(context)
+            val paramMap = mapOf("a" to classDeclaration.asType(emptyList()))
+            val ex = assertThrows<ExprValidator.NotClassRefNodeException> {
+                validator.validate("a is 123", paramMap)
             }
             println(ex)
 

@@ -12,6 +12,7 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty2
 import kotlin.reflect.KType
+import kotlin.reflect.full.cast
 import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.createType
@@ -61,6 +62,8 @@ internal class DefaultExprEvaluator(
         is ExprNode.Gt -> compare(node.location, node.left, node.right, ctx) { x, y -> x > y }
         is ExprNode.Le -> compare(node.location, node.left, node.right, ctx) { x, y -> x <= y }
         is ExprNode.Lt -> compare(node.location, node.left, node.right, ctx) { x, y -> x < y }
+        is ExprNode.Is -> visitIs(node.location, node.left, node.right, ctx)
+        is ExprNode.As -> visitAs(node.location, node.left, node.right, ctx)
         is ExprNode.Literal -> Value(node.value, node.type)
         is ExprNode.Comma -> node.nodeList.map {
             visit(it, ctx)
@@ -177,6 +180,32 @@ internal class DefaultExprEvaluator(
         }
     }
 
+    private fun visitIs(
+        location: ExprLocation,
+        leftNode: ExprNode,
+        rightNode: ExprNode,
+        ctx: ExprContext,
+    ): Value<Boolean> {
+        val (left) = visit(leftNode, ctx)
+        rightNode as? ExprNode.ClassRef ?: throw ExprException("The right operand must be a class reference at $location.")
+        val (_, rightType) = visitClassRef(rightNode, ctx)
+        val rightClass = rightType.classifier as? KClass<*> ?: throw ExprException("The right operand is not resolved as a class at $location.")
+        return Value(rightClass.isInstance(left), typeOf<Boolean>())
+    }
+
+    private fun visitAs(
+        location: ExprLocation,
+        leftNode: ExprNode,
+        rightNode: ExprNode,
+        ctx: ExprContext,
+    ): Value<Any> {
+        val (left) = visit(leftNode, ctx)
+        rightNode as? ExprNode.ClassRef ?: throw ExprException("The right operand must be a class reference at $location.")
+        val (_, rightType) = visitClassRef(rightNode, ctx)
+        val rightClass = rightType.classifier as? KClass<*> ?: throw ExprException("The right operand is not resolved as a class at $location.")
+        return Value(rightClass.cast(left), rightType)
+    }
+
     private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): Value<*> {
         val clazz =
             try {
@@ -190,7 +219,7 @@ internal class DefaultExprEvaluator(
             klass.objectInstance != null -> Value(klass.objectInstance!!, klass.createType())
             klass.companionObjectInstance != null -> Value(klass.companionObjectInstance!!, klass.companionObject!!.createType())
             clazz.isEnum -> Value(ClassRef.EnumRef(clazz as Class<Enum<*>>), klass.createType())
-            else -> error("The unsupported class \"${klass.qualifiedName}\" is referenced.")
+            else -> Value(klass, klass.createType())
         }
     }
 

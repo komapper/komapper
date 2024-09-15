@@ -34,6 +34,7 @@ import org.komapper.core.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
 import org.komapper.core.template.sql.SqlTokenType.SPACE
 import org.komapper.core.template.sql.SqlTokenType.UNION
 import org.komapper.core.template.sql.SqlTokenType.WHERE
+import org.komapper.core.template.sql.SqlTokenType.WITH_DIRECTIVE
 import org.komapper.core.template.sql.SqlTokenType.WORD
 import java.util.LinkedList
 
@@ -95,6 +96,7 @@ internal class SqlParser constructor(
                 ELSE_DIRECTIVE -> parseElseDirective()
                 END_DIRECTIVE -> parseEndDirective()
                 FOR_DIRECTIVE -> parseForDirective()
+                WITH_DIRECTIVE -> parseWithDirective()
                 PARTIAL_DIRECTIVE -> parsePartialDirective()
                 PARSER_LEVEL_COMMENT_DIRECTIVE -> Unit // do nothing
             }
@@ -158,7 +160,7 @@ internal class SqlParser constructor(
     private fun parseEndDirective() {
         reduceUntil { it is BlockReducer }
         if (reducers.isEmpty()) {
-            throw SqlException("The corresponding if or for directive is not found at $location")
+            throw SqlException("The corresponding if, for, or with directive is not found at $location")
         }
         pushNode(SqlNode.EndDirective(location, token))
         val block = reducers.pop()
@@ -184,6 +186,15 @@ internal class SqlParser constructor(
         }
         reducers.push(ForBlockReducer(location))
         reducers.push(ForDirectiveReducer(location, token, identifier, expression))
+    }
+
+    private fun parseWithDirective() {
+        val expression = token.substring(7, token.length - 2).trim()
+        if (expression.isEmpty()) {
+            throw SqlException("The expression is not found in the with directive at $location")
+        }
+        reducers.push(WithBlockReducer(location))
+        reducers.push(WithDirectiveReducer(location, token, expression))
     }
 
     private fun parsePartialDirective() {
