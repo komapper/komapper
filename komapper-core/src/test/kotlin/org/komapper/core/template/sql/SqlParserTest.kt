@@ -210,6 +210,13 @@ class SqlParserTest {
             val node = SqlParser(sql).parse()
             assertEquals("select a from b", node.toText())
         }
+
+        @Test
+        fun `parserLevelComment - space`() {
+            val sql = "select a/*% ! comment */ from b"
+            val node = SqlParser(sql).parse()
+            assertEquals("select a from b", node.toText())
+        }
     }
 
     @Nested
@@ -272,6 +279,13 @@ class SqlParserTest {
         }
 
         @Test
+        fun `if - space`() {
+            val sql = "/*% if a */ b /*% end */ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
         fun if_elseif() {
             val sql = "/*%if a*/ b /*%elseif c*/ d /*%end*/ h"
             val node = SqlParser(sql).parse()
@@ -279,8 +293,22 @@ class SqlParserTest {
         }
 
         @Test
+        fun `if_elseif - space`() {
+            val sql = "/*% if a */ b /*% elseif c */ d /*% end */ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
         fun if_else() {
             val sql = "/*%if a*/ b /*%else c*/ d /*%end*/ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun `if_else - space`() {
+            val sql = "/*% if a */ b /*% else c */ d /*% end */ h"
             val node = SqlParser(sql).parse()
             assertEquals(sql, node.toText())
         }
@@ -374,6 +402,13 @@ class SqlParserTest {
         }
 
         @Test
+        fun `simple - space`() {
+            val sql = "/*% for a in aaa */ b /*% end */ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
         fun nested() {
             val sql = "/*%for a in aaa*/ b /*%for c in ccc*/ d /*%end*/ e /*%end*/"
             val node = SqlParser(sql).parse()
@@ -434,6 +469,13 @@ class SqlParserTest {
         }
 
         @Test
+        fun `simple - space`() {
+            val sql = "/*% with a */ b /*% end */ h"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
         fun nested() {
             val sql = "/*%with a */ b /*%with c */ d /*%end*/ e /*%end*/"
             val node = SqlParser(sql).parse()
@@ -485,6 +527,23 @@ class SqlParserTest {
         @Test
         fun `The right operand is not found`() {
             val sql = "/*%with a as */"
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
+            println(exception)
+        }
+    }
+
+    @Nested
+    inner class PartialTest {
+        @Test
+        fun simple() {
+            val sql = "/*> a */"
+            val node = SqlParser(sql).parse()
+            assertEquals(sql, node.toText())
+        }
+
+        @Test
+        fun `The expression is not found in the partial directive`() {
+            val sql = "/*>   */"
             val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }

@@ -82,7 +82,7 @@ sealed interface Condition {
 }
 
 sealed interface Condition2 {
-    sealed interface FilterBy: Condition2
+    sealed interface FilterBy : Condition2
 
     @KomapperPartial(
         """
