@@ -48,8 +48,12 @@ internal class CommandCallGenerator(
         } else {
             ""
         }
+        w.println("// language=sql")
+        w.println("private val sql = \"\"\"")
+        w.println(command.sql.replace("$", "\${'$'}"))
+        w.println("\"\"\".trimIndent()")
+        w.println()
         w.println("public fun $QueryDsl.`${command.functionName}`(command: $parameterTypeName) : $returnTypeName {")
-        w.println("    val sql = \"\"\"${command.sql.replace("$", "\${'$'}") }\"\"\"")
         w.println("    val binding = $templateCall$returningCall$bindCalls")
         w.println("    return with(command) {")
         w.println("        binding.execute()")
