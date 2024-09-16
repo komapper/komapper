@@ -58,7 +58,7 @@ Add the following code to the Gradle build script (gradle.build.kts).
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.0"
-    id("com.google.devtools.ksp") version "2.0.0-1.0.24"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.25"
 }
 
 val komapperVersion = "3.0.0"
@@ -168,10 +168,10 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 | Kotlin and KSP version | Komapper version | KSP2 support? | JRE min version | Gradle min version |
 |:-----------------------|:-----------------|---------------|:----------------|--------------------|
-| 1.8.22-1.0.11          | 1.8.x - 1.16.x   | No            | 11              | 6.8.3              |
-| 1.9.24-1.0.20          | 1.8.x - 2.1.x    | No            | 11              | 6.8.3              |
-| 2.0.0-1.0.24           | 1.8.x - 2.1.x    | No            | 11              | 6.8.3              |
-| 2.0.0-1.0.24           | 1.18.1 - 2.1.x   | Yes           | 11              | 6.8.3              |
+| 1.8.22-1.0.11          | 1.16.1           | No            | 11              | 6.8.3              |
+| 1.9.24-1.0.20          | 1.18.1 - 2.1.0   | No            | 11              | 6.8.3              |
+| 2.0.0-1.0.25           | 1.18.1 - 2.2.2   | No            | 11              | 7.6.4              |
+| 2.0.0-1.0.25           | 1.18.1 - 3.0.x   | Yes           | 11              | 7.6.4              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
