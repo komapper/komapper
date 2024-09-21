@@ -287,6 +287,53 @@ class TwoWayTemplateStatementBuilderTest {
             assertEquals(3, statement.args[4].any)
             assertEquals("Item3", statement.args[5].any)
         }
+
+        @Test
+        fun comma() {
+            val template =
+                "select name, age from person order by /*%for i in list*//*# i *//*# i_comma */ /*%end*/"
+            val statement =
+                statementBuilder.build(template, mapOf("list" to Value(listOf("a", "b", "c"), typeOf<List<Int>>())), extensions)
+            assertEquals("select name, age from person order by a, b, c ", statement.toSql())
+            assertEquals(
+                emptyList(),
+                statement.args,
+            )
+        }
+
+        @Test
+        fun and() {
+            val template =
+                "select name, age from person where /*%for i in list*/age = /*i*/0 /*# i_and */ /*%end*/"
+            val statement =
+                statementBuilder.build(template, mapOf("list" to Value(listOf(1, 2, 3), typeOf<List<Int>>())), extensions)
+            assertEquals("select name, age from person where age = ? and age = ? and age = ?  ", statement.toSql())
+            assertEquals(
+                listOf(
+                    Value(1, typeOf<Int>()),
+                    Value(2, typeOf<Int>()),
+                    Value(3, typeOf<Int>()),
+                ),
+                statement.args,
+            )
+        }
+
+        @Test
+        fun or() {
+            val template =
+                "select name, age from person where /*%for i in list*/age = /*i*/0 /*# i_or */ /*%end*/"
+            val statement =
+                statementBuilder.build(template, mapOf("list" to Value(listOf(1, 2, 3), typeOf<List<Int>>())), extensions)
+            assertEquals("select name, age from person where age = ? or age = ? or age = ?  ", statement.toSql())
+            assertEquals(
+                listOf(
+                    Value(1, typeOf<Int>()),
+                    Value(2, typeOf<Int>()),
+                    Value(3, typeOf<Int>()),
+                ),
+                statement.args,
+            )
+        }
     }
 
     @Nested
