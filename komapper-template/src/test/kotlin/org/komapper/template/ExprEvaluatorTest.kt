@@ -514,7 +514,7 @@ class ExprEvaluatorTest {
             val ex = assertFailsWith<ExprException> {
                 evaluator.eval("a", ctx)
             }
-            assertEquals("The template variable \"a\" is not bound to a value. Make sure the variable name is correct. <a>:1", ex.message)
+            assertEquals("The template variable \"a\" is not bound to a value. Make sure the variable name is correct at [a]:1", ex.message)
         }
     }
 
