@@ -227,9 +227,9 @@ internal class TwoWayTemplateStatementBuilder(
             var index = 0
             val idIndex = id + "_index"
             val idHasNext = id + "_has_next"
-            val idComma = id + "_comma"
-            val idAnd = id + "_and"
-            val idOr = id + "_or"
+            val idComma = id + "_next_comma"
+            val idAnd = id + "_next_and"
+            val idOr = id + "_next_or"
             while (it.hasNext()) {
                 val each = it.next()
                 s.valueMap[id] = newValue(each)

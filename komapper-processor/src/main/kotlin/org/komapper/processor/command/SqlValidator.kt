@@ -121,9 +121,9 @@ internal class SqlValidator(
                 id to type,
                 id + "_index" to intType,
                 id + "_has_next" to booleanType,
-                id + "_comma" to stringType,
-                id + "_and" to stringType,
-                id + "_or" to stringType,
+                id + "_next_comma" to stringType,
+                id + "_next_and" to stringType,
+                id + "_next_or" to stringType,
             )
             forDirective.nodeList.fold(newParamMap, ::visit)
         }
