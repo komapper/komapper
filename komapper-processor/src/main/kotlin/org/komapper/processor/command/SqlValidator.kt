@@ -24,6 +24,7 @@ internal class SqlValidator(
     private val intType = context.resolver.builtIns.intType
     private val booleanType = context.resolver.builtIns.booleanType
     private val iterableType = context.resolver.builtIns.iterableType
+    private val stringType = context.resolver.builtIns.stringType
 
     fun validate(): Set<String> {
         val node = nodeFactory.get(sql)
@@ -120,6 +121,9 @@ internal class SqlValidator(
                 id to type,
                 id + "_index" to intType,
                 id + "_has_next" to booleanType,
+                id + "_next_comma" to stringType,
+                id + "_next_and" to stringType,
+                id + "_next_or" to stringType,
             )
             forDirective.nodeList.fold(newParamMap, ::visit)
         }

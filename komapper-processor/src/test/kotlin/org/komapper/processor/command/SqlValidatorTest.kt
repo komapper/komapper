@@ -128,6 +128,24 @@ class SqlValidatorTest : AbstractKspTest() {
     }
 
     @Test
+    fun `for - special variables - success`() {
+        val result = compile("") { env, resolver ->
+            val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
+            val sql = "/*%for item in items */ /*# item_index */ /*# item_has_next */ /*# item_next_comma */ /*# item_next_and */ /*# item_next_or */ /*%end */"
+            val iterableDecl = resolver.builtIns.iterableType.declaration as KSClassDeclaration
+            val typeRef = resolver.createKSTypeReferenceFromKSType(resolver.builtIns.stringType)
+            val typeArg = resolver.getTypeArgument(typeRef, Variance.INVARIANT)
+            val iterableType = iterableDecl.asType(listOf(typeArg))
+            val paramMap = mapOf("items" to iterableType)
+            val usedParams = SqlValidator(context, sql, paramMap).validate()
+            assertEquals(setOf("items", "item_index", "item_has_next", "item_next_comma", "item_next_and", "item_next_or"), usedParams)
+
+            emptyList()
+        }
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
     fun `for - ExprMustBeIterableException`() {
         val result = compile("") { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)

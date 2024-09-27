@@ -227,11 +227,17 @@ internal class TwoWayTemplateStatementBuilder(
             var index = 0
             val idIndex = id + "_index"
             val idHasNext = id + "_has_next"
+            val idComma = id + "_next_comma"
+            val idAnd = id + "_next_and"
+            val idOr = id + "_next_or"
             while (it.hasNext()) {
                 val each = it.next()
                 s.valueMap[id] = newValue(each)
                 s.valueMap[idIndex] = Value(index++, typeOf<Int>())
                 s.valueMap[idHasNext] = Value(it.hasNext(), typeOf<Boolean>())
+                s.valueMap[idComma] = Value(if (it.hasNext()) "," else "", typeOf<String>())
+                s.valueMap[idAnd] = Value(if (it.hasNext()) "and" else "", typeOf<String>())
+                s.valueMap[idOr] = Value(if (it.hasNext()) "or" else "", typeOf<String>())
                 s = node.forDirective.nodeList.fold(s, ::visit)
             }
             if (preserved != null) {
@@ -239,6 +245,9 @@ internal class TwoWayTemplateStatementBuilder(
             }
             s.valueMap.remove(idIndex)
             s.valueMap.remove(idHasNext)
+            s.valueMap.remove(idComma)
+            s.valueMap.remove(idAnd)
+            s.valueMap.remove(idOr)
             s
         }
 
