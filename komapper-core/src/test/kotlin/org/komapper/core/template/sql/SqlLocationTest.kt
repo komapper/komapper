@@ -13,16 +13,15 @@ class SqlLocationTest {
             |from
             |  emp
         """.trimMargin()
-        val location = SqlLocation(sql, 3, 4)
+        val location = SqlLocation(sql, 3, 2, 4)
         assertEquals(
             """
             |[
             |select
             |  *
-            |from
-            |...^
+            |fr>>>om<<<
             |  emp
-            |]:3:4
+            |]:3:2..4
             """.trimMargin(),
             location.toString(),
         )
@@ -36,16 +35,15 @@ class SqlLocationTest {
             |from
             |  emp
         """.trimMargin()
-        val location = SqlLocation(sql, 3, 0)
+        val location = SqlLocation(sql, 3, 0, 4)
         assertEquals(
             """
             |[
             |select
             |  *
-            |from
-            |^
+            |>>>from<<<
             |  emp
-            |]:3:0
+            |]:3:0..4
             """.trimMargin(),
             location.toString(),
         )

@@ -49,10 +49,12 @@ class ExprTokenizer(private val expression: String) {
     private var binaryOpAvailable = false
     private var type = EOE
     var token = ""
+    private var startIndex = 0
     val location
-        get() = ExprLocation(expression, buf.position())
+        get() = ExprLocation(expression, startIndex, buf.position())
 
     operator fun next(): ExprTokenType {
+        startIndex = buf.position()
         read()
         tokenBuf.limit(buf.position())
         token = tokenBuf.toString()

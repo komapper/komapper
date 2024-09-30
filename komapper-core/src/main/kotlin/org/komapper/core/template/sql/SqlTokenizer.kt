@@ -52,14 +52,16 @@ internal class SqlTokenizer(private val sql: String) {
     private var type: SqlTokenType = EOF
     var token: String = ""
         private set
+    private var startColumnIndex: Int = 0
 
     val location
-        get() = SqlLocation(sql, lineNumber, buf.position() - lineStartPosition)
+        get() = SqlLocation(sql, lineNumber, startColumnIndex, buf.position() - lineStartPosition)
 
     fun next(): SqlTokenType {
         if (type == EOL) {
             lineStartPosition = buf.position()
         }
+        startColumnIndex = buf.position() - lineStartPosition
         read()
         tokenBuf.limit(buf.position())
         token = tokenBuf.toString()
