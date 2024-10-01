@@ -5,6 +5,7 @@ import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.core.template.expression.ExprTokenType.CLASS_REF
 import org.komapper.core.template.expression.ExprTokenType.DOUBLE
 import org.komapper.core.template.expression.ExprTokenType.EOE
+import org.komapper.core.template.expression.ExprTokenType.EOL
 import org.komapper.core.template.expression.ExprTokenType.FALSE
 import org.komapper.core.template.expression.ExprTokenType.FLOAT
 import org.komapper.core.template.expression.ExprTokenType.INT
@@ -161,6 +162,42 @@ class ExprTokenizerTest {
         assertEquals(VALUE, tokenizer.next())
         assertEquals("ccc", tokenizer.token)
         assertEquals(8, tokenizer.location.startIndex)
+    }
+
+    @Test
+    fun eol() {
+        val tokenizer = ExprTokenizer("aaa\r\nbbb\rccc\nddd")
+        assertEquals(1, tokenizer.location.lineNumber)
+        assertEquals(0, tokenizer.location.startIndex)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("aaa", tokenizer.token)
+        assertEquals(1, tokenizer.location.lineNumber)
+        assertEquals(0, tokenizer.location.startIndex)
+        assertEquals(EOL, tokenizer.next())
+        assertEquals("\r\n", tokenizer.token)
+        assertEquals(2, tokenizer.location.lineNumber)
+        assertEquals(3, tokenizer.location.startIndex)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("bbb", tokenizer.token)
+        assertEquals(2, tokenizer.location.lineNumber)
+        assertEquals(0, tokenizer.location.startIndex)
+        assertEquals(EOL, tokenizer.next())
+        assertEquals("\r", tokenizer.token)
+        assertEquals(3, tokenizer.location.lineNumber)
+        assertEquals(3, tokenizer.location.startIndex)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("ccc", tokenizer.token)
+        assertEquals(3, tokenizer.location.lineNumber)
+        assertEquals(0, tokenizer.location.startIndex)
+        assertEquals(EOL, tokenizer.next())
+        assertEquals("\n", tokenizer.token)
+        assertEquals(4, tokenizer.location.lineNumber)
+        assertEquals(3, tokenizer.location.startIndex)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("ddd", tokenizer.token)
+        assertEquals(4, tokenizer.location.lineNumber)
+        assertEquals(0, tokenizer.location.startIndex)
+        assertEquals(EOE, tokenizer.next())
     }
 
     @Test

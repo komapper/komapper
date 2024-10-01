@@ -35,5 +35,6 @@ enum class ExprTokenType {
     IS,
     AS,
     OTHER,
+    EOL,
     EOE,
 }

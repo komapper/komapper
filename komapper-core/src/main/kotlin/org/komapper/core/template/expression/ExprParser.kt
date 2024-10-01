@@ -10,6 +10,7 @@ import org.komapper.core.template.expression.ExprTokenType.CLOSE_PAREN
 import org.komapper.core.template.expression.ExprTokenType.COMMA
 import org.komapper.core.template.expression.ExprTokenType.DOUBLE
 import org.komapper.core.template.expression.ExprTokenType.EOE
+import org.komapper.core.template.expression.ExprTokenType.EOL
 import org.komapper.core.template.expression.ExprTokenType.EQ
 import org.komapper.core.template.expression.ExprTokenType.FALSE
 import org.komapper.core.template.expression.ExprTokenType.FLOAT
@@ -60,7 +61,7 @@ internal class ExprParser(
                 EOE -> break@outer
                 OPEN_PAREN -> parseParen()
                 CLOSE_PAREN -> break@outer
-                WHITESPACE -> {
+                WHITESPACE, EOL -> {
                 }
                 CLASS_REF -> parseClassRef()
                 VALUE -> parseValue()
