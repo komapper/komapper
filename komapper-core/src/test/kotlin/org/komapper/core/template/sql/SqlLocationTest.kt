@@ -13,7 +13,7 @@ class SqlLocationTest {
             |from
             |  emp
         """.trimMargin()
-        val location = SqlLocation(sql, 3, 2, 4)
+        val location = SqlLocation(sql, 3, 0, 2, 4)
         assertEquals(
             """
             |[
@@ -21,21 +21,21 @@ class SqlLocationTest {
             |  *
             |fr>>>om<<<
             |  emp
-            |]:3:2..4
+            |]:3:3
             """.trimMargin(),
             location.toString(),
         )
     }
 
     @Test
-    fun `position is 0`() {
+    fun `startColumnIndex is 0`() {
         val sql = """
             |select
             |  *
             |from
             |  emp
         """.trimMargin()
-        val location = SqlLocation(sql, 3, 0, 4)
+        val location = SqlLocation(sql, 3, 0, 0, 4)
         assertEquals(
             """
             |[
@@ -43,7 +43,7 @@ class SqlLocationTest {
             |  *
             |>>>from<<<
             |  emp
-            |]:3:0..4
+            |]:3:1
             """.trimMargin(),
             location.toString(),
         )

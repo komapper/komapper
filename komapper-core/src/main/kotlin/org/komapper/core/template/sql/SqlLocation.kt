@@ -3,8 +3,10 @@ package org.komapper.core.template.sql
 class SqlLocation(
     private val sql: String,
     val lineNumber: Int,
-    val startColumnIndex: Int,
-    val endColumnIndex: Int,
+    @Deprecated("Do not use this property directly.")
+    val position: Int,
+    val startColumnIndex: Int = -1,
+    val endColumnIndex: Int = -1,
 ) {
     companion object {
         private const val MARKER_START = ">>>"
@@ -14,7 +16,7 @@ class SqlLocation(
     override fun toString(): String = """
         |[
         |${highlightSql()}
-        |]:$lineNumber:$startColumnIndex..$endColumnIndex
+        |]:$lineNumber:${startColumnIndex + 1}
     """.trimMargin()
 
     private fun highlightSql(): String {

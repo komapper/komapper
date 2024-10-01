@@ -146,27 +146,21 @@ class ExprTokenizerTest {
     fun index() {
         val tokenizer = ExprTokenizer("aaa bbb ccc")
         assertEquals(0, tokenizer.location.startIndex)
-        assertEquals(0, tokenizer.location.endIndex)
         assertEquals(VALUE, tokenizer.next())
         assertEquals("aaa", tokenizer.token)
         assertEquals(0, tokenizer.location.startIndex)
-        assertEquals(3, tokenizer.location.endIndex)
         assertEquals(WHITESPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
         assertEquals(3, tokenizer.location.startIndex)
-        assertEquals(4, tokenizer.location.endIndex)
         assertEquals(VALUE, tokenizer.next())
         assertEquals("bbb", tokenizer.token)
         assertEquals(4, tokenizer.location.startIndex)
-        assertEquals(7, tokenizer.location.endIndex)
         assertEquals(WHITESPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
         assertEquals(7, tokenizer.location.startIndex)
-        assertEquals(8, tokenizer.location.endIndex)
         assertEquals(VALUE, tokenizer.next())
         assertEquals("ccc", tokenizer.token)
         assertEquals(8, tokenizer.location.startIndex)
-        assertEquals(11, tokenizer.location.endIndex)
     }
 
     @Test

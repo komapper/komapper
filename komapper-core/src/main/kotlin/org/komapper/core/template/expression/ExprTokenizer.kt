@@ -51,7 +51,7 @@ class ExprTokenizer(private val expression: String) {
     var token = ""
     private var startIndex = 0
     val location
-        get() = ExprLocation(expression, startIndex, buf.position())
+        get() = ExprLocation(expression, buf.position(), startIndex)
 
     operator fun next(): ExprTokenType {
         startIndex = buf.position()
