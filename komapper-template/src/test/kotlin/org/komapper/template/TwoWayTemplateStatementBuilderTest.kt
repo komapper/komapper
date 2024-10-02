@@ -49,7 +49,7 @@ class TwoWayTemplateStatementBuilderTest {
     }
 
     @Test
-    fun `The expression evaluation was failed`() {
+    fun `The expression evaluation failed`() {
         val template =
             "select name, age from person where name = /*name.a*/'test'"
         val exception = assertFailsWith<SqlException> {
