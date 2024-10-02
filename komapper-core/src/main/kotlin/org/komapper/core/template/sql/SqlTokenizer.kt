@@ -55,7 +55,7 @@ internal class SqlTokenizer(private val sql: String) {
     private var columnIndex: Int = 0
 
     val location
-        get() = SqlLocation(sql, lineIndex + 1, buf.position() - lineStartPosition, columnIndex + 1, buf.position() - columnIndex)
+        get() = SqlLocation(sql, lineIndex + 1, buf.position() - lineStartPosition, columnIndex + 1, buf.position() - lineStartPosition - columnIndex)
 
     fun next(): SqlTokenType {
         if (type == EOL) {

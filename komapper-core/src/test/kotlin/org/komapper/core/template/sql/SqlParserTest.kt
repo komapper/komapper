@@ -42,6 +42,53 @@ class SqlParserTest {
         assertEquals(sql, node.toText())
     }
 
+    @Test
+    fun location() {
+        val sql = """
+            |select
+            |   name,
+            |   age
+            |from
+            |   person
+            |where
+            |   name = /*name*/'test'
+            |   and
+            |   age > 1
+            |order by
+            |   name,
+            |   age
+            |for update
+        """.trimMargin()
+        val statementNode = SqlParser(sql).parse()
+        assertTrue(statementNode is SqlNode.Statement)
+        val selectNode = statementNode.nodeList.filterIsInstance<SqlNode.Clause.Select>().single()
+        val fromNode = selectNode.nodeList.filterIsInstance<SqlNode.Clause.From>().single()
+        println(fromNode.location)
+        assertEquals(4, fromNode.location.lineNumber)
+        assertEquals(1, fromNode.location.columnNumber)
+        assertEquals(4, fromNode.location.tokenLength)
+        assertEquals(
+            """
+            |[
+            |select
+            |   name,
+            |   age
+            |>>>from<<<
+            |   person
+            |where
+            |   name = /*name*/'test'
+            |   and
+            |   age > 1
+            |order by
+            |   name,
+            |   age
+            |for update
+            |]:4:1
+            """.trimMargin(),
+            fromNode.location.toString(),
+        )
+    }
+
     @Nested
     inner class ClauseTest {
         @Test
