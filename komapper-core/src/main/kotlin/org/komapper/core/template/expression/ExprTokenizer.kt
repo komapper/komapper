@@ -47,20 +47,20 @@ class ExprTokenizer(private val expression: String) {
     private val lookahead = CharArray(LOOKAHEAD_SIZE)
     private val buf = CharBuffer.wrap(expression)
     private val tokenBuf = buf.asReadOnlyBuffer()
-    private var lineNumber: Int = 1
+    private var lineIndex: Int = 0
     private var lineStartPosition: Int = 0
     private var binaryOpAvailable = false
     private var type = EOE
     var token = ""
-    private var startColumnIndex = 0
+    private var columnIndex: Int = 0
     val location
-        get() = ExprLocation(expression, buf.position(), lineNumber, startColumnIndex)
+        get() = ExprLocation(expression, buf.position(), lineIndex + 1, columnIndex + 1)
 
     operator fun next(): ExprTokenType {
         if (type == EOL) {
             lineStartPosition = buf.position()
         }
-        startColumnIndex = buf.position() - lineStartPosition
+        columnIndex = buf.position() - lineStartPosition
         read()
         tokenBuf.limit(buf.position())
         token = tokenBuf.toString()
@@ -181,7 +181,7 @@ class ExprTokenizer(private val expression: String) {
         }
         if (c[0] == '\r' && c[1] == '\n') {
             type = EOL
-            lineNumber++
+            lineIndex++
             return
         }
         buf.position(buf.position() - 1)
@@ -202,7 +202,7 @@ class ExprTokenizer(private val expression: String) {
         }
         if (c == '\r' || c == '\n') {
             type = EOL
-            lineNumber++
+            lineIndex++
             return
         } else if (c.isWhitespace()) {
             type = WHITESPACE

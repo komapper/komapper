@@ -5,8 +5,8 @@ class SqlLocation(
     val lineNumber: Int,
     @Deprecated("Do not use this property directly.")
     val position: Int,
-    val startColumnIndex: Int = -1,
-    val endColumnIndex: Int = -1,
+    val columnNumber: Int,
+    val tokenLength: Int,
 ) {
     companion object {
         private const val MARKER_START = ">>>"
@@ -16,19 +16,22 @@ class SqlLocation(
     override fun toString(): String = """
         |[
         |${highlightSql()}
-        |]:$lineNumber:${startColumnIndex + 1}
+        |]:$lineNumber:$columnNumber
     """.trimMargin()
 
     private fun highlightSql(): String {
+        val lineIndex = lineNumber - 1
+        val startColumnIndex = columnNumber - 1
+        val endColumnIndex = startColumnIndex + tokenLength
         val lines = sql.lines()
 
-        // Check if the line number is within the valid range
-        if (lineNumber !in 1..lines.size) {
+        // Check if the line index is within the valid range
+        if (lineIndex !in lines.indices) {
             return sql
         }
 
         val highlightedLines = lines.toMutableList()
-        val targetLine = lines[lineNumber - 1]
+        val targetLine = lines[lineIndex]
 
         // Check if the column indices are within the valid range
         if (startColumnIndex !in 0..targetLine.length || endColumnIndex !in startColumnIndex..targetLine.length) {
@@ -43,7 +46,7 @@ class SqlLocation(
             append(MARKER_END)
             append(targetLine.substring(endColumnIndex))
         }
-        highlightedLines[lineNumber - 1] = highlightedLine
+        highlightedLines[lineIndex] = highlightedLine
 
         return highlightedLines.joinToString("\n")
     }
