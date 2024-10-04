@@ -188,7 +188,7 @@ class CommandProcessorErrorTest : AbstractKspTest(CommandProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The parameter \"d\" is not found at <d>:1. Available parameters are: [a, b, c]"))
+        assertTrue(result.messages.contains("The parameter \"d\" is not found at [d]:1:1. Available parameters are: [a, b, c]"))
     }
 
     @Test

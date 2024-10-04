@@ -47,19 +47,21 @@ internal class SqlTokenizer(private val sql: String) {
     private val lookahead = CharArray(LOOKAHEAD_SIZE)
     private val buf: CharBuffer = CharBuffer.wrap(sql)
     private val tokenBuf: CharBuffer = buf.asReadOnlyBuffer()
-    private var lineNumber: Int = 1
+    private var lineIndex: Int = 0
     private var lineStartPosition: Int = 0
     private var type: SqlTokenType = EOF
     var token: String = ""
         private set
+    private var columnIndex: Int = 0
 
     val location
-        get() = SqlLocation(sql, lineNumber, buf.position() - lineStartPosition)
+        get() = SqlLocation(sql, lineIndex + 1, buf.position() - lineStartPosition, columnIndex + 1, buf.position() - lineStartPosition - columnIndex)
 
     fun next(): SqlTokenType {
         if (type == EOL) {
             lineStartPosition = buf.position()
         }
+        columnIndex = buf.position() - lineStartPosition
         read()
         tokenBuf.limit(buf.position())
         token = tokenBuf.toString()
@@ -386,7 +388,7 @@ internal class SqlTokenizer(private val sql: String) {
                         return
                     }
                     if (c2 == '\r' && c3 == '\n' || c2 == '\r' || c2 == '\n') {
-                        lineNumber++
+                        lineIndex++
                     }
                     buf.reset()
                 }
@@ -405,7 +407,7 @@ internal class SqlTokenizer(private val sql: String) {
             return
         } else if (c[0] == '\r' && c[1] == '\n') {
             type = EOL
-            lineNumber++
+            lineIndex++
             return
         }
         buf.position(buf.position() - 1)
@@ -479,7 +481,7 @@ internal class SqlTokenizer(private val sql: String) {
             }
         } else if (c == '\r' || c == '\n') {
             type = EOL
-            lineNumber++
+            lineIndex++
         } else {
             type = OTHER
         }

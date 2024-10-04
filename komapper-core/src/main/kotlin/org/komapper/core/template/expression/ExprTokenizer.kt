@@ -10,6 +10,7 @@ import org.komapper.core.template.expression.ExprTokenType.CLOSE_PAREN
 import org.komapper.core.template.expression.ExprTokenType.COMMA
 import org.komapper.core.template.expression.ExprTokenType.DOUBLE
 import org.komapper.core.template.expression.ExprTokenType.EOE
+import org.komapper.core.template.expression.ExprTokenType.EOL
 import org.komapper.core.template.expression.ExprTokenType.EQ
 import org.komapper.core.template.expression.ExprTokenType.FALSE
 import org.komapper.core.template.expression.ExprTokenType.FLOAT
@@ -46,13 +47,20 @@ class ExprTokenizer(private val expression: String) {
     private val lookahead = CharArray(LOOKAHEAD_SIZE)
     private val buf = CharBuffer.wrap(expression)
     private val tokenBuf = buf.asReadOnlyBuffer()
+    private var lineIndex: Int = 0
+    private var lineStartPosition: Int = 0
     private var binaryOpAvailable = false
     private var type = EOE
     var token = ""
+    private var columnIndex: Int = 0
     val location
-        get() = ExprLocation(expression, buf.position())
+        get() = ExprLocation(expression, buf.position(), lineIndex + 1, columnIndex + 1)
 
     operator fun next(): ExprTokenType {
+        if (type == EOL) {
+            lineStartPosition = buf.position()
+        }
+        columnIndex = buf.position() - lineStartPosition
         read()
         tokenBuf.limit(buf.position())
         token = tokenBuf.toString()
@@ -171,6 +179,11 @@ class ExprTokenizer(private val expression: String) {
             }
             return
         }
+        if (c[0] == '\r' && c[1] == '\n') {
+            type = EOL
+            lineIndex++
+            return
+        }
         buf.position(buf.position() - 1)
         readOneChar(c[0])
     }
@@ -187,7 +200,11 @@ class ExprTokenizer(private val expression: String) {
                 return
             }
         }
-        if (c.isWhitespace()) {
+        if (c == '\r' || c == '\n') {
+            type = EOL
+            lineIndex++
+            return
+        } else if (c.isWhitespace()) {
             type = WHITESPACE
             return
         } else if (c == ',') {

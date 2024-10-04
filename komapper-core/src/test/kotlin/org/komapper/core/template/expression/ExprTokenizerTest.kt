@@ -5,6 +5,7 @@ import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.core.template.expression.ExprTokenType.CLASS_REF
 import org.komapper.core.template.expression.ExprTokenType.DOUBLE
 import org.komapper.core.template.expression.ExprTokenType.EOE
+import org.komapper.core.template.expression.ExprTokenType.EOL
 import org.komapper.core.template.expression.ExprTokenType.FALSE
 import org.komapper.core.template.expression.ExprTokenType.FLOAT
 import org.komapper.core.template.expression.ExprTokenType.INT
@@ -143,24 +144,60 @@ class ExprTokenizerTest {
     }
 
     @Test
-    fun position() {
+    fun columnNumber() {
         val tokenizer = ExprTokenizer("aaa bbb ccc")
-        assertEquals(0, tokenizer.location.position)
+        assertEquals(1, tokenizer.location.columnNumber)
         assertEquals(VALUE, tokenizer.next())
         assertEquals("aaa", tokenizer.token)
-        assertEquals(3, tokenizer.location.position)
+        assertEquals(1, tokenizer.location.columnNumber)
         assertEquals(WHITESPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
-        assertEquals(4, tokenizer.location.position)
+        assertEquals(4, tokenizer.location.columnNumber)
         assertEquals(VALUE, tokenizer.next())
         assertEquals("bbb", tokenizer.token)
-        assertEquals(7, tokenizer.location.position)
+        assertEquals(5, tokenizer.location.columnNumber)
         assertEquals(WHITESPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
-        assertEquals(8, tokenizer.location.position)
+        assertEquals(8, tokenizer.location.columnNumber)
         assertEquals(VALUE, tokenizer.next())
         assertEquals("ccc", tokenizer.token)
-        assertEquals(11, tokenizer.location.position)
+        assertEquals(9, tokenizer.location.columnNumber)
+    }
+
+    @Test
+    fun eol() {
+        val tokenizer = ExprTokenizer("aaa\r\nbbb\rccc\nddd")
+        assertEquals(1, tokenizer.location.lineNumber)
+        assertEquals(1, tokenizer.location.columnNumber)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("aaa", tokenizer.token)
+        assertEquals(1, tokenizer.location.lineNumber)
+        assertEquals(1, tokenizer.location.columnNumber)
+        assertEquals(EOL, tokenizer.next())
+        assertEquals("\r\n", tokenizer.token)
+        assertEquals(2, tokenizer.location.lineNumber)
+        assertEquals(4, tokenizer.location.columnNumber)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("bbb", tokenizer.token)
+        assertEquals(2, tokenizer.location.lineNumber)
+        assertEquals(1, tokenizer.location.columnNumber)
+        assertEquals(EOL, tokenizer.next())
+        assertEquals("\r", tokenizer.token)
+        assertEquals(3, tokenizer.location.lineNumber)
+        assertEquals(4, tokenizer.location.columnNumber)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("ccc", tokenizer.token)
+        assertEquals(3, tokenizer.location.lineNumber)
+        assertEquals(1, tokenizer.location.columnNumber)
+        assertEquals(EOL, tokenizer.next())
+        assertEquals("\n", tokenizer.token)
+        assertEquals(4, tokenizer.location.lineNumber)
+        assertEquals(4, tokenizer.location.columnNumber)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("ddd", tokenizer.token)
+        assertEquals(4, tokenizer.location.lineNumber)
+        assertEquals(1, tokenizer.location.columnNumber)
+        assertEquals(EOE, tokenizer.next())
     }
 
     @Test

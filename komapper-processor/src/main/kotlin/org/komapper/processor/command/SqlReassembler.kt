@@ -184,7 +184,7 @@ internal class SqlReassembler(
         return try {
             exprValidator.validate(expression, paramMap)
         } catch (e: ExprException) {
-            throw SqlPartialEvaluationException("The expression evaluation was failed. ${e.message} at $location. ", e)
+            throw SqlPartialEvaluationException("The expression evaluation failed. ${e.message} at $location. ", e)
         }
     }
 

@@ -308,7 +308,7 @@ internal class TwoWayTemplateStatementBuilder(
     private fun eval(location: SqlLocation, expression: String, ctx: ExprContext): Value<*> = try {
         exprEvaluator.eval(expression, ctx)
     } catch (e: ExprException) {
-        throw SqlException("The expression evaluation was failed at $location.", e)
+        throw SqlException("The expression evaluation failed. ${e.message} at $location.", e)
     }
 
     override fun clearCache() {

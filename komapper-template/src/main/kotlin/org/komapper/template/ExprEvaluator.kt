@@ -248,7 +248,7 @@ internal class DefaultExprEvaluator(
 
     private fun getValue(name: String, location: ExprLocation, ctx: ExprContext): Value<*> {
         return ctx.valueMap[name] ?: exprEnvironment.ctx[name]
-            ?: throw ExprException("The template variable \"${name}\" is not bound to a value. Make sure the variable name is correct. $location")
+            ?: throw ExprException("The template variable \"${name}\" is not bound to a value. Make sure the variable name is correct at $location")
     }
 
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value<*> {

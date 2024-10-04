@@ -103,9 +103,16 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             Unit
         }
         val message = ex.message!!
-        assertEquals("The expression evaluation was failed at <select * from address where street = /*street*/'test'>:1:47.", message)
+        assertEquals(
+            """
+            |The expression evaluation failed. The template variable "street" is not bound to a value. Make sure the variable name is correct at [street]:1:1 at [
+            |select * from address where street = >>>/*street*/<<<'test'
+            |]:1:38.
+            """.trimMargin(),
+            message,
+        )
         val causeMessage = ex.cause!!.message
-        assertEquals("The template variable \"street\" is not bound to a value. Make sure the variable name is correct. <street>:6", causeMessage)
+        assertEquals("The template variable \"street\" is not bound to a value. Make sure the variable name is correct at [street]:1:1", causeMessage)
     }
 
     @Test
