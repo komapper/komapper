@@ -44,3 +44,35 @@ version-resolver:
 
 exclude-labels:
   - 'skip-changelog'
+
+autolabeler:
+  - label: 'chore'
+    branch:
+      - '/chore\/.+/'
+  - label: 'ci'
+    branch:
+      - '/ci\/.+/'
+  - label: 'dependencies'
+    branch:
+      - '/dependencies\/.+/'
+  - label: 'docs'
+    branch:
+      - '/docs\/.+/'
+  - label: 'feature'
+    branch:
+      - '/feat(ure)?\/.+/'
+  - label: 'fix'
+    branch:
+      - '/fix\/.+/'
+  - label: 'perf'
+    branch:
+      - '/perf\/.+/'
+  - label: 'refactor'
+    branch:
+      - '/refactor\/.+/'
+  - label: 'security'
+    branch:
+      - '/security\/.+/'
+  - label: 'test'
+    branch:
+      - '/test\/.+/'
