@@ -43,6 +43,9 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
      */
     val nullable: Boolean
 
+    // TODO
+    val updatable: Boolean
+
     /**
      * Converts the given entity to a `Value` object containing the interior type.
      *
@@ -67,6 +70,7 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val columnName: String get() = descriptor.columnName
     override val alwaysQuote: Boolean get() = descriptor.alwaysQuote
     override val masking: Boolean get() = descriptor.masking
+    override val updatable: Boolean get() = descriptor.updatable
     override val getter: (ENTITY) -> EXTERIOR? get() = descriptor.getter
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = descriptor.setter
     override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.wrap
@@ -84,6 +88,7 @@ class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     override val columnName: String get() = fail()
     override val alwaysQuote: Boolean get() = fail()
     override val masking: Boolean get() = fail()
+    override val updatable: Boolean get() = fail()
     override val getter: (ENTITY) -> EXTERIOR? get() = fail()
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = fail()
     override val wrap: (EXTERIOR) -> EXTERIOR get() = fail()

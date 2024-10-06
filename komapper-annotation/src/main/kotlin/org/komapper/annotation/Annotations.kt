@@ -154,12 +154,14 @@ annotation class KomapperColumn(
     val name: String = NAME,
     val alwaysQuote: Boolean = ALWAYS_QUOTE,
     val masking: Boolean = MASKING,
+    val updatable: Boolean = UPDATABLE,
     val alternateType: KClass<*> = Void::class,
 ) {
     companion object {
         const val NAME = ""
         const val ALWAYS_QUOTE = false
         const val MASKING = false
+        const val UPDATABLE = true
     }
 }
 

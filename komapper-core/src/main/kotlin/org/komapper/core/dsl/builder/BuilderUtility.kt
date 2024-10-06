@@ -64,7 +64,7 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityUps
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityUpsertContext<ENTITY, ID, META>.createAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
     fun properties(meta: META): List<PropertyMetamodel<ENTITY, *, *>> {
-        return meta.properties().filter { it != meta.createdAtProperty() } - meta.idProperties().toSet()
+        return meta.properties().filter { it.updatable && it != meta.createdAtProperty() } - meta.idProperties().toSet()
     }
     return properties(target).zip(properties(excluded)).map { (p1, p2) ->
         p1 to Operand.Column(p2)

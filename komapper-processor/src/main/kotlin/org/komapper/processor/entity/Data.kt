@@ -270,6 +270,7 @@ internal data class Column(
     val name: String,
     val alwaysQuote: Boolean,
     val masking: Boolean,
+    val updatable: Boolean,
     val alternateType: ValueClass?,
 )
 
