@@ -132,6 +132,21 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    fun nonUpdatableColumn_updateSingle(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.man
+        val findQuery = QueryDsl.from(p).where { p.manId eq 1 }.first()
+        val person1 = Man(manId = 1, name = "Alice", createdBy = "nobody", updatedBy = "nobody")
+        val person2 = db.runQuery {
+            QueryDsl.insert(p).single(person1).andThen(findQuery)
+        }
+        val person3 = db.runQuery {
+            QueryDsl.update(p).single(person2.copy(createdBy = "somebody", updatedBy = "somebody")).andThen(findQuery)
+        }
+        assertEquals("nobody", person3.createdBy)
+        assertEquals("somebody", person3.updatedBy)
+    }
+
+    @Test
     fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(1, "STREET 2", 1)

@@ -2,10 +2,12 @@ package integration.jdbc
 
 import integration.core.Address
 import integration.core.IdColumnOnlyAddress
+import integration.core.Man
 import integration.core.Person
 import integration.core.address
 import integration.core.department
 import integration.core.idColumnOnlyAddress
+import integration.core.man
 import integration.core.person
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -206,5 +208,29 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
             db.runQuery { updateQuery }.run { }
         }
         println(ex)
+    }
+
+    @Test
+    fun nonUpdatableColumn_updateBatch() {
+        val p = Meta.man
+        val findQuery = QueryDsl.from(p).where { p.manId inList listOf(1, 2, 3) }
+        val initialList = listOf(
+            Man(manId = 1, name = "Alice", createdBy = "nobody", updatedBy = "nobody"),
+            Man(manId = 2, name = "Bob", createdBy = "nobody", updatedBy = "nobody"),
+            Man(manId = 3, name = "Clair", createdBy = "nobody", updatedBy = "nobody"),
+        )
+        for (person in initialList) {
+            db.runQuery { QueryDsl.insert(p).single(person) }
+        }
+        val beforeUpdate = db.runQuery { findQuery }
+        db.runQuery {
+            val updateList = beforeUpdate.map { it.copy(createdBy = "somebody", updatedBy = "somebody") }
+            QueryDsl.update(p).batch(updateList)
+        }
+        val afterUpdate = db.runQuery { findQuery }
+        for (person in afterUpdate) {
+            assertEquals("nobody", person.createdBy)
+            assertEquals("somebody", person.updatedBy)
+        }
     }
 }

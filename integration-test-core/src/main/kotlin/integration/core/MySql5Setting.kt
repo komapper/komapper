@@ -11,7 +11,7 @@ public interface MySql5Setting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists address(address_id integer not null primary key, street varchar(20) unique, version integer);
         create table if not exists address_archive(address_id integer not null primary key, street varchar(20) unique, version integer);
         create table if not exists employee(employee_id integer not null primary key, employee_no integer not null ,employee_name varchar(20),manager_id integer,hiredate date,salary numeric(7,2),department_id integer,address_id integer, version integer, constraint fk_department_id foreign key(department_id) references department(department_id),constraint fk_address_id foreign key(address_id) references address(address_id));
-        create table if not exists human(human_id integer not null primary key, name varchar(20), created_at timestamp NULL DEFAULT NULL, updated_at timestamp NULL DEFAULT NULL, version integer);
+        create table if not exists human(human_id integer not null primary key, name varchar(20), created_at timestamp NULL DEFAULT NULL, updated_at timestamp NULL DEFAULT NULL, version integer, created_by varchar(20), updated_by varchar(20));
         create table if not exists person(person_id integer not null primary key, name varchar(20), created_at datetime(6), updated_at datetime(6), version integer);
         create table if not exists `order`(`order_id` integer not null primary key, `value` varchar(20));
 

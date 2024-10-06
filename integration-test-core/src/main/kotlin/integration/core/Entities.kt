@@ -111,6 +111,10 @@ public data class Man(
     @KomapperUpdatedAt
     @KomapperColumn("updated_at")
     val updatedAt: Instant? = null,
+    @KomapperColumn("created_by", updatable = false)
+    val createdBy: String? = null,
+    @KomapperColumn("updated_by")
+    val updatedBy: String? = null,
 )
 
 @KomapperEntity
