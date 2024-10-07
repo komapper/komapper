@@ -1,10 +1,12 @@
 package integration.jdbc
 
+import integration.core.Man
 import integration.core.Person
 import integration.core.address
 import integration.core.android
 import integration.core.employee
 import integration.core.identityStrategy
+import integration.core.man
 import integration.core.person
 import integration.core.robot
 import org.junit.jupiter.api.extension.ExtendWith
@@ -13,6 +15,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.operator.times
+import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
@@ -284,6 +287,27 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals(10, address2.version)
+    }
+
+    @Test
+    fun nonUpdatableColumn_updateSetManual() {
+        val p = Meta.man
+        val findQuery = QueryDsl.from(p).where { p.manId eq 1 }.first()
+        val person1 = Man(manId = 1, name = "Alice", createdBy = "nobody", updatedBy = "nobody")
+        db.runQuery {
+            QueryDsl.insert(p).single(person1)
+        }
+        val person2 = db.runQuery {
+            QueryDsl.update(p)
+                .set {
+                    p.createdBy eq "somebody"
+                    p.updatedBy eq "somebody"
+                }
+                .where { p.manId eq 1 }
+                .andThen(findQuery)
+        }
+        assertEquals("somebody", person2.createdBy)
+        assertEquals("somebody", person2.updatedBy)
     }
 
     @Test

@@ -14,7 +14,7 @@ public interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
         create table address(address_id int not null primary key, street varchar(20) unique, version int);
         create table address_archive(address_id int not null primary key, street varchar(20) unique, version int);
         create table employee(employee_id int not null primary key, employee_no int not null ,employee_name varchar(20),manager_id int,hiredate date,salary numeric(7,2),department_id int,address_id int, version int, constraint fk_department_id foreign key(department_id) references department(department_id),constraint fk_address_id foreign key(address_id) references address(address_id));
-        create table human(human_id int not null primary key, name varchar(20), created_at datetimeoffset, updated_at datetimeoffset, version int);
+        create table human(human_id int not null primary key, name varchar(20), created_at datetimeoffset, updated_at datetimeoffset, version int, created_by varchar(20), updated_by varchar(20));
         create table person(person_id int not null primary key, name varchar(20), created_at datetime2, updated_at datetime2, version int);
         create table [order]([order_id] int not null primary key, [value] varchar(20));
 

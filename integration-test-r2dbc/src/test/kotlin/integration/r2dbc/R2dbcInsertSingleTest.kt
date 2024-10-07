@@ -317,6 +317,23 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    fun onDuplicateKeyUpdate_nonUpdatableColumn(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.man
+        val person1 = Man(manId = 1, name = "Alice", createdBy = "nobody", updatedBy = "nobody")
+        db.runQuery {
+            QueryDsl.insert(p).onDuplicateKeyUpdate().single(person1)
+        }
+        val person2 = person1.copy(createdBy = "somebody", updatedBy = "somebody")
+        db.runQuery {
+            QueryDsl.insert(p).onDuplicateKeyUpdate().single(person2)
+        }
+        val person3 = db.runQuery { QueryDsl.from(p).where { p.manId eq 1 }.first() }
+
+        assertEquals("nobody", person3.createdBy)
+        assertEquals("somebody", person3.updatedBy)
+    }
+
+    @Test
     fun onDuplicateKeyUpdate_update_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)

@@ -2,10 +2,12 @@ package integration.r2dbc
 
 import integration.core.Address
 import integration.core.Dbms
+import integration.core.Man
 import integration.core.Person
 import integration.core.Run
 import integration.core.address
 import integration.core.department
+import integration.core.man
 import integration.core.person
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
@@ -166,6 +168,31 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
             assertTrue(a.departmentName.endsWith("]"))
             assertFalse(a.location.startsWith("["))
             assertFalse(a.location.endsWith("]"))
+        }
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun nonUpdatableColumn_updateBatch(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.man
+        val findQuery = QueryDsl.from(p).where { p.manId inList listOf(1, 2, 3) }
+        val initialList = listOf(
+            Man(manId = 1, name = "Alice", createdBy = "nobody", updatedBy = "nobody"),
+            Man(manId = 2, name = "Bob", createdBy = "nobody", updatedBy = "nobody"),
+            Man(manId = 3, name = "Clair", createdBy = "nobody", updatedBy = "nobody"),
+        )
+        for (person in initialList) {
+            db.runQuery { QueryDsl.insert(p).single(person) }
+        }
+        val beforeUpdate = db.runQuery { findQuery }
+        db.runQuery {
+            val updateList = beforeUpdate.map { it.copy(createdBy = "somebody", updatedBy = "somebody") }
+            QueryDsl.update(p).batch(updateList)
+        }
+        val afterUpdate = db.runQuery { findQuery }
+        for (person in afterUpdate) {
+            assertEquals("nobody", person.createdBy)
+            assertEquals("somebody", person.updatedBy)
         }
     }
 }

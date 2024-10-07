@@ -283,7 +283,13 @@ internal class EntityFactory(
     private fun getColumn(column: Column?, parameter: KSValueParameter): Column {
         return if (column == null) {
             val name = parameter.toString()
-            Column(context.config.namingStrategy.apply(name), alwaysQuote = false, masking = false, alternateType = null)
+            Column(
+                context.config.namingStrategy.apply(name),
+                alwaysQuote = false,
+                masking = false,
+                updatable = true,
+                alternateType = null,
+            )
         } else {
             column
         }

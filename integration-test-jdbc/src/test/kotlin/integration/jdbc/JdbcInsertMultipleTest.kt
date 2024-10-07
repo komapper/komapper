@@ -4,11 +4,13 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Department
 import integration.core.IdentityStrategy
+import integration.core.Man
 import integration.core.Person
 import integration.core.Run
 import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
+import integration.core.man
 import integration.core.person
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -143,6 +145,28 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
             list.map { it.departmentName to it.location },
         )
+    }
+
+    @Test
+    fun onDuplicateKeyUpdate_nonUpdatableColumn() {
+        val p = Meta.man
+        val initialList = listOf(
+            Man(manId = 1, name = "Alice", createdBy = "nobody", updatedBy = "nobody"),
+            Man(manId = 2, name = "Bob", createdBy = "nobody", updatedBy = "nobody"),
+            Man(manId = 3, name = "Clair", createdBy = "nobody", updatedBy = "nobody"),
+        )
+        val findQuery = QueryDsl.from(p).where { p.manId inList listOf(1, 2, 3) }
+        db.runQuery { QueryDsl.insert(p).onDuplicateKeyUpdate().multiple(initialList) }
+        val beforeUpdate = db.runQuery { findQuery }
+        db.runQuery {
+            val updateList = beforeUpdate.map { it.copy(createdBy = "somebody", updatedBy = "somebody") }
+            QueryDsl.insert(p).onDuplicateKeyUpdate().multiple(updateList)
+        }
+        val afterUpdate = db.runQuery { findQuery }
+        for (person in afterUpdate) {
+            assertEquals("nobody", person.createdBy)
+            assertEquals("somebody", person.updatedBy)
+        }
     }
 
     @Test

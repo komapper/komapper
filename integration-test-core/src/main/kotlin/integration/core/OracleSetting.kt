@@ -13,7 +13,7 @@ public interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
         create table address(address_id integer not null primary key, street varchar2(20) unique, version integer);
         create table address_archive(address_id integer not null primary key, street varchar2(20) unique, version integer);
         create table employee(employee_id integer not null primary key, employee_no integer not null ,employee_name varchar2(20),manager_id integer,hiredate date,salary numeric(7,2),department_id integer,address_id integer, version integer, constraint fk_department_id foreign key(department_id) references department(department_id), constraint fk_address_id foreign key(address_id) references address(address_id));
-        create table human(human_id integer not null primary key, name varchar2(20), created_at timestamp with time zone, updated_at timestamp with time zone, version integer);
+        create table human(human_id integer not null primary key, name varchar2(20), created_at timestamp with time zone, updated_at timestamp with time zone, version integer, created_by varchar2(20), updated_by varchar2(20));
         create table person(person_id integer not null primary key, name varchar2(20), created_at timestamp, updated_at timestamp, version integer);
         create table "order"("order_id" integer not null primary key, "value" varchar2(20));
 

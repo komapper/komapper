@@ -33,7 +33,8 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         val createdAtProperty = target.createdAtProperty()
         val updatedAtProperty = target.updatedAtProperty()
         val base = includedProperties.toSet().ifEmpty { target.properties().toSet() } - excludedProperties.toSet()
-        val subtraction = idProperties.toSet() + setOfNotNull(createdAtProperty)
+        val subtraction = idProperties.toSet() + setOfNotNull(createdAtProperty) +
+            target.properties().filter { !it.updatable }.toSet()
         val addition = setOfNotNull(versionProperty, updatedAtProperty)
         return (base - subtraction + addition).toList()
     }
