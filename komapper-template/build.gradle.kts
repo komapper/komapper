@@ -1,4 +1,4 @@
 dependencies {
     api(project(":komapper-core"))
-    implementation(kotlin("reflect"))
+    implementation(libs.kotlin.reflect)
 }

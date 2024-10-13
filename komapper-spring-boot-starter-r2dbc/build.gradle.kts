@@ -1,17 +1,14 @@
 dependencies {
-    val kotlinCoroutinesVersion: String by project
-    val springVersion: String by project
-    val springBootVersion: String by project
-    api("org.springframework:spring-beans:$springVersion")
-    api("org.springframework:spring-core:$springVersion")
-    api("org.springframework:spring-context:$springVersion")
-    api("org.springframework:spring-r2dbc:$springVersion")
-    api("org.springframework:spring-tx:$springVersion")
-    api("org.springframework.boot:spring-boot-starter:$springBootVersion")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinCoroutinesVersion")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinCoroutinesVersion")
-    api("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
+    api(libs.spring.beans)
+    api(libs.spring.core)
+    api(libs.spring.context)
+    api(libs.spring.r2dbc)
+    api(libs.spring.tx)
+    api(libs.spring.boot.starter)
+    api(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.coroutines.reactive)
+    api(libs.kotlinx.coroutines.reactor)
+    api(libs.r2dbc.pool)
     api(project(":komapper-annotation"))
     api(project(":komapper-r2dbc"))
     runtimeOnly(project(":komapper-datetime-r2dbc"))

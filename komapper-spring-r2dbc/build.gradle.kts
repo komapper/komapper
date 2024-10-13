@@ -1,17 +1,15 @@
 plugins {
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
-    val kotlinCoroutinesVersion: String by project
-    val springVersion: String by project
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinCoroutinesVersion")
-    implementation("org.springframework:spring-r2dbc:$springVersion")
+    implementation(libs.kotlinx.coroutines.reactor)
+    implementation(libs.spring.r2dbc)
     implementation(project(":komapper-r2dbc"))
     implementation(project(":komapper-spring"))
     testImplementation(project(":komapper-annotation"))
     testImplementation(project(":komapper-slf4j"))
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.10")
+    testRuntimeOnly(libs.logback.classic)
     testImplementation(project(":komapper-dialect-h2-r2dbc"))
     kspTest(project(":komapper-processor"))
 }

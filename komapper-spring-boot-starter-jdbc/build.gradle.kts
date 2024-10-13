@@ -1,7 +1,6 @@
 dependencies {
-    val springBootVersion: String by project
-    api("org.springframework.boot:spring-boot-starter:$springBootVersion")
-    api("org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion")
+    api(libs.spring.boot.starter)
+    api(libs.spring.boot.starter.jdbc)
     api(project(":komapper-annotation"))
     api(project(":komapper-jdbc"))
     runtimeOnly(project(":komapper-datetime-jdbc"))

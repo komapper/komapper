@@ -1,7 +1,7 @@
 plugins {
-    id("org.springframework.boot")
-    id("com.google.devtools.ksp")
-    kotlin("plugin.spring")
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.plugin.spring)
 }
 
 apply(plugin = "io.spring.dependency-management")

@@ -1,13 +1,13 @@
 plugins {
     application
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
     val kotlinxDatetime: String by project
     ksp(project(":komapper-processor"))
     implementation(project(":komapper-starter-r2dbc"))
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetime")
+    implementation(libs.kotlinx.datetime)
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
 }
 
