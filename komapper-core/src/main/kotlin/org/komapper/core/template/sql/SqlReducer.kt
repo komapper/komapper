@@ -1,6 +1,6 @@
 package org.komapper.core.template.sql
 
-import java.util.*
+import java.util.LinkedList
 
 internal abstract class SqlReducer {
     protected val nodeList = LinkedList<SqlNode>()
@@ -110,7 +110,6 @@ internal class LiteralValueDirectiveReducer(
 internal abstract class BlockReducer : SqlReducer()
 
 internal class IfBlockReducer(private val location: SqlLocation) : BlockReducer() {
-
     override fun addNode(node: SqlNode) = when (node) {
         is SqlNode.IfDirective,
         is SqlNode.ElseifDirective,
@@ -166,7 +165,6 @@ internal class IfBlockReducer(private val location: SqlLocation) : BlockReducer(
 }
 
 internal class ForBlockReducer(private val location: SqlLocation) : BlockReducer() {
-
     override fun addNode(node: SqlNode) = when (node) {
         is SqlNode.ForDirective, is SqlNode.EndDirective -> super.addNode(node)
         else -> error(node)
@@ -190,7 +188,6 @@ internal class ForBlockReducer(private val location: SqlLocation) : BlockReducer
 }
 
 internal class WithBlockReducer(private val location: SqlLocation) : BlockReducer() {
-
     override fun addNode(node: SqlNode) = when (node) {
         is SqlNode.WithDirective, is SqlNode.EndDirective -> super.addNode(node)
         else -> error(node)
