@@ -1,14 +1,13 @@
 plugins {
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
-    val kotlinxDatetime: String by project
     compileOnly(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(project(":komapper-core"))
-    api("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetime")
-    implementation("ch.qos.logback:logback-classic:1.5.10")
+    api(libs.kotlinx.datetime)
+    implementation(libs.logback.classic)
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
 }

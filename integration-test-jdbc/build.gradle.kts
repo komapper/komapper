@@ -2,7 +2,7 @@
 
 plugins {
     `jvm-test-suite`
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
@@ -12,7 +12,7 @@ dependencies {
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(project(":komapper-codegen"))
-    api(platform("org.testcontainers:testcontainers-bom:1.20.2"))
+    api(platform(libs.testcontainers.bom))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 
@@ -61,7 +61,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                runtimeOnly("org.testcontainers:mariadb")
+                runtimeOnly(libs.testcontainers.mariadb)
                 runtimeOnly(project(":komapper-dialect-mariadb-jdbc"))
             }
         }
@@ -70,7 +70,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                runtimeOnly("org.testcontainers:mysql")
+                runtimeOnly(libs.testcontainers.mysql)
                 runtimeOnly(project(":komapper-dialect-mysql-jdbc"))
             }
         }
@@ -79,7 +79,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                runtimeOnly("org.testcontainers:mysql")
+                runtimeOnly(libs.testcontainers.mysql)
                 implementation(project(":komapper-dialect-mysql-jdbc"))
             }
         }
@@ -88,7 +88,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                runtimeOnly("org.testcontainers:oracle-xe")
+                runtimeOnly(libs.testcontainers.oracle)
                 runtimeOnly(project(":komapper-dialect-oracle-jdbc"))
             }
         }
@@ -97,7 +97,7 @@ testing {
             setup(name)
             dependencies {
                 implementation.add(project())
-                runtimeOnly("org.testcontainers:postgresql")
+                runtimeOnly(libs.testcontainers.postgresql)
                 implementation(project(":komapper-dialect-postgresql-jdbc"))
             }
         }
@@ -106,7 +106,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                runtimeOnly("org.testcontainers:mssqlserver")
+                runtimeOnly(libs.testcontainers.sqlserver)
                 runtimeOnly(project(":komapper-dialect-sqlserver-jdbc"))
             }
         }

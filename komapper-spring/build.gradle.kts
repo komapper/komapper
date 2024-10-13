@@ -1,5 +1,4 @@
 dependencies {
-    val springVersion: String by project
-    implementation("org.springframework:spring-tx:$springVersion")
+    implementation(libs.spring.tx)
     implementation(project(":komapper-tx-core"))
 }

@@ -2,7 +2,7 @@
 
 plugins {
     `jvm-test-suite`
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
@@ -11,8 +11,8 @@ dependencies {
     api(project(":komapper-datetime-r2dbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
-    api("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
-    api(platform("org.testcontainers:testcontainers-bom:1.20.2"))
+    api(libs.r2dbc.pool)
+    api(platform(libs.testcontainers.bom))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
     api("org.testcontainers:r2dbc")
 }
@@ -55,9 +55,9 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:mariadb")
+                implementation(libs.testcontainers.mariadb)
                 implementation(project(":komapper-dialect-mariadb-r2dbc"))
-                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.4.1")
+                runtimeOnly(libs.jdbc.mariadb)
             }
         }
 
@@ -65,9 +65,9 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:mysql")
+                implementation(libs.testcontainers.mysql)
                 implementation(project(":komapper-dialect-mysql-r2dbc"))
-                runtimeOnly("mysql:mysql-connector-java:8.0.33")
+                runtimeOnly(libs.jdbc.mysql)
             }
         }
 
@@ -75,9 +75,9 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:mysql")
+                implementation(libs.testcontainers.mysql)
                 implementation(project(":komapper-dialect-mysql-r2dbc"))
-                runtimeOnly("mysql:mysql-connector-java:8.0.33")
+                runtimeOnly(libs.jdbc.mysql)
             }
         }
 
@@ -85,7 +85,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:oracle-xe")
+                implementation(libs.testcontainers.oracle)
                 implementation(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
@@ -94,7 +94,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:postgresql")
+                implementation(libs.testcontainers.postgresql)
                 implementation(project(":komapper-dialect-postgresql-r2dbc"))
             }
         }
@@ -103,9 +103,9 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                implementation("org.testcontainers:mssqlserver")
+                implementation(libs.testcontainers.sqlserver)
                 implementation(project(":komapper-dialect-sqlserver-r2dbc"))
-                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11")
+                runtimeOnly(libs.jdbc.sqlserver)
             }
         }
     }

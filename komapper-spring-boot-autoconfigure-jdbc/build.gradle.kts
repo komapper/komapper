@@ -1,12 +1,10 @@
 dependencies {
-    val springVersion: String by project
-    val springBootVersion: String by project
-    api("org.springframework:spring-jdbc:$springVersion")
-    api("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
+    api(libs.spring.jdbc)
+    api(libs.spring.boot.autoconfigure)
     api(project(":komapper-jdbc"))
     api(project(":komapper-spring-jdbc"))
     testImplementation(project(":komapper-slf4j"))
     testImplementation(project(":komapper-dialect-h2-jdbc"))
-    testImplementation("ch.qos.logback:logback-classic:1.5.10")
-    testImplementation("com.zaxxer:HikariCP:6.0.0")
+    testImplementation(libs.logback.classic)
+    testImplementation(libs.hikariCP)
 }

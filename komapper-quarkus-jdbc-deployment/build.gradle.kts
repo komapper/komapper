@@ -3,10 +3,9 @@ plugins {
 }
 
 dependencies {
-    val quarkusVersion: String by project
-    implementation("io.quarkus:quarkus-core-deployment:$quarkusVersion")
-    implementation("io.quarkus:quarkus-arc-deployment:$quarkusVersion")
-    implementation("io.quarkus:quarkus-agroal-deployment:$quarkusVersion")
-    implementation("io.quarkus:quarkus-datasource-deployment:$quarkusVersion")
+    implementation(libs.quarkus.core.deployment)
+    implementation(libs.quarkus.arc.deployment)
+    implementation(libs.quarkus.agroal.deployment)
+    implementation(libs.quarkus.datasource.deployment)
     implementation(project(":komapper-quarkus-jdbc"))
 }

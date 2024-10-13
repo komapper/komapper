@@ -6,10 +6,10 @@ plugins {
     java
     `maven-publish`
     signing
-    kotlin("jvm")
-    id("com.diffplug.spotless") version "6.25.0"
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("net.researchgate.release") version "3.0.2"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.publish)
+    alias(libs.plugins.release)
 }
 
 val platformProject = project("komapper-platform")
@@ -29,12 +29,14 @@ val javaProjects = subprojects.filter {
 val kotlinProjects = subprojects - platformProject - javaProjects.toSet()
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
-val googleJavaFormatVersion: String by project
-val ktlintVersion: String by project
+
+// Retain a reference to rootProject.libs to make the version catalog accessible within allprojects and subprojects.
+// See https://github.com/gradle/gradle/issues/16708
+val catalog = libs
 
 allprojects {
     apply(plugin = "base")
-    apply(plugin = "com.diffplug.spotless")
+    apply(plugin = catalog.plugins.spotless.get().pluginId)
 
     repositories {
         mavenCentral()
@@ -44,7 +46,7 @@ allprojects {
     spotless {
         lineEndings = com.diffplug.spotless.LineEnding.UNIX
         kotlinGradle {
-            ktlint(ktlintVersion)
+            ktlint(catalog.ktlint.get().version)
         }
     }
 
@@ -57,10 +59,10 @@ allprojects {
 
 configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
     apply(plugin = "java")
-    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = catalog.plugins.kotlin.jvm.get().pluginId)
 
     dependencies {
-        testImplementation(kotlin("test"))
+        testImplementation(rootProject.libs.kotlin.test)
     }
 
     java {
@@ -107,7 +109,7 @@ configure(libraryProjects + gradlePluginProject) {
 configure(kotlinProjects) {
     spotless {
         kotlin {
-            ktlint(ktlintVersion)
+            ktlint(catalog.ktlint.get().version)
             targetExclude("build/**")
         }
     }
@@ -116,10 +118,10 @@ configure(kotlinProjects) {
 configure(javaProjects) {
     spotless {
         java {
-            googleJavaFormat(googleJavaFormatVersion)
+            googleJavaFormat(catalog.google.java.format.get().version)
         }
         kotlin {
-            ktlint(ktlintVersion)
+            ktlint(catalog.ktlint.get().version)
             targetExclude("build/**")
         }
     }
