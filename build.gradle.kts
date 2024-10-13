@@ -29,6 +29,7 @@ val javaProjects = subprojects.filter {
 val kotlinProjects = subprojects - platformProject - javaProjects.toSet()
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
+val googleJavaFormatVersion: String by project
 val ktlintVersion: String by project
 
 allprojects {
@@ -114,7 +115,7 @@ configure(kotlinProjects) {
 configure(javaProjects) {
     spotless {
         java {
-            googleJavaFormat("1.13.0")
+            googleJavaFormat(googleJavaFormatVersion)
         }
         kotlin {
             ktlint(ktlintVersion)
