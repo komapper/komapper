@@ -18,7 +18,6 @@ internal class R2dbcRelationInsertValuesReturningRunner<ENTITY : Any, ID : Any, 
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcRunner<T> {
-
     private val runner: RelationInsertValuesReturningRunner<ENTITY, ID, META> = RelationInsertValuesReturningRunner(context)
 
     private val support: R2dbcRelationInsertValuesSupport<ENTITY, ID, META> = R2dbcRelationInsertValuesSupport(context)

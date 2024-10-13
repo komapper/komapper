@@ -13,7 +13,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : JdbcRunner<Pair<Long, ID?>> {
-
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
     private val support: JdbcRelationInsertValuesSupport<ENTITY, ID, META> = JdbcRelationInsertValuesSupport(context)

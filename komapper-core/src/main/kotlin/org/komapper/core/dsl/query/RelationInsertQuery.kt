@@ -38,7 +38,6 @@ interface RelationInsertQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 }
 
 interface RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : RelationInsertQuery<ENTITY, ID, META, Pair<Long, ID?>> {
-
     /**
      * Indicates to retrieve an entity.
      *
@@ -61,7 +60,10 @@ interface RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamod
      * @param expression2 the second property
      * @return the query
      */
-    fun <A : Any, B : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>): RelationInsertReturningQuery<Pair<A?, B?>>
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>
+    ): RelationInsertReturningQuery<Pair<A?, B?>>
 
     /**
      * Indicates to retrieve a property triple.
@@ -71,7 +73,11 @@ interface RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamod
      * @param expression3 the third property
      * @return the query
      */
-    fun <A : Any, B : Any, C : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>, expression3: PropertyMetamodel<ENTITY, C, *>): RelationInsertReturningQuery<Triple<A?, B?, C?>>
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>
+    ): RelationInsertReturningQuery<Triple<A?, B?, C?>>
 
     override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertValuesQuery<ENTITY, ID, META>
 }
@@ -79,7 +85,6 @@ interface RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamod
 internal data class RelationInsertSelectQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
 ) : RelationInsertQuery<ENTITY, ID, META, Pair<Long, List<ID>>> {
-
     override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, Pair<Long, List<ID>>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
@@ -98,7 +103,6 @@ internal data class RelationInsertSelectQuery<ENTITY : Any, ID : Any, META : Ent
 internal data class RelationInsertValuesQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : RelationInsertValuesQuery<ENTITY, ID, META> {
-
     override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertValuesQuery<ENTITY, ID, META> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

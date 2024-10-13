@@ -26,7 +26,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {

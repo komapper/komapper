@@ -10,7 +10,6 @@ class EntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : Runner {
-
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
 

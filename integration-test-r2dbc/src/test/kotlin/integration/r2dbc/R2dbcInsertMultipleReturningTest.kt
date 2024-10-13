@@ -23,7 +23,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test_list(info: TestInfo) = inTransaction(db, info) {
@@ -255,7 +254,9 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location)
+        val query = QueryDsl.insert(
+            d
+        ).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location)
         val pairList = db.runQuery { query }
         assertEquals(listOf(department1.departmentName to department1.location), pairList)
         val list = db.runQuery {
@@ -274,7 +275,9 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location, d.departmentNo)
+        val query = QueryDsl.insert(
+            d
+        ).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location, d.departmentNo)
         val tripleList = db.runQuery { query }
         assertEquals(listOf(Triple(department1.departmentName, department1.location, department1.departmentNo)), tripleList)
         val list = db.runQuery {

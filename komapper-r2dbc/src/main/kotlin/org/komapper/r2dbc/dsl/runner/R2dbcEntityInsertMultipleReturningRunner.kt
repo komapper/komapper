@@ -16,7 +16,6 @@ internal class R2dbcEntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, 
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) :
     R2dbcRunner<List<T>> {
-
     private val runner: EntityInsertMultipleReturningRunner<ENTITY, ID, META> =
         EntityInsertMultipleReturningRunner(context, entities)
 

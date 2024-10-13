@@ -278,7 +278,9 @@ interface FilterScope<F : FilterScope<F>> {
     /**
      * Applies the `NOT IN` predicate.
      */
-    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> SubqueryExpression<Pair<A?, B?>>)
+    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(
+        block: () -> SubqueryExpression<Pair<A?, B?>>
+    )
 
     /**
      * Applies the `EXISTS` predicate.

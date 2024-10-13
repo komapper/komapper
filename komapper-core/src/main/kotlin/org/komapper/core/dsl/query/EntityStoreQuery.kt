@@ -22,7 +22,6 @@ interface EntityStoreQuery : Query<EntityStore> {
 internal data class EntityStoreQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
 ) : EntityStoreQuery {
-
     private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
     fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery {

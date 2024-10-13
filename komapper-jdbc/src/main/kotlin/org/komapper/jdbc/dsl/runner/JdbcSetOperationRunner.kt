@@ -14,7 +14,6 @@ internal class JdbcSetOperationRunner<T : Any?, R>(
     private val transform: (JdbcDataOperator, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcRunner<R> {
-
     private val runner: SetOperationRunner = SetOperationRunner(context)
 
     override fun check(config: DatabaseConfig) {

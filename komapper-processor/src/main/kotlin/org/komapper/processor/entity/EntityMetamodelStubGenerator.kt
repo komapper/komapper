@@ -21,7 +21,6 @@ internal class EntityMetamodelStubGenerator(
     private val entityTypeName: String,
     private val w: PrintWriter,
 ) : Runnable {
-
     private val constructorParamList = listOf(
         "table: String = \"\"",
         "catalog: String = \"\"",
@@ -45,7 +44,9 @@ internal class EntityMetamodelStubGenerator(
         if (parameters != null) {
             for (p in parameters) {
                 val typeName = p.type.resolve().declaration.qualifiedName?.asString()
-                w.println("    public val `$p`: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
+                w.println(
+                    "    public val `$p`: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()"
+                )
             }
         }
         w.println("    public fun clone($constructorParamList): $simpleName = $simpleName()")

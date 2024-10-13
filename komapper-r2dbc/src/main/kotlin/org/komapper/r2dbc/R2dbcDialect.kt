@@ -8,7 +8,6 @@ import org.komapper.core.StatementPart
  * Represents a dialect for R2DBC access.
  */
 interface R2dbcDialect : Dialect {
-
     fun getBinder(): Binder {
         return DefaultBinder
     }

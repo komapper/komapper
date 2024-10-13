@@ -18,7 +18,6 @@ import javax.sql.DataSource
  * Represents a database accessed by JDBC.
  */
 interface JdbcDatabase : Database {
-
     /**
      * The database configuration.
      */

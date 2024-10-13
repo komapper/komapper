@@ -161,7 +161,6 @@ internal data class ValueClass(
     val property: ValueClassProperty,
     val alternateType: ValueClass?,
 ) : KotlinClass {
-
     override val interiorTypeName: String
         get() {
             return alternateType?.exteriorTypeName ?: property.typeName

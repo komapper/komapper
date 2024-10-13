@@ -6,7 +6,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 internal class StatementBufferTest {
-
     @Test
     fun appendAndBind() {
         val buffer = StatementBuffer()

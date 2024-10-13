@@ -12,7 +12,6 @@ class MariaDbOffsetLimitStatementBuilder(
     private val offset: Int,
     private val limit: Int,
 ) : OffsetLimitStatementBuilder {
-
     private val buf = StatementBuffer()
 
     override fun build(): Statement {

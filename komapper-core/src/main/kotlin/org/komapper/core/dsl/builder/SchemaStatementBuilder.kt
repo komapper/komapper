@@ -16,7 +16,6 @@ interface SchemaStatementBuilder {
 abstract class AbstractSchemaStatementBuilder(
     protected val dialect: BuilderDialect,
 ) : SchemaStatementBuilder {
-
     override fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {
         val statements = mutableListOf<Statement>()
         for (e in metamodels) {
@@ -82,7 +81,11 @@ abstract class AbstractSchemaStatementBuilder(
             if (dialect.supportsCreateIfNotExists()) {
                 buf.append("if not exists ")
             }
-            buf.append("${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy}")
+            buf.append(
+                "${idGenerator.getCanonicalSequenceName(
+                    dialect::enquote
+                )} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy}"
+            )
         }
         return listOf(buf.toStatement())
     }

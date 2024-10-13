@@ -10,7 +10,6 @@ class EntityInsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     context: EntityInsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     private val support: EntityInsertRunnerSupport<ENTITY, ID, META> =

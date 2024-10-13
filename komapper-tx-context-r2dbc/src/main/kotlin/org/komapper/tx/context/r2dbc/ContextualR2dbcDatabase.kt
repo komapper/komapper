@@ -23,7 +23,6 @@ import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 
 interface ContextualR2dbcDatabase : Database {
-
     /**
      * Runs the given [query] and returns the result.
      *
@@ -72,7 +71,8 @@ interface ContextualR2dbcDatabase : Database {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) () -> R,
+        block: suspend context(R2dbcContext)
+        () -> R,
     ): R
 
     /**
@@ -87,7 +87,8 @@ interface ContextualR2dbcDatabase : Database {
     fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit,
+        block: suspend context(R2dbcContext)
+        FlowCollector<R>.() -> Unit,
     ): Flow<R>
 
     fun unwrap(): R2dbcDatabase
@@ -99,7 +100,6 @@ internal class ContextualR2dbcDatabaseImpl(
     private val coroutineTransactionOperator: ContextualR2dbcCoroutineTransactionOperator,
     private val flowTransactionOperator: ContextualR2dbcFlowTransactionOperator,
 ) : ContextualR2dbcDatabase {
-
     override val config: R2dbcDatabaseConfig
         get() = database.config
 
@@ -155,7 +155,8 @@ internal class ContextualR2dbcDatabaseImpl(
     override suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) () -> R,
+        block: suspend context(R2dbcContext)
+        () -> R,
     ): R {
         val context = R2dbcContext(this, coroutineTransactionOperator, flowTransactionOperator)
         return with(context) {
@@ -172,7 +173,8 @@ internal class ContextualR2dbcDatabaseImpl(
     override fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit,
+        block: suspend context(R2dbcContext)
+        FlowCollector<R>.() -> Unit,
     ): Flow<R> {
         val context = R2dbcContext(this, coroutineTransactionOperator, flowTransactionOperator)
         return with(context) {

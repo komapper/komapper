@@ -10,7 +10,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcTemplateExecuteRunner(
     private val context: TemplateExecuteContext,
 ) : R2dbcRunner<Long> {
-
     private val runner = TemplateExecuteRunner(context)
 
     override fun check(config: DatabaseConfig) {

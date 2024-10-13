@@ -20,7 +20,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcQuoteTest(val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogAndSchema() = runBlockingWithTimeout {

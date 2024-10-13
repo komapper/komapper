@@ -9,7 +9,6 @@ import org.komapper.core.dsl.context.SchemaContext
 class SchemaCreateRunner(
     private val context: SchemaContext,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

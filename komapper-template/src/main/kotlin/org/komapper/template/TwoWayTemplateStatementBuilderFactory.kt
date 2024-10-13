@@ -9,7 +9,6 @@ import org.komapper.core.template.sql.CacheSqlNodeFactory
 import org.komapper.core.template.sql.NoCacheSqlNodeFactory
 
 class TwoWayTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
-
     override fun create(dialect: BuilderDialect, enableCache: Boolean): TemplateStatementBuilder {
         val sqlNodeFactory = if (enableCache) CacheSqlNodeFactory() else NoCacheSqlNodeFactory()
         val exprNodeFactory = if (enableCache) CacheExprNodeFactory() else NoCacheExprNodeFactory()

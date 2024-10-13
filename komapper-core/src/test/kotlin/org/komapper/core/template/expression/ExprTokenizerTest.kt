@@ -22,7 +22,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class ExprTokenizerTest {
-
     @Test
     fun value() {
         val tokenizer = ExprTokenizer("name")

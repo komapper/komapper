@@ -15,7 +15,6 @@ import java.io.PrintWriter
 internal class CommandProcessor(
     private val contextFactory: ContextFactory,
 ) : SymbolProcessor {
-
     private val annotationClass = KomapperCommand::class
 
     override fun process(resolver: Resolver): List<KSAnnotated> {

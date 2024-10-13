@@ -14,7 +14,6 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 class AssignmentScope<ENTITY : Any>(
     private val assignments: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf(),
 ) {
-
     /**
      * The `=` operator.
      */

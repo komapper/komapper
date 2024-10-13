@@ -43,7 +43,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectTest(private val db: JdbcDatabase) {
-
     @Test
     fun select() {
         val result = db.runQuery {

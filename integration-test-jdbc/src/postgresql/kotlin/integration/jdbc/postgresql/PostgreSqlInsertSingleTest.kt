@@ -13,7 +13,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class PostgreSqlInsertSingleTest(private val db: JdbcDatabase) {
-
     @Test
     fun dangerouslyOnDuplicateKeyUpdate() {
         val f = Meta.friend

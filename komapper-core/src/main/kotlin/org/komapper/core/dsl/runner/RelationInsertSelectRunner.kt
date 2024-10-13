@@ -11,7 +11,6 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 class RelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) {
         checkAutoIncrementWhenInsertingMultipleRows(config, context.target)
         checkGeneratedKeysReturningWhenInsertingMultipleRows(config, context.target, context.options)

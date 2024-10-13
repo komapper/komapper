@@ -16,7 +16,6 @@ internal class R2dbcEntityUpsertSingleReturningRunner<ENTITY : Any, ID : Any, ME
     private val transform: (R2dbcDataOperator, Row) -> T,
     private val collect: suspend (Flow<T>) -> R,
 ) : R2dbcRunner<R> {
-
     private val runner: EntityUpsertSingleReturningRunner<ENTITY, ID, META> =
         EntityUpsertSingleReturningRunner(context, entity)
 

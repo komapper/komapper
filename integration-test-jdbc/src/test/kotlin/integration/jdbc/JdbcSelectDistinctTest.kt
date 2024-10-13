@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectDistinctTest(private val db: JdbcDatabase) {
-
     @Test
     fun distinct() {
         val d = Meta.department

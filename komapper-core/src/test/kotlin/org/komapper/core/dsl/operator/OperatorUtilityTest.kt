@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class OperatorUtilityTest {
-
     @Test
     fun columnExpression() {
         val value = "world"

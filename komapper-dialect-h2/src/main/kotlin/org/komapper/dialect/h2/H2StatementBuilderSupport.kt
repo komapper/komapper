@@ -10,7 +10,6 @@ class H2StatementBuilderSupport(
     private val dialect: BuilderDialect,
     private val returningProvider: ReturningProvider,
 ) {
-
     fun buildReturningFirstFragment(tableType: DeltaTableType = DeltaTableType.FINAL): Statement {
         val expressions = returningProvider.returning.expressions()
         return with(StatementBuffer()) {
@@ -47,6 +46,7 @@ class H2StatementBuilderSupport(
     }
 
     enum class DeltaTableType {
-        OLD, FINAL
+        OLD,
+        FINAL
     }
 }

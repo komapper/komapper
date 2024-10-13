@@ -11,7 +11,6 @@ internal class R2dbcEntityInsertBatchRunner<ENTITY : Any, ID : Any, META : Entit
     context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : R2dbcRunner<List<ENTITY>> {
-
     private val runner: EntityInsertBatchRunner<ENTITY, ID, META> =
         EntityInsertBatchRunner(context, entities)
 

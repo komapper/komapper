@@ -12,7 +12,6 @@ class SpringJdbcTransactionSession(
     override val dataSource: DataSource,
 ) :
     JdbcSession {
-
     override val transactionOperator: TransactionOperator = SpringJdbcTransactionOperator(transactionManager)
 
     override fun getConnection(): Connection {

@@ -8,7 +8,6 @@ import kotlin.test.assertEquals
 
 @Tag("slow")
 class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
-
     @Test
     fun `The enum property can be annotated with @KomapperEnum`() {
         val result = compile(

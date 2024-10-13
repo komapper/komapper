@@ -27,7 +27,6 @@ interface TemplateExecuteQuery : Query<Long>, TemplateBinder<TemplateExecuteQuer
 internal data class TemplateExecuteQueryImpl(
     private val context: TemplateExecuteContext,
 ) : TemplateExecuteQuery {
-
     override fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

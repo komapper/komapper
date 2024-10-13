@@ -11,7 +11,6 @@ internal class JdbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : JdbcRunner<List<Long>> {
-
     private val runner: EntityUpsertBatchRunner<ENTITY, ID, META> =
         EntityUpsertBatchRunner(context, entities)
 

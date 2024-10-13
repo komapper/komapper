@@ -38,7 +38,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class SqlTokenizerTest {
-
     private lateinit var lineSeparator: String
 
     @BeforeTest

@@ -11,7 +11,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcDryRunTest(private val db: R2dbcDatabase) {
-
     @Test
     fun dryRunQuery() {
         val a = Meta.address

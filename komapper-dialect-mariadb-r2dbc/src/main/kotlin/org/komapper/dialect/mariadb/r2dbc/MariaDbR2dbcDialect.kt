@@ -5,7 +5,6 @@ import org.komapper.dialect.mariadb.MariaDbDialect
 import org.komapper.r2dbc.R2dbcDialect
 
 interface MariaDbR2dbcDialect : MariaDbDialect, R2dbcDialect {
-
     override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
         return exception.errorCode in MariaDbDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
     }

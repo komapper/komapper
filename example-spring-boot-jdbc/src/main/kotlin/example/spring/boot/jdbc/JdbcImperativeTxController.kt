@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/imperative")
 class JdbcImperativeTxController(val db: JdbcDatabase) {
-
     @GetMapping("")
     fun list(): List<Message> = db.withTransaction {
         db.runQuery {
@@ -25,7 +24,9 @@ class JdbcImperativeTxController(val db: JdbcDatabase) {
     }
 
     @GetMapping(value = [""], params = ["text"])
-    fun add(@RequestParam text: String): Message = db.withTransaction {
+    fun add(
+        @RequestParam text: String
+    ): Message = db.withTransaction {
         val message = Message(text = text)
         db.runQuery {
             val m = Meta.message
@@ -34,7 +35,9 @@ class JdbcImperativeTxController(val db: JdbcDatabase) {
     }
 
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable id: Int) = db.withTransaction {
+    fun delete(
+        @PathVariable id: Int
+    ) = db.withTransaction {
         db.runQuery {
             val m = Meta.message
             QueryDsl.delete(m).where { m.id eq id }

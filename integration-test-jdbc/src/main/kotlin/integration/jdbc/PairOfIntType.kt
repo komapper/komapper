@@ -8,7 +8,6 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class PairOfIntType : JdbcUserDefinedDataType<Pair<Int, Int>> {
-
     override val name: String = "varchar(500)"
     override val type: KType = typeOf<Pair<Int, Int>>()
     override val jdbcType: JDBCType = JDBCType.VARCHAR

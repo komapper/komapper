@@ -27,7 +27,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
-
     @Test
     fun instant(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.kotlinInstantData

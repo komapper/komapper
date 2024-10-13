@@ -12,7 +12,6 @@ internal class CommandCallGenerator(
     private val command: Command,
     private val w: PrintWriter,
 ) : Runnable {
-
     override fun run() {
         suppress()
         packageDeclaration()

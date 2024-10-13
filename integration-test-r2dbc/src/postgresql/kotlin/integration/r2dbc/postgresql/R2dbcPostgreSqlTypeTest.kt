@@ -26,7 +26,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
-
     @Test
     fun box(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.boxData

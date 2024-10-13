@@ -13,7 +13,6 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * @param T the result type
  */
 interface RelationDeleteReturningQuery<T> : Query<T> {
-
     /**
      * Builds a query with the options applied.
      *
@@ -26,7 +25,6 @@ interface RelationDeleteReturningQuery<T> : Query<T> {
 internal data class RelationDeleteReturningQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
 ) : RelationDeleteReturningQuery<List<ENTITY>> {
-
     override fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteReturningQuery<List<ENTITY>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
@@ -41,7 +39,6 @@ internal data class RelationDeleteReturningSingleColumnQuery<ENTITY : Any, ID : 
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val expression: ColumnExpression<A, *>,
 ) : RelationDeleteReturningQuery<List<A?>> {
-
     override fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteReturningQuery<List<A?>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
@@ -56,7 +53,6 @@ internal data class RelationDeleteReturningPairColumnsQuery<ENTITY : Any, ID : A
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
 ) : RelationDeleteReturningQuery<List<Pair<A?, B?>>> {
-
     override fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteReturningQuery<List<Pair<A?, B?>>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
@@ -71,7 +67,6 @@ internal data class RelationDeleteReturningTripleColumnsQuery<ENTITY : Any, ID :
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
 ) : RelationDeleteReturningQuery<List<Triple<A?, B?, C?>>> {
-
     override fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteReturningQuery<List<Triple<A?, B?, C?>>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

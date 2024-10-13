@@ -23,7 +23,6 @@ internal class R2dbcExecutor(
     executionOptionsProvider: ExecutionOptionsProvider,
     private val generatedColumn: String? = null,
 ) {
-
     private val executionOptions = config.executionOptions + executionOptionsProvider.getExecutionOptions()
 
     fun <T> executeQuery(
@@ -201,7 +200,9 @@ internal class R2dbcExecutor(
         return result.map { row, _ ->
             when (val value = row.get(0)) {
                 is Number -> value.toLong()
-                else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
+                else -> error(
+                    "Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}"
+                )
             }
         }
     }

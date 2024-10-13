@@ -17,7 +17,6 @@ class DefaultEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
-
     override fun build(): Statement {
         val buf = StatementBuffer()
         buf.append(buildInsertInto())

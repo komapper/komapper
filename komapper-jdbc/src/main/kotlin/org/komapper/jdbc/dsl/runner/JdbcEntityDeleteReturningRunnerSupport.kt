@@ -8,7 +8,6 @@ import org.komapper.jdbc.JdbcExecutor
 internal class JdbcEntityDeleteReturningRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val context: EntityDeleteContext<ENTITY, ID, META>,
 ) {
-
     fun <T> delete(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
         val executor = config.dialect.createExecutor(config, context.options)
         return execute(executor)

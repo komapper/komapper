@@ -12,7 +12,6 @@ abstract class AbstractJdbcDataTypeProvider(
     private val next: JdbcDataTypeProvider,
     dataTypes: List<JdbcDataType<*>>,
 ) : JdbcDataTypeProvider {
-
     private val dataTypeMap: Map<KType, JdbcDataType<*>> = dataTypes.associateBy { it.type }
 
     override fun <T : Any> get(type: KType): JdbcDataType<T>? {

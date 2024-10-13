@@ -53,7 +53,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertSingleTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val a = Meta.address

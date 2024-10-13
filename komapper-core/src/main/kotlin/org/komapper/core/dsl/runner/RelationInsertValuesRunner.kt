@@ -15,7 +15,6 @@ import org.komapper.core.dsl.metamodel.isAutoIncrement
 class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

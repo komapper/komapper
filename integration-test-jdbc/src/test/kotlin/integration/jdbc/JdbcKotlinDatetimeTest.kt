@@ -26,7 +26,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcKotlinDatetimeTest(val db: JdbcDatabase) {
-
     @Test
     fun instant() {
         val m = Meta.kotlinInstantData

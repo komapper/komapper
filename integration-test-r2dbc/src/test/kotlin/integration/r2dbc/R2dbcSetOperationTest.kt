@@ -18,7 +18,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
-
     @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun except_entity(info: TestInfo) = inTransaction(db, info) {

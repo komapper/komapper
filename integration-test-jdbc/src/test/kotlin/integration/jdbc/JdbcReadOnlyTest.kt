@@ -13,7 +13,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcReadOnlyTest(private val db: JdbcDatabase) {
-
     @Test
     fun list() {
         db.withTransaction(

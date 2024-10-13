@@ -17,7 +17,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectAggregateTest(private val db: R2dbcDatabase) {
-
     @Test
     fun aggregate_avg(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

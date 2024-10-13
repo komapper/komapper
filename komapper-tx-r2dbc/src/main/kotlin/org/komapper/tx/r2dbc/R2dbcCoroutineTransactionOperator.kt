@@ -9,7 +9,6 @@ internal class R2dbcCoroutineTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
     private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : CoroutineTransactionOperator {
-
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R,

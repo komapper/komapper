@@ -14,7 +14,6 @@ internal class R2dbcTemplateEntityProjectionSelectFlowBuilder<T>(
     private val context: TemplateSelectContext,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcFlowBuilder<T> {
-
     private val runner = TemplateSelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

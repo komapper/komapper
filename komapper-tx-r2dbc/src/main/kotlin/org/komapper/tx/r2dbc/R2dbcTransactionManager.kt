@@ -14,7 +14,6 @@ import kotlin.coroutines.coroutineContext
  */
 @ThreadSafe
 interface R2dbcTransactionManager {
-
     suspend fun getConnection(): Connection
 
     /**
@@ -50,7 +49,6 @@ internal class R2dbcTransactionManagerImpl(
     connectionFactory: ConnectionFactory,
     loggerFacade: LoggerFacade,
 ) : R2dbcTransactionManager {
-
     private val key = object : CoroutineContext.Key<TxHolder> {}
 
     private val management: R2dbcTransactionManagement = R2dbcTransactionManagement(connectionFactory, loggerFacade)

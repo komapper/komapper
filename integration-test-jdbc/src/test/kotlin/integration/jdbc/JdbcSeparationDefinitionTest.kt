@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSeparationDefinitionTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val p = Meta.place

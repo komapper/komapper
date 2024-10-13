@@ -49,7 +49,10 @@ interface EntityDeleteSingleQuery<ENTITY : Any> : EntityDeleteQuery {
      * @param expression2 the second property
      * @return the query
      */
-    fun <A : Any, B : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>): EntityDeleteReturningQuery<Pair<A?, B?>?>
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>
+    ): EntityDeleteReturningQuery<Pair<A?, B?>?>
 
     /**
      * Indicates to retrieve a property triple.
@@ -59,7 +62,11 @@ interface EntityDeleteSingleQuery<ENTITY : Any> : EntityDeleteQuery {
      * @param expression3 the third property
      * @return the query
      */
-    fun <A : Any, B : Any, C : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>, expression3: PropertyMetamodel<ENTITY, C, *>): EntityDeleteReturningQuery<Triple<A?, B?, C?>?>
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>
+    ): EntityDeleteReturningQuery<Triple<A?, B?, C?>?>
 
     override fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteSingleQuery<ENTITY>
 }
@@ -68,7 +75,6 @@ internal data class EntityDeleteSingleQueryImpl<ENTITY : Any, ID : Any, META : E
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : EntityDeleteSingleQuery<ENTITY> {
-
     override fun returning(): EntityDeleteReturningQuery<ENTITY?> {
         val newContext = context.copy(returning = Returning.Metamodel(context.target))
         return EntityDeleteSingleReturningQuery(newContext, entity)
@@ -112,7 +118,6 @@ internal data class EntityDeleteBatchQuery<ENTITY : Any, ID : Any, META : Entity
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : EntityDeleteQuery {
-
     override fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteQuery {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

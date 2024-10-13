@@ -13,7 +13,6 @@ internal data class SingleColumnSetOperationQuery<A : Any>(
     override val context: SetOperationContext,
     private val expression: ColumnExpression<A, *>,
 ) : FlowSetOperationQuery<A?> {
-
     private val support: SetOperationQuerySupport<A?> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

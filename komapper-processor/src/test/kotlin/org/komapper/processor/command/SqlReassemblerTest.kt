@@ -14,7 +14,6 @@ import kotlin.test.assertEquals
 
 @Tag("slow")
 class SqlReassemblerTest : AbstractKspTest() {
-
     @Test
     fun success() {
         val result = compile("") { env, resolver ->

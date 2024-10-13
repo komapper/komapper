@@ -8,15 +8,13 @@ import org.komapper.core.dsl.visitor.DefaultQueryVisitor
 import java.io.PrintWriter
 import java.io.StringWriter
 
-internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
+internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
     this.idProperties().forEach { p ->
         p.getter(entity) ?: error("The id value must not null. name=${p.name}")
     }
 }
 
-internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
+internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
     entities.mapIndexed { index, entity ->
         this.idProperties().forEach { p ->
             p.getter(entity) ?: error("The id value must not null. index=$index, name=${p.name}")

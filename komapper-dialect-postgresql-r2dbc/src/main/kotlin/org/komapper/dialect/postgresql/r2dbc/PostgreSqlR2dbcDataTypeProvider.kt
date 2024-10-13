@@ -29,7 +29,6 @@ import kotlin.reflect.KType
 
 class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
     R2dbcDataTypeProvider {
-
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),

@@ -15,7 +15,6 @@ internal class JdbcTemplateSelectRunner<T, R>(
     private val transform: (Row) -> T,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcRunner<R> {
-
     private val runner = TemplateSelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

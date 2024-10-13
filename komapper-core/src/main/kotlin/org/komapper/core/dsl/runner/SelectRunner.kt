@@ -11,7 +11,6 @@ class SelectRunner(
     private val context: SelectContext<*, *, *>,
 ) :
     Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

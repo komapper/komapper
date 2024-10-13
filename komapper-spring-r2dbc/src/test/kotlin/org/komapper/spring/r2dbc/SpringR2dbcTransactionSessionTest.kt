@@ -22,7 +22,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class SpringR2dbcTransactionSessionTest {
-
     @Volatile
     private var openCount = 0
 

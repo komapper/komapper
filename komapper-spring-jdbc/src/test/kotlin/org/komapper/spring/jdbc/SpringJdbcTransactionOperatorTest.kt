@@ -15,7 +15,6 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 internal class SpringJdbcTransactionOperatorTest {
-
     private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
     private val transactionManager = DataSourceTransactionManager(dataSource)
     private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {

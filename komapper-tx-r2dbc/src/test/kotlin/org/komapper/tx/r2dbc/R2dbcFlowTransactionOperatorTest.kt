@@ -19,7 +19,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 internal class R2dbcFlowTransactionOperatorTest {
-
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
     private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, H2R2dbcDialect()) {
         override val session: R2dbcSession by lazy {

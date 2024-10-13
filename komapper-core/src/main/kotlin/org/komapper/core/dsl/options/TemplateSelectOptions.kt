@@ -13,7 +13,6 @@ data class TemplateSelectOptions(
     override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
 ) : FetchOptions {
-
     companion object {
         val DEFAULT = TemplateSelectOptions(
             escapeSequence = null,

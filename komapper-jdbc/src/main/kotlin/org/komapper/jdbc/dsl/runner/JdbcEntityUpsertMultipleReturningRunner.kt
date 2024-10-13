@@ -15,7 +15,6 @@ internal class JdbcEntityUpsertMultipleReturningRunner<ENTITY : Any, ID : Any, M
     private val entities: List<ENTITY>,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
 ) : JdbcRunner<List<T>> {
-
     private val runner: EntityUpsertMultipleReturningRunner<ENTITY, ID, META> =
         EntityUpsertMultipleReturningRunner(context, entities)
 

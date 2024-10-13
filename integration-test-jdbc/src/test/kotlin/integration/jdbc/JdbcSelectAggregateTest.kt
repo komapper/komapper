@@ -20,7 +20,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectAggregateTest(private val db: JdbcDatabase) {
-
     @Test
     fun aggregate_avg() {
         val a = Meta.address

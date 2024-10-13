@@ -16,7 +16,6 @@ import kotlin.test.assertFailsWith
 import kotlin.to
 
 class ExprEvaluatorTest {
-
     private val extensions = TemplateBuiltinExtensions { it }
 
     private val evaluator = DefaultExprEvaluator(
@@ -59,7 +58,10 @@ class ExprEvaluatorTest {
     }
 
     enum class Direction {
-        NORTH, SOUTH, WEST, EAST
+        NORTH,
+        SOUTH,
+        WEST,
+        EAST
     }
 
     sealed interface Color {
@@ -101,7 +103,6 @@ class ExprEvaluatorTest {
 
     @Nested
     inner class ComparisonOperatorTest {
-
         @Test
         fun eq1() {
             val ctx = ExprContext(mapOf("a" to Value(1, typeOf<Int>())), extensions)
@@ -514,7 +515,10 @@ class ExprEvaluatorTest {
             val ex = assertFailsWith<ExprException> {
                 evaluator.eval("a", ctx)
             }
-            assertEquals("The template variable \"a\" is not bound to a value. Make sure the variable name is correct at [a]:1:1", ex.message)
+            assertEquals(
+                "The template variable \"a\" is not bound to a value. Make sure the variable name is correct at [a]:1:1",
+                ex.message
+            )
         }
     }
 

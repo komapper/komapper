@@ -21,7 +21,6 @@ class JdbcEnv :
     AfterTestExecutionCallback,
     ParameterResolver,
     ExecutionCondition {
-
     companion object {
         @Volatile
         private var initialized: Boolean = false

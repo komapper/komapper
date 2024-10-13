@@ -15,7 +15,6 @@ internal class R2dbcFlowTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
     private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : FlowTransactionOperator {
-
     override fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,

@@ -23,7 +23,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class KomapperR2dbcAutoConfigurationTest {
-
     private val context = AnnotationConfigApplicationContext()
 
     @Test
@@ -85,7 +84,6 @@ class KomapperR2dbcAutoConfigurationTest {
     @Suppress("unused")
     @Configuration
     open class CustomConfigure {
-
         @Bean
         open fun clockProvider(): ClockProvider {
             return ClockProvider {

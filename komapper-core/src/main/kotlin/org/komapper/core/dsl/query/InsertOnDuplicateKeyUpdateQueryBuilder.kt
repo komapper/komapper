@@ -86,8 +86,9 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
  */
 interface InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> :
     InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
-
-    override fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
+    override fun set(
+        declaration: AssignmentScope<ENTITY>.(META) -> Unit
+    ): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
 
     /**
      * Builds a query to insert or update a single entity.
@@ -108,8 +109,9 @@ interface InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY : Any, ID : Any, 
  */
 interface InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> :
     InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
-
-    override fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META>
+    override fun set(
+        declaration: AssignmentScope<ENTITY>.(META) -> Unit
+    ): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META>
 
     /**
      * Builds a query to insert or update a single entity.
@@ -123,7 +125,6 @@ interface InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY : Any, ID : Any,
 internal data class InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
-
     private val builder: EntityUpsertQueryBuilderNonNull<ENTITY, ID, META> =
         EntityUpsertQueryBuilderNonNullImpl(context)
 
@@ -165,7 +166,6 @@ internal data class InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl<ENTITY : A
 internal data class InsertOnDuplicateKeyUpdateQueryBuilderNullableImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META> {
-
     private val builder: EntityUpsertQueryBuilderNullable<ENTITY, ID, META> =
         EntityUpsertQueryBuilderNullableImpl(context)
 

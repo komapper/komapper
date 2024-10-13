@@ -11,7 +11,6 @@ internal class R2dbcEntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : Enti
     context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : R2dbcRunner<ENTITY> {
-
     private val runner: EntityUpdateSingleRunner<ENTITY, ID, META> =
         EntityUpdateSingleRunner(context, entity)
 

@@ -85,7 +85,6 @@ internal data class EntityUpsertMultipleReturningQuery<ENTITY : Any, ID : Any, M
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : EntityUpsertReturningQuery<List<ENTITY>> {
-
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertReturningQuery<List<ENTITY>> {
         return copy(context = context.copyConfigure(configure))
     }
@@ -100,7 +99,6 @@ internal data class EntityUpsertMultipleReturningSingleColumnQuery<ENTITY : Any,
     private val entities: List<ENTITY>,
     private val expression: ColumnExpression<A, *>,
 ) : EntityUpsertReturningQuery<List<A?>> {
-
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertReturningQuery<List<A?>> {
         return copy(context = context.copyConfigure(configure))
     }
@@ -115,7 +113,6 @@ internal data class EntityUpsertMultipleReturningPairColumnsQuery<ENTITY : Any, 
     private val entities: List<ENTITY>,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
 ) : EntityUpsertReturningQuery<List<Pair<A?, B?>>> {
-
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertReturningQuery<List<Pair<A?, B?>>> {
         return copy(context = context.copyConfigure(configure))
     }
@@ -130,7 +127,6 @@ internal data class EntityUpsertMultipleReturningTripleColumnsQuery<ENTITY : Any
     private val entities: List<ENTITY>,
     private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
 ) : EntityUpsertReturningQuery<List<Triple<A?, B?, C?>>> {
-
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertReturningQuery<List<Triple<A?, B?, C?>>> {
         return copy(context = context.copyConfigure(configure))
     }

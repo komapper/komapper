@@ -12,7 +12,6 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 class RelationInsertValuesReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : Runner {
-
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
     override fun check(config: DatabaseConfig) {

@@ -11,7 +11,6 @@ internal class JdbcEntityInsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
     context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : JdbcRunner<List<ENTITY>> {
-
     private val runner: EntityInsertBatchRunner<ENTITY, ID, META> =
         EntityInsertBatchRunner(context, entities)
 

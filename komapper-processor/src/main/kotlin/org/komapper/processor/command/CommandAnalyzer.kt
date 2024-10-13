@@ -10,7 +10,6 @@ import org.komapper.processor.report
 import kotlin.reflect.KClass
 
 internal class CommandAnalyzer(private val context: Context, private val annotationClass: KClass<*>) {
-
     private val sqlNodeFactory = CacheSqlNodeFactory()
     private val exprValidator = ExprValidator(context, CacheExprNodeFactory())
 
@@ -50,7 +49,10 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
         }
         val unusedParams = command.paramMap.keys - usedParams - command.unusedParams
         if (unusedParams.isNotEmpty()) {
-            context.logger.warn("Unused SQL params: $unusedParams. You can suppress this warning message by specifying @KomapperUnused for the param properties.", command.classDeclaration)
+            context.logger.warn(
+                "Unused SQL params: $unusedParams. You can suppress this warning message by specifying @KomapperUnused for the param properties.",
+                command.classDeclaration
+            )
         }
     }
 }

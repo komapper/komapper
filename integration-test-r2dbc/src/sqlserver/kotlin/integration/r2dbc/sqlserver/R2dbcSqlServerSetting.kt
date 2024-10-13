@@ -12,7 +12,6 @@ import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
 class R2dbcSqlServerSetting(private val url: String) : SqlServerSetting<R2dbcDatabase> {
-
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
         val container = MSSQLServerContainerProvider().newInstance(connectionUrl) as MSSQLServerContainer<*>

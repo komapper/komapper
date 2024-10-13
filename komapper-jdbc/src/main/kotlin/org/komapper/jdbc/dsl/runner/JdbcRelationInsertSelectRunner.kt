@@ -11,7 +11,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
 ) : JdbcRunner<Pair<Long, List<ID>>> {
-
     private val runner: RelationInsertSelectRunner<ENTITY, ID, META> = RelationInsertSelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

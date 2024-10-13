@@ -13,7 +13,6 @@ class H2EntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
     context: EntityDeleteContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : EntityDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultEntityDeleteStatementBuilder(dialect, context, entity)
     private val support = H2StatementBuilderSupport(dialect, context)

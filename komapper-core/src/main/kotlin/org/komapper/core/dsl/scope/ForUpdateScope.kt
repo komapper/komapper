@@ -5,7 +5,6 @@ import org.komapper.core.dsl.expression.LockTarget
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class ForUpdateScope {
-
     var lockTarget: LockTarget = LockTarget.Empty
     var lockOption: LockOption = LockOption.Default
 

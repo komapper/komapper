@@ -18,7 +18,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(JdbcEnv::class)
 class JdbcLiteralTest(val db: JdbcDatabase) {
-
     @Test
     fun test_boolean() {
         val m = Meta.booleanData

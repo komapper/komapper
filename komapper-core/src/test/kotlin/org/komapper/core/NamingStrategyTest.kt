@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NamingStrategyTest {
-
     @Test
     fun testCamelToLowerSnakeCase() {
         val strategy = CamelToLowerSnakeCase

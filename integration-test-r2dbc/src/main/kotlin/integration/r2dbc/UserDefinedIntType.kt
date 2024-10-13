@@ -8,7 +8,6 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class UserDefinedIntType : R2dbcUserDefinedDataType<UserDefinedInt> {
-
     override val name: String = "integer"
 
     override val type: KType = typeOf<UserDefinedInt>()

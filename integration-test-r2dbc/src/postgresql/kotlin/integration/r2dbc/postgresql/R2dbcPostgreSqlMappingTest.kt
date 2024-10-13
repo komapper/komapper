@@ -11,7 +11,6 @@ import kotlin.test.Test
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcPostgreSqlMappingTest(private val db: R2dbcDatabase) {
-
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {

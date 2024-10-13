@@ -262,7 +262,6 @@ internal data class EntityUpsertSingleUpdateQuery<ENTITY : Any, ID : Any, META :
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : Query<ENTITY> {
-
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.entityUpsertSingleUpdateQuery(context, entity)
     }

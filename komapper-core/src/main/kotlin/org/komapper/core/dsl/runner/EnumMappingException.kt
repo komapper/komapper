@@ -8,6 +8,6 @@ class EnumMappingException(
     value: Any,
     cause: Exception?,
 ) : RuntimeException(
-    "Failed to map the value \"$value\" to the property \"$propertyName\" of the enum class \"${enumType}\".",
-    cause,
-)
+        "Failed to map the value \"$value\" to the property \"$propertyName\" of the enum class \"${enumType}\".",
+        cause,
+    )

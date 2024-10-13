@@ -13,7 +13,6 @@ data class RelationInsertSelectContext<ENTITY : Any, ID : Any, META : EntityMeta
     val select: SubqueryExpression<ENTITY>,
     val options: InsertOptions,
 ) : TablesProvider {
-
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)
     }

@@ -7,7 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class ConfigTest {
-
     @Test
     fun empty() {
         val options = emptyMap<String, String>()

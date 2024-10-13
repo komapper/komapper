@@ -20,7 +20,6 @@ import kotlin.test.assertEquals
 @ExtendWith(JdbcEnv::class)
 @Run(unless = [Dbms.MYSQL_5])
 class JdbcSelectWithTest(private val db: JdbcDatabase) {
-
     @Test
     fun with() {
         val e = Meta.employee

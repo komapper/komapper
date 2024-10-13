@@ -9,7 +9,6 @@ import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(JdbcEnv::class)
 class JdbcH2MappingTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         db.runQuery {

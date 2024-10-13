@@ -50,7 +50,6 @@ import org.komapper.core.dsl.query.UpdateQueryBuilderImpl
  */
 @ThreadSafe
 interface QueryDsl {
-
     /**
      * Creates a `WITH` query DSL.
      *
@@ -220,7 +219,9 @@ interface QueryDsl {
      * @param sql the sql template
      * @return the builder
      */
-    fun fromTemplate(@Language("sql") sql: String): TemplateSelectQueryBuilder
+    fun fromTemplate(
+        @Language("sql") sql: String
+    ): TemplateSelectQueryBuilder
 
     /**
      * Creates a query for executing an arbitrary command.
@@ -228,14 +229,18 @@ interface QueryDsl {
      * @param sql the sql template
      * @return the query
      */
-    fun executeTemplate(@Language("sql") sql: String): TemplateExecuteQuery
+    fun executeTemplate(
+        @Language("sql") sql: String
+    ): TemplateExecuteQuery
 
     /**
      * Creates a query for executing a script.
      *
      * @param sql the script to execute
      */
-    fun executeScript(@Language("sql") sql: String): ScriptExecuteQuery
+    fun executeScript(
+        @Language("sql") sql: String
+    ): ScriptExecuteQuery
 
     /**
      * Creates a query for creating tables and their associated constraints.
@@ -281,7 +286,6 @@ internal class QueryDslImpl(
     private val templateSelectOptions: TemplateSelectOptions,
     private val updateOptions: UpdateOptions,
 ) : QueryDsl {
-
     override fun with(
         metamodel: EntityMetamodel<*, *, *>,
         subquery: SubqueryExpression<*>,
@@ -366,15 +370,21 @@ internal class QueryDslImpl(
         return DeleteQueryBuilderImpl(EntityDeleteContext(metamodel, options = deleteOptions))
     }
 
-    override fun fromTemplate(@Language("sql") sql: String): TemplateSelectQueryBuilder {
+    override fun fromTemplate(
+        @Language("sql") sql: String
+    ): TemplateSelectQueryBuilder {
         return TemplateSelectQueryBuilderImpl(TemplateSelectContext(sql, options = templateSelectOptions))
     }
 
-    override fun executeTemplate(@Language("sql") sql: String): TemplateExecuteQuery {
+    override fun executeTemplate(
+        @Language("sql") sql: String
+    ): TemplateExecuteQuery {
         return TemplateExecuteQueryImpl(TemplateExecuteContext(sql, options = templateExecuteOptions))
     }
 
-    override fun executeScript(@Language("sql") sql: String): ScriptExecuteQuery {
+    override fun executeScript(
+        @Language("sql") sql: String
+    ): ScriptExecuteQuery {
         return ScriptExecuteQueryImpl(ScriptContext(sql, options = scriptOptions))
     }
 

@@ -7,7 +7,6 @@ import kotlin.reflect.typeOf
  * Represents a binder that binds given values to an SQL template.
  */
 interface TemplateBinder<BINDER : TemplateBinder<BINDER>> {
-
     /**
      * Bind a value.
      *

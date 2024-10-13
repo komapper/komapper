@@ -711,7 +711,6 @@ class BuilderSupport(
     }
 
     private inner class CriterionOperation {
-
         fun binary(left: Operand, right: Operand, operator: String) {
             visitOperand(left)
             buf.append(" $operator ")

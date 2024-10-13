@@ -14,7 +14,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val a = Meta.address

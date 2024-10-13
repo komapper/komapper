@@ -26,7 +26,6 @@ class DefaultEntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : EntityDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val aliasManager =
         if (dialect.supportsAliasForDeleteStatement()) {
             DefaultAliasManager(context)

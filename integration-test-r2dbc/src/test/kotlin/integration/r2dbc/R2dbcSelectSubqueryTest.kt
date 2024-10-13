@@ -14,7 +14,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectSubqueryTest(private val db: R2dbcDatabase) {
-
     @Test
     fun subquery_selectClause(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department

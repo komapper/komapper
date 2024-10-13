@@ -28,7 +28,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class KomapperJdbcAutoConfigurationTest {
-
     private val context = AnnotationConfigApplicationContext()
 
     @Test
@@ -92,7 +91,6 @@ class KomapperJdbcAutoConfigurationTest {
     @Suppress("unused", "UNCHECKED_CAST")
     @Configuration
     open class CustomConfigure {
-
         @Bean
         open fun dataTypeProvider(): JdbcDataTypeProvider {
             return object : JdbcDataTypeProvider {

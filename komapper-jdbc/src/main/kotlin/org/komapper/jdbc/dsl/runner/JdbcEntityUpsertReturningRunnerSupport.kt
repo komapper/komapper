@@ -8,7 +8,6 @@ import org.komapper.jdbc.JdbcExecutor
 internal class JdbcEntityUpsertReturningRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
 ) {
-
     private val support: JdbcEntityInsertReturningRunnerSupport<ENTITY, ID, META> =
         JdbcEntityInsertReturningRunnerSupport(context.insertContext)
 

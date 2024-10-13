@@ -19,7 +19,6 @@ class R2dbcTransactionSession(
     loggerFacade: LoggerFacade,
     transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : R2dbcSession {
-
     private val transactionManager: R2dbcTransactionManager =
         R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
 

@@ -12,7 +12,6 @@ internal class R2dbcEntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : En
     private val entities: List<ENTITY>,
 ) :
     R2dbcRunner<List<ENTITY>> {
-
     private val runner: EntityInsertMultipleRunner<ENTITY, ID, META> =
         EntityInsertMultipleRunner(context, entities)
 

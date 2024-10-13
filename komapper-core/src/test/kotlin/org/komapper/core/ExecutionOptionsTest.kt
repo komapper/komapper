@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class ExecutionOptionsTest {
-
     @Test
     fun plus() {
         val a = ExecutionOptions(batchSize = 1, fetchSize = 1)

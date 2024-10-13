@@ -11,7 +11,6 @@ internal class TripleNotNullColumnsSelectQuery<A : Any, B : Any, C : Any>(
     override val context: SelectContext<*, *, *>,
     private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
 ) : FlowSubquery<Triple<A, B, C>> {
-
     private val support: FlowSubquerySupport<Triple<A, B, C>> =
         FlowSubquerySupport(context) { TripleNotNullColumnsSetOperationQuery(it, expressions = expressions) }
 

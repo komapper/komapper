@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {

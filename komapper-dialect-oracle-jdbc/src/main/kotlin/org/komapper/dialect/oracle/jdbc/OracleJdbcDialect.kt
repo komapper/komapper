@@ -9,7 +9,6 @@ import org.komapper.jdbc.JdbcExecutor
 import java.sql.SQLException
 
 interface OracleJdbcDialect : OracleDialect, JdbcDialect {
-
     override fun createExecutor(
         config: JdbcDatabaseConfig,
         executionOptionProvider: ExecutionOptionsProvider,

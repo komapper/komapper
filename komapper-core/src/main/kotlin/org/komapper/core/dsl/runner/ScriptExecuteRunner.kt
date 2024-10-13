@@ -9,7 +9,6 @@ data class ScriptExecuteRunner(
     private val context: ScriptContext,
 ) :
     Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

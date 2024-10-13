@@ -15,7 +15,6 @@ internal class R2dbcRelationDeleteReturningRunner<ENTITY : Any, ID : Any, META :
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcRunner<List<T>> {
-
     private val runner: RelationDeleteReturningRunner<ENTITY, ID, META> = RelationDeleteReturningRunner(context)
 
     override suspend fun run(config: R2dbcDatabaseConfig): List<T> {

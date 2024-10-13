@@ -83,7 +83,6 @@ data class DryRunStatement(
     val sqlWithArgs: String = "",
     val args: List<Value<*>> = emptyList(),
 ) {
-
     companion object {
         val EMPTY = DryRunStatement()
 

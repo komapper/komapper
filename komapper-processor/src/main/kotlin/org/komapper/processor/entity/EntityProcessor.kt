@@ -13,7 +13,6 @@ internal class EntityProcessor(
     private val contextFactory: ContextFactory,
     private val processingAnnotations: List<ProcessingAnnotation>,
 ) : SymbolProcessor {
-
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val context = contextFactory.create(resolver)
         val processedSymbols = mutableSetOf<KSAnnotated>()

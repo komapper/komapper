@@ -10,7 +10,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcRelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
 ) : JdbcRunner<Long> {
-
     private val runner: RelationDeleteRunner<ENTITY, ID, META> = RelationDeleteRunner(context)
 
     override fun check(config: DatabaseConfig) {

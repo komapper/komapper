@@ -13,7 +13,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcDeleteWhereTest(private val db: R2dbcDatabase) {
-
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

@@ -35,7 +35,6 @@ data class SelectContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
     val includeAll: Boolean = false,
     override val options: SelectOptions,
 ) : TablesProvider, WhereProvider, SubqueryContext {
-
     fun getProjection(): Projection {
         return if (select.isNotEmpty()) {
             Projection.Expressions(select)

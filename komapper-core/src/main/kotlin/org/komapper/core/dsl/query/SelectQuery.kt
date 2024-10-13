@@ -259,5 +259,8 @@ interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
      * @param expressions the column expressions
      * @return the query that returns a list of entity
      */
-    fun <ENTITY2 : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY2, *, *>, vararg expressions: ColumnExpression<*, *>): FlowSubquery<ENTITY2>
+    fun <ENTITY2 : Any> selectAsEntity(
+        metamodel: EntityMetamodel<ENTITY2, *, *>,
+        vararg expressions: ColumnExpression<*, *>
+    ): FlowSubquery<ENTITY2>
 }

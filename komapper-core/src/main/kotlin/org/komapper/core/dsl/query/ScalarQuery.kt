@@ -25,7 +25,7 @@ internal data class NullableScalarQuery<A, B : Any, C : Any>(
     val expression: ScalarExpression<B, C>,
 ) :
     ScalarQuery<A?, B, C>,
-    Query<A?> by query.firstOrNull() {
+        Query<A?> by query.firstOrNull() {
     override val context: SubqueryContext
         get() = query.context
     override val owner: TableExpression<*>
@@ -51,7 +51,7 @@ internal data class NotNullScalarQuery<A, B : Any, C : Any>(
     val expression: ScalarExpression<B, C>,
 ) :
     ScalarQuery<A, B, C>,
-    Query<A> by query.first() {
+        Query<A> by query.first() {
     override val context: SubqueryContext
         get() = query.context
     override val owner: TableExpression<*>

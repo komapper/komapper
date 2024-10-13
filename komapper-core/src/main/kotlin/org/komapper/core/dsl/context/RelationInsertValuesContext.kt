@@ -14,7 +14,6 @@ data class RelationInsertValuesContext<ENTITY : Any, ID : Any, META : EntityMeta
     override val returning: Returning = Returning.Expressions(emptyList()),
     val options: InsertOptions,
 ) : TablesProvider, ReturningProvider {
-
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)
     }

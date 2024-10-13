@@ -5,7 +5,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DryRunStatementTest {
-
     @Test
     fun plus() {
         val a =

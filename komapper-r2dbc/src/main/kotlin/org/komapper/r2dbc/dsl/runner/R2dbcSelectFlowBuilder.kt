@@ -15,7 +15,6 @@ internal class R2dbcSelectFlowBuilder<T>(
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) :
     R2dbcFlowBuilder<T> {
-
     private val runner: SelectRunner = SelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

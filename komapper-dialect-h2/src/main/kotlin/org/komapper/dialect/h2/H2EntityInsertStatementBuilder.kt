@@ -13,7 +13,6 @@ class H2EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
     context: EntityInsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
     private val support = H2StatementBuilderSupport(dialect, context)

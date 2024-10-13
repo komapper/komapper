@@ -9,7 +9,6 @@ internal class FlowSubquerySupport<T>(
     private val context: SubqueryContext,
     private val transform: (SetOperationContext) -> FlowSetOperationQuery<T>,
 ) {
-
     fun except(other: SubqueryExpression<T>): FlowSetOperationQuery<T> {
         return setOperation(SetOperationKind.EXCEPT, other)
     }

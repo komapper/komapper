@@ -92,7 +92,6 @@ abstract class AbstractJdbcDataType<T : Any>(
     override val type: KType,
     override val jdbcType: JDBCType,
 ) : JdbcDataType<T> {
-
     override fun getValue(rs: ResultSet, index: Int): T? {
         val value = doGetValue(rs, index)
         return if (rs.wasNull()) null else value
@@ -128,7 +127,6 @@ abstract class AbstractJdbcDataType<T : Any>(
 
 class JdbcAnyType(override val name: String) :
     AbstractJdbcDataType<Any>(typeOf<Any>(), JDBCType.OTHER) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Any? {
         return rs.getObject(index)
     }
@@ -143,7 +141,6 @@ class JdbcAnyType(override val name: String) :
 }
 
 class JdbcArrayType(override val name: String) : AbstractJdbcDataType<Array>(typeOf<Array>(), JDBCType.ARRAY) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Array? {
         return rs.getArray(index)
     }
@@ -159,7 +156,6 @@ class JdbcArrayType(override val name: String) : AbstractJdbcDataType<Array>(typ
 
 class JdbcBigDecimalType(override val name: String) :
     AbstractJdbcDataType<BigDecimal>(typeOf<BigDecimal>(), JDBCType.DECIMAL) {
-
     override fun doGetValue(rs: ResultSet, index: Int): BigDecimal? {
         return rs.getBigDecimal(index)
     }
@@ -197,7 +193,6 @@ class JdbcBigIntegerType(override val name: String) : JdbcDataType<BigInteger> {
 
 class JdbcBlobType(override val name: String) :
     AbstractJdbcDataType<Blob>(typeOf<Blob>(), JDBCType.BLOB) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Blob? {
         return rs.getBlob(index)
     }
@@ -213,7 +208,6 @@ class JdbcBlobType(override val name: String) :
 
 class JdbcBooleanType(override val name: String) :
     AbstractJdbcDataType<Boolean>(typeOf<Boolean>(), JDBCType.BOOLEAN) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {
         return rs.getBoolean(index)
     }
@@ -232,7 +226,6 @@ class JdbcBooleanType(override val name: String) :
 }
 
 class JdbcByteType(override val name: String) : AbstractJdbcDataType<Byte>(typeOf<Byte>(), JDBCType.SMALLINT) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Byte {
         return rs.getByte(index)
     }
@@ -248,7 +241,6 @@ class JdbcByteType(override val name: String) : AbstractJdbcDataType<Byte>(typeO
 
 class JdbcByteArrayType(override val name: String) :
     AbstractJdbcDataType<ByteArray>(typeOf<ByteArray>(), JDBCType.BINARY) {
-
     override fun doGetValue(rs: ResultSet, index: Int): ByteArray? {
         return rs.getBytes(index)
     }
@@ -263,7 +255,6 @@ class JdbcByteArrayType(override val name: String) :
 }
 
 class JdbcClobType(override val name: String) : AbstractJdbcDataType<Clob>(typeOf<Clob>(), JDBCType.CLOB) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Clob? {
         return rs.getClob(index)
     }
@@ -278,7 +269,6 @@ class JdbcClobType(override val name: String) : AbstractJdbcDataType<Clob>(typeO
 }
 
 class JdbcClobStringType(override val name: String) : AbstractJdbcDataType<ClobString>(typeOf<ClobString>(), JDBCType.CLOB) {
-
     override fun doGetValue(rs: ResultSet, index: Int): ClobString? {
         val text = rs.getString(index)
         return if (text == null) null else ClobString(text)
@@ -300,7 +290,6 @@ class JdbcClobStringType(override val name: String) : AbstractJdbcDataType<ClobS
 
 class JdbcDoubleType(override val name: String) :
     AbstractJdbcDataType<Double>(typeOf<Double>(), JDBCType.DOUBLE) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Double {
         return rs.getDouble(index)
     }
@@ -315,7 +304,6 @@ class JdbcDoubleType(override val name: String) :
 }
 
 class JdbcFloatType(override val name: String) : AbstractJdbcDataType<Float>(typeOf<Float>(), JDBCType.FLOAT) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Float {
         return rs.getFloat(index)
     }
@@ -331,7 +319,6 @@ class JdbcFloatType(override val name: String) : AbstractJdbcDataType<Float>(typ
 
 class JdbcInstantType(override val name: String) :
     AbstractJdbcDataType<Instant>(typeOf<Instant>(), JDBCType.TIMESTAMP_WITH_TIMEZONE) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Instant? {
         return rs.getObject(index, Instant::class.java)
     }
@@ -347,7 +334,6 @@ class JdbcInstantType(override val name: String) :
 
 class JdbcInstantAsTimestampType(override val name: String) :
     AbstractJdbcDataType<Instant>(typeOf<Instant>(), JDBCType.TIMESTAMP) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Instant? {
         val dateTime: LocalDateTime? = rs.getObject(index, LocalDateTime::class.java)
         return dateTime?.let { toInstant(it) }
@@ -370,7 +356,6 @@ class JdbcInstantAsTimestampType(override val name: String) :
 
 class JdbcInstantAsTimestampWithTimezoneType(override val name: String) :
     AbstractJdbcDataType<Instant>(typeOf<Instant>(), JDBCType.TIMESTAMP_WITH_TIMEZONE) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Instant? {
         val dateTime: OffsetDateTime? = rs.getObject(index, OffsetDateTime::class.java)
         return dateTime?.toInstant()
@@ -388,7 +373,6 @@ class JdbcInstantAsTimestampWithTimezoneType(override val name: String) :
 }
 
 class JdbcIntType(override val name: String) : AbstractJdbcDataType<Int>(typeOf<Int>(), JDBCType.INTEGER) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Int {
         return rs.getInt(index)
     }
@@ -404,7 +388,6 @@ class JdbcIntType(override val name: String) : AbstractJdbcDataType<Int>(typeOf<
 
 class JdbcLocalDateTimeType(override val name: String) :
     AbstractJdbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), JDBCType.TIMESTAMP) {
-
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {
         return rs.getObject(index, LocalDateTime::class.java)
     }
@@ -424,7 +407,6 @@ class JdbcLocalDateTimeType(override val name: String) :
 
 class JdbcLocalDateType(override val name: String) :
     AbstractJdbcDataType<LocalDate>(typeOf<LocalDate>(), JDBCType.DATE) {
-
     override fun doGetValue(rs: ResultSet, index: Int): LocalDate? {
         return rs.getObject(index, LocalDate::class.java)
     }
@@ -444,7 +426,6 @@ class JdbcLocalDateType(override val name: String) :
 
 class JdbcLocalTimeType(override val name: String) :
     AbstractJdbcDataType<LocalTime>(typeOf<LocalTime>(), JDBCType.TIME) {
-
     override fun doGetValue(rs: ResultSet, index: Int): LocalTime? {
         return rs.getObject(index, LocalTime::class.java)
     }
@@ -463,7 +444,6 @@ class JdbcLocalTimeType(override val name: String) :
 }
 
 class JdbcLongType(override val name: String) : AbstractJdbcDataType<Long>(typeOf<Long>(), JDBCType.BIGINT) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Long {
         return rs.getLong(index)
     }
@@ -478,7 +458,6 @@ class JdbcLongType(override val name: String) : AbstractJdbcDataType<Long>(typeO
 }
 
 class JdbcNClobType(override val name: String) : AbstractJdbcDataType<NClob>(typeOf<NClob>(), JDBCType.NCLOB) {
-
     override fun doGetValue(rs: ResultSet, index: Int): NClob? {
         return rs.getNClob(index)
     }
@@ -494,7 +473,6 @@ class JdbcNClobType(override val name: String) : AbstractJdbcDataType<NClob>(typ
 
 class JdbcOffsetDateTimeType(override val name: String) :
     AbstractJdbcDataType<OffsetDateTime>(typeOf<OffsetDateTime>(), JDBCType.TIMESTAMP_WITH_TIMEZONE) {
-
     override fun doGetValue(rs: ResultSet, index: Int): OffsetDateTime? {
         return rs.getObject(index, OffsetDateTime::class.java)
     }
@@ -514,7 +492,6 @@ class JdbcOffsetDateTimeType(override val name: String) :
 
 class JdbcShortType(override val name: String) :
     AbstractJdbcDataType<Short>(typeOf<Short>(), JDBCType.SMALLINT) {
-
     override fun doGetValue(rs: ResultSet, index: Int): Short {
         return rs.getShort(index)
     }
@@ -530,7 +507,6 @@ class JdbcShortType(override val name: String) :
 
 class JdbcStringType(override val name: String) :
     AbstractJdbcDataType<String>(typeOf<String>(), JDBCType.VARCHAR) {
-
     override fun doGetValue(rs: ResultSet, index: Int): String? {
         return rs.getString(index)
     }
@@ -550,7 +526,6 @@ class JdbcStringType(override val name: String) :
 
 class JdbcSQLXMLType(override val name: String) :
     AbstractJdbcDataType<SQLXML>(typeOf<SQLXML>(), JDBCType.SQLXML) {
-
     override fun doGetValue(rs: ResultSet, index: Int): SQLXML? {
         return rs.getSQLXML(index)
     }
@@ -621,7 +596,6 @@ class JdbcUShortType(override val name: String) : AbstractJdbcDataType<UShort>(t
 class JdbcUserDefinedDataTypeAdapter<T : Any>(
     private val dataType: JdbcUserDefinedDataType<T>,
 ) : JdbcDataType<T> {
-
     override val name: String
         get() = dataType.name
 
@@ -658,7 +632,6 @@ class JdbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
     private val converter: DataTypeConverter<EXTERIOR, INTERIOR>,
     private val dataType: JdbcDataType<INTERIOR>,
 ) : JdbcDataType<EXTERIOR> {
-
     override val name: String get() = dataType.name
 
     override val type: KType get() = converter.exteriorType

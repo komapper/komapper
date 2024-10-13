@@ -57,7 +57,6 @@ internal class EntityMetamodelGenerator(
     private val entityTypeName: String,
     private val w: PrintWriter,
 ) : Runnable {
-
     private val idTypeName: String = if (entity.idProperties.size == 1) {
         entity.idProperties[0].typeName
     } else {
@@ -130,7 +129,9 @@ internal class EntityMetamodelGenerator(
     private fun classDeclaration() {
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
-        w.println("public class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
+        w.println(
+            "public class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {"
+        )
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
         w.println("    private val __schemaName = schema")
@@ -332,7 +333,9 @@ internal class EntityMetamodelGenerator(
                         "`$ep` = $PropertyMetamodelImpl(this, $EntityDescriptor.`__$p`.`__$ep`)"
                     }
                     val index = embeddableIndexMap[embeddable]
-                    w.println("    public val `$p`:  __${embeddable.simpleName}$index by lazy { __${embeddable.simpleName}$index($argList) }")
+                    w.println(
+                        "    public val `$p`:  __${embeddable.simpleName}$index by lazy { __${embeddable.simpleName}$index($argList) }"
+                    )
                 }
 
                 is LeafProperty -> {
@@ -348,7 +351,9 @@ internal class EntityMetamodelGenerator(
             }
             val propertyList = embeddable.properties.joinToString { "`$it`" }
             val argumentList = embeddable.properties.joinToString { ep -> "$Argument(this.`$ep`, composite?.`$ep`)" }
-            w.println("    public class __${embeddable.simpleName}$index($paramList): $EmbeddedMetamodel<$entityTypeName, ${embeddable.typeName}>, $EmbeddableMetamodel<${embeddable.typeName}> {")
+            w.println(
+                "    public class __${embeddable.simpleName}$index($paramList): $EmbeddedMetamodel<$entityTypeName, ${embeddable.typeName}>, $EmbeddableMetamodel<${embeddable.typeName}> {"
+            )
             w.println("         override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($propertyList)")
             w.println("         override fun columns(): List<$ColumnExpression<*, *>> = properties()")
             w.println("         override fun arguments(composite: ${embeddable.typeName}?): List<$Argument<*, *>> = listOf($argumentList)")
@@ -481,7 +486,8 @@ internal class EntityMetamodelGenerator(
             val list = p.embeddable.properties.joinToString { ep ->
                 val nullable1 = p.nullability == Nullability.NULLABLE
                 val nullable2 = ep.nullability == Nullability.NULLABLE
-                "e.`$p`${if (nullable1) "?" else ""}.`$ep`" + if (nullable1 || nullable2) " ?: error(\"The id property '$p.$ep' must not null.\")" else ""
+                "e.`$p`${if (nullable1) "?" else ""}.`$ep`" +
+                    if (nullable1 || nullable2) " ?: error(\"The id property '$p.$ep' must not null.\")" else ""
             }
             "listOf($list)"
         } else if (entity.idProperties.size == 1) {
@@ -679,17 +685,23 @@ internal class EntityMetamodelGenerator(
     private fun newMetamodel() {
         val paramList =
             "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declaration: $EntityMetamodelDeclaration<$simpleName>"
-        w.println("    override fun newMetamodel($paramList, disableAutoIncrement: Boolean): $simpleName = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)")
+        w.println(
+            "    override fun newMetamodel($paramList, disableAutoIncrement: Boolean): $simpleName = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)"
+        )
     }
 
     private fun clone() {
-        w.println("    public fun clone($constructorParamList): $simpleName = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)")
+        w.println(
+            "    public fun clone($constructorParamList): $simpleName = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)"
+        )
     }
 
     private fun companionObject() {
         w.println("    public companion object {")
         w.println("        init {")
-        w.println("            $checkMetamodelVersion(\"$packageName.$simpleName\", ${org.komapper.core.dsl.metamodel.EntityMetamodel.METAMODEL_VERSION})")
+        w.println(
+            "            $checkMetamodelVersion(\"$packageName.$simpleName\", ${org.komapper.core.dsl.metamodel.EntityMetamodel.METAMODEL_VERSION})"
+        )
         w.println("        }")
         for (alias in aliases) {
             w.println("        public val `$alias`: $simpleName = $simpleName()")
@@ -784,7 +796,11 @@ internal class EntityMetamodelGenerator(
     private fun factory() {
         w.println("@$EntityMetamodelFactory")
         w.println("public class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
-        w.println("    override fun create(): List<Pair<Any, $EntityMetamodel<*, *, *>>> = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
+        w.println(
+            "    override fun create(): List<Pair<Any, $EntityMetamodel<*, *, *>>> = listOf(${aliases.joinToString {
+                "$unitTypeName to $simpleName.`$it`"
+            }})"
+        )
         w.println("}")
         w.println()
     }

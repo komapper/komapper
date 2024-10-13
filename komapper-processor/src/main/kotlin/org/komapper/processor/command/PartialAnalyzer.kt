@@ -8,7 +8,6 @@ import org.komapper.processor.report
 import kotlin.reflect.KClass
 
 internal class PartialAnalyzer(private val context: Context, private val annotationClass: KClass<*>) {
-
     fun analyze(symbol: KSAnnotated): PartialAnalysisResult {
         val partial = try {
             PartialFactory(context, annotationClass, symbol).create()
@@ -33,7 +32,10 @@ internal class PartialAnalyzer(private val context: Context, private val annotat
         }
         val unusedParams = partial.paramMap.keys - usedParams - partial.unusedParams
         if (unusedParams.isNotEmpty()) {
-            context.logger.warn("Unused SQL params: $unusedParams. You can suppress this warning message by specifying @KomapperUnused for the param properties.", partial.classDeclaration)
+            context.logger.warn(
+                "Unused SQL params: $unusedParams. You can suppress this warning message by specifying @KomapperUnused for the param properties.",
+                partial.classDeclaration
+            )
         }
     }
 }

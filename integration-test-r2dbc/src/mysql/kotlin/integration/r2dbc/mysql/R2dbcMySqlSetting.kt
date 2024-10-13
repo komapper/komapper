@@ -13,7 +13,6 @@ import org.testcontainers.jdbc.ConnectionUrl
 @Suppress("unused")
 class R2dbcMySqlSetting(private val url: String) :
     MySqlSetting<R2dbcDatabase> {
-
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
         val container = MySQLContainerProvider().newInstance(connectionUrl) as MySQLContainer<*>

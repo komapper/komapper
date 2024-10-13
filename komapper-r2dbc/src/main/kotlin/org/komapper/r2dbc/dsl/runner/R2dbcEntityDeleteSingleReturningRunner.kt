@@ -15,7 +15,6 @@ internal class R2dbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, ME
     entity: ENTITY,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcRunner<T?> {
-
     private val runner: EntityDeleteSingleReturningRunner<ENTITY, ID, META> =
         EntityDeleteSingleReturningRunner(context, entity)
 

@@ -9,7 +9,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcEntityUpsertRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
 ) {
-
     private val runner: EntityUpsertRunnerSupport<ENTITY, ID, META> = EntityUpsertRunnerSupport(context)
 
     private val support: R2dbcEntityInsertRunnerSupport<ENTITY, ID, META> =

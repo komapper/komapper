@@ -11,7 +11,6 @@ internal class MultipleColumnsSelectQuery(
     override val context: SelectContext<*, *, *>,
     private val expressions: List<ColumnExpression<*, *>>,
 ) : FlowSubquery<Record> {
-
     private val support: FlowSubquerySupport<Record> =
         FlowSubquerySupport(context) { MultipleColumnsSetOperationQuery(it, expressions = expressions) }
 

@@ -11,7 +11,6 @@ class EntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
     private val entities: List<ENTITY>,
 ) :
     Runner {
-
     override fun check(config: DatabaseConfig) {
         checkAutoIncrementWhenInsertingMultipleRows(config, context.target)
         checkGeneratedKeysReturningWhenInsertingMultipleRows(config, context.target, context.options)

@@ -11,7 +11,6 @@ internal class R2dbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : En
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : R2dbcRunner<Long> {
-
     private val runner: EntityUpsertMultipleRunner<ENTITY, ID, META> =
         EntityUpsertMultipleRunner(context, entities)
 

@@ -39,7 +39,6 @@ import org.komapper.core.template.sql.SqlTokenType.WORD
 import java.nio.CharBuffer
 
 internal class SqlTokenizer(private val sql: String) {
-
     companion object {
         const val LOOKAHEAD_SIZE: Int = 10
     }
@@ -55,7 +54,13 @@ internal class SqlTokenizer(private val sql: String) {
     private var columnIndex: Int = 0
 
     val location
-        get() = SqlLocation(sql, lineIndex + 1, buf.position() - lineStartPosition, columnIndex + 1, buf.position() - lineStartPosition - columnIndex)
+        get() = SqlLocation(
+            sql,
+            lineIndex + 1,
+            buf.position() - lineStartPosition,
+            columnIndex + 1,
+            buf.position() - lineStartPosition - columnIndex
+        )
 
     fun next(): SqlTokenType {
         if (type == EOL) {

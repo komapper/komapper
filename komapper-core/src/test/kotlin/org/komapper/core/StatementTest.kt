@@ -5,7 +5,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class StatementTest {
-
     @Test
     fun args() {
         val statement =

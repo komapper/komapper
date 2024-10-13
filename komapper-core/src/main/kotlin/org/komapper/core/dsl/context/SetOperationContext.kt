@@ -14,7 +14,6 @@ data class SetOperationContext(
     val orderBy: List<SortItem> = listOf(),
     override val options: SelectOptions,
 ) : TablesProvider, SubqueryContext {
-
     fun getProjection(): Projection {
         fun visitSubqueryContext(subqueryContext: SubqueryContext): Projection {
             return when (subqueryContext) {
@@ -39,5 +38,8 @@ data class SetOperationContext(
 }
 
 enum class SetOperationKind {
-    EXCEPT, INTERSECT, UNION, UNION_ALL
+    EXCEPT,
+    INTERSECT,
+    UNION,
+    UNION_ALL
 }

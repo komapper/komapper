@@ -13,7 +13,6 @@ class OracleEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMe
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultEntityUpdateStatementBuilder(dialect, context, entity)
     private val support = OracleStatementBuilderSupport(dialect, context)

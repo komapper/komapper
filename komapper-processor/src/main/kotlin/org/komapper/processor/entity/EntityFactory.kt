@@ -38,7 +38,6 @@ internal class EntityFactory(
     private val context: Context,
     private val entityDef: EntityDef,
 ) {
-
     private val annotationSupport = AnnotationSupport(context)
 
     fun create(): Entity {
@@ -319,7 +318,10 @@ internal class EntityFactory(
         }
     }
 
-    private fun validateEnumClassProperty(property: LeafProperty, @Suppress("UNUSED_PARAMETER") enumClass: EnumClass) {
+    private fun validateEnumClassProperty(
+        property: LeafProperty,
+        @Suppress("UNUSED_PARAMETER") enumClass: EnumClass
+    ) {
         if (property.column.alternateType != null) {
             report("@KomapperColumn.alternateType is invalid for enum property types.", property.node)
         }

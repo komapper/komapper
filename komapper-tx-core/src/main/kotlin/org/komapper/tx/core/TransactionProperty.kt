@@ -6,7 +6,6 @@ import java.time.Duration
 
 @ThreadSafe
 interface TransactionProperty {
-
     operator fun <E : Element<*>> get(key: Key<E>): E?
 
     fun <R> fold(initial: R, operation: (R, Element<*>) -> R): R
@@ -96,7 +95,6 @@ private data class CombinedTransactionProperty(
     val left: TransactionProperty,
     val element: TransactionProperty.Element<*>,
 ) : TransactionProperty {
-
     override fun <E : TransactionProperty.Element<*>> get(key: TransactionProperty.Key<E>): E? {
         var cur = this
         while (true) {

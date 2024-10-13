@@ -19,7 +19,6 @@ import kotlin.test.assertFalse
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSchemaTest(private val db: JdbcDatabase) {
-
     private val metamodels =
         listOf(
             Meta.aaa,

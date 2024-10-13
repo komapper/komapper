@@ -65,7 +65,6 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
 internal data class InsertOnDuplicateKeyIgnoreQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
-
     private val builder: EntityUpsertQueryBuilderNullable<ENTITY, ID, META> = EntityUpsertQueryBuilderNullableImpl(context)
 
     override fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY> {

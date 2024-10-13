@@ -17,7 +17,6 @@ class OracleJdbcExecutor(
     private val config: JdbcDatabaseConfig,
     private val executor: DefaultJdbcExecutor,
 ) : JdbcExecutor by executor {
-
     override fun <T, R> executeReturning(
         statement: Statement,
         transform: (JdbcDataOperator, ResultSet) -> T,

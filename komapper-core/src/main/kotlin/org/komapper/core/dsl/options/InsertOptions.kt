@@ -12,7 +12,6 @@ data class InsertOptions(
     override val allowMissingWhereClause: Boolean = DEFAULT.allowMissingWhereClause,
     override val escapeSequence: String? = DEFAULT.escapeSequence,
 ) : WhereOptions, BatchOptions, QueryOptions {
-
     companion object {
         val DEFAULT = InsertOptions(
             batchSize = null,

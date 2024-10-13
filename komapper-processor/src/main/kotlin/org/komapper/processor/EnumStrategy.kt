@@ -3,7 +3,6 @@ package org.komapper.processor
 import com.google.devtools.ksp.symbol.KSAnnotation
 
 sealed interface EnumStrategy {
-
     object Name : EnumStrategy {
         const val propertyName: String = "name"
         const val typeName: String = "String"

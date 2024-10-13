@@ -22,7 +22,6 @@ import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface OracleDialect : Dialect {
-
     companion object : Dialect.Identifier {
         private const val DRIVER = "oracle"
 

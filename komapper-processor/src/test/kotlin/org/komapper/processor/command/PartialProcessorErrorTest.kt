@@ -9,7 +9,6 @@ import kotlin.test.assertTrue
 
 @Tag("slow")
 class PartialProcessorErrorTest : AbstractKspTest(PartialProcessorProvider()) {
-
     @Test
     fun `The class must not have type parameters`() {
         val result = compile(

@@ -21,7 +21,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {

@@ -16,7 +16,6 @@ class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMe
     private val entities: List<ENTITY>,
 ) :
     EntityInsertStatementBuilder<ENTITY, ID, META> {
-
     init {
         require(entities.isNotEmpty()) { "entities must not be empty." }
     }

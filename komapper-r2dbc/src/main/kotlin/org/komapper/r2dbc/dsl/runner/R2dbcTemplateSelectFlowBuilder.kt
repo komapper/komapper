@@ -13,7 +13,6 @@ internal class R2dbcTemplateSelectFlowBuilder<T>(
     private val context: TemplateSelectContext,
     private val transform: (Row) -> T,
 ) : R2dbcFlowBuilder<T> {
-
     private val runner = TemplateSelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

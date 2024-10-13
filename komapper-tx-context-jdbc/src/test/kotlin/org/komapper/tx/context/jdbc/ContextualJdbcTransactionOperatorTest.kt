@@ -18,7 +18,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 internal class ContextualJdbcTransactionOperatorTest {
-
     private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
     private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {
         override val session: JdbcSession by lazy {

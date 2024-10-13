@@ -10,7 +10,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : JdbcRunner<Long> {
-
     private val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context)
 
     override fun check(config: DatabaseConfig) {

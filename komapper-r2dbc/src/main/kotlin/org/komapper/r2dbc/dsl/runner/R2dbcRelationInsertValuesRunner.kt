@@ -14,7 +14,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : R2dbcRunner<Pair<Long, ID?>> {
-
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
     private val support: R2dbcRelationInsertValuesSupport<ENTITY, ID, META> = R2dbcRelationInsertValuesSupport(context)

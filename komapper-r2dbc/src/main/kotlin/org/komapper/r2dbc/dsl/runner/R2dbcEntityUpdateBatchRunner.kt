@@ -12,7 +12,6 @@ internal class R2dbcEntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : Entit
     private val entities: List<ENTITY>,
 ) :
     R2dbcRunner<List<ENTITY>> {
-
     private val runner: EntityUpdateBatchRunner<ENTITY, ID, META> =
         EntityUpdateBatchRunner(context, entities)
 

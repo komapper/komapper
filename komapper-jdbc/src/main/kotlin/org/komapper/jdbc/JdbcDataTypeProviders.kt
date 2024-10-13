@@ -8,7 +8,6 @@ import java.util.ServiceLoader
 import kotlin.reflect.KType
 
 object JdbcDataTypeProviders {
-
     /**
      * @param driver the driver name
      * @return the [JdbcDataTypeProvider]
@@ -21,7 +20,6 @@ object JdbcDataTypeProviders {
         val secondProvider = JdbcUserDefinedDataTypeProvider
         val converters = DataTypeConverters.get().associateBy { it.exteriorType }
         return object : JdbcDataTypeProvider {
-
             override fun <T : Any> get(type: KType): JdbcDataType<T>? {
                 @Suppress("UNCHECKED_CAST")
                 val converter = converters[type] as DataTypeConverter<T, Any>?

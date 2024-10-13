@@ -10,7 +10,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcEntityMetamodels {
-
     @Test
     fun list() {
         val list = EntityMetamodels.all().map { it.second }

@@ -13,7 +13,6 @@ class SqlServerEntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : Entit
     context: EntityDeleteContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : EntityDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val builder = DefaultEntityDeleteStatementBuilder(dialect, context, entity)
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 

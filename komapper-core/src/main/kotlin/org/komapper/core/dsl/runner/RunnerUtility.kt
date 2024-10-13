@@ -40,7 +40,9 @@ internal fun checkAutoIncrementWhenInsertingMultipleRows(config: DatabaseConfig,
     if (!dialect.supportsAutoIncrementWhenInsertingMultipleRows() &&
         metamodel.hasAutoIncrementProperty()
     ) {
-        throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support auto-increment when inserting multiple rows.")
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support auto-increment when inserting multiple rows."
+        )
     }
 }
 
@@ -65,7 +67,9 @@ internal fun checkBatchExecutionReturningGeneratedValues(config: DatabaseConfig,
     if (!dialect.supportsBatchExecutionReturningGeneratedValues() &&
         metamodel.hasAutoIncrementProperty()
     ) {
-        throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support batch execution for entities with auto-increment properties.")
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support batch execution for entities with auto-increment properties."
+        )
     }
 }
 

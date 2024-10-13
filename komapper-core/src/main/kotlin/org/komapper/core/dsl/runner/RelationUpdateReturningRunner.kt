@@ -11,7 +11,6 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 class RelationUpdateReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: RelationUpdateContext<ENTITY, ID, META>,
 ) : Runner {
-
     val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context)
 
     override fun check(config: DatabaseConfig) {

@@ -19,7 +19,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcQuoteTest(val db: JdbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogAndSchema() {

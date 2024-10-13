@@ -13,7 +13,6 @@ class PostgreSqlEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
     context: EntityInsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
     private val support = PostgreSqlStatementBuilderSupport(dialect, context)

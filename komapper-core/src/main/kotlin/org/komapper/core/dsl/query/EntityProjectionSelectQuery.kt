@@ -11,7 +11,6 @@ internal class EntityProjectionSelectQuery<ENTITY : Any>(
     override val context: SelectContext<*, *, *>,
     private val metamodel: EntityMetamodel<ENTITY, *, *>,
 ) : FlowSubquery<ENTITY> {
-
     private val support: FlowSubquerySupport<ENTITY> =
         FlowSubquerySupport(context) { EntityProjectionSetOperationQuery(it, metamodel) }
 

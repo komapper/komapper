@@ -12,7 +12,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
 ) : R2dbcRunner<Pair<Long, List<ID>>> {
-
     private val runner: RelationInsertSelectRunner<ENTITY, ID, META> = RelationInsertSelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

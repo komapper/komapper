@@ -18,7 +18,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertExecAndGetTest(private val db: JdbcDatabase) {
-
     @Test
     fun onDuplicateKeyUpdate_insert() {
         val d = Meta.department

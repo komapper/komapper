@@ -21,7 +21,6 @@ interface SchemaDropQuery : Query<Unit> {
 internal data class SchemaDropQueryImpl(
     private val context: SchemaContext,
 ) : SchemaDropQuery {
-
     override fun options(configure: (SchemaOptions) -> SchemaOptions): SchemaDropQuery {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

@@ -10,7 +10,6 @@ class EntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, META : EntityM
     context: EntityInsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>,
 ) : Runner {
-
     private val runner: EntityInsertMultipleRunner<ENTITY, ID, META> = EntityInsertMultipleRunner(context, entities)
 
     override fun check(config: DatabaseConfig) {

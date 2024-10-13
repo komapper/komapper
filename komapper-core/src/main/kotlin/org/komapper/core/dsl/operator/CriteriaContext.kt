@@ -6,7 +6,6 @@ import org.komapper.core.dsl.expression.SqlBuilderScope
  * The context for criteria.
  */
 interface CriteriaContext {
-
     /**
      * Adds a SQL builder.
      *

@@ -7,7 +7,6 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class PairOfIntType : R2dbcUserDefinedDataType<Pair<Int, Int>> {
-
     override val name: String = "varchar(500)"
     override val type: KType = typeOf<Pair<Int, Int>>()
     override val r2dbcType: Class<String> = String::class.javaObjectType

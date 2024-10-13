@@ -9,7 +9,6 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 class TemplateSelectRunner(
     private val context: TemplateSelectContext,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

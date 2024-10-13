@@ -88,7 +88,6 @@ interface RelationUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : RelationUpdateQuery<ENTITY, ID, META> {
-
     override fun set(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateQuery<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)

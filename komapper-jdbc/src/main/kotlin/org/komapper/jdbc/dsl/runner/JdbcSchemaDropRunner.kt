@@ -9,7 +9,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcSchemaDropRunner(
     private val context: SchemaContext,
 ) : JdbcRunner<Unit> {
-
     private val runner = SchemaDropRunner(context)
 
     override fun check(config: DatabaseConfig) {

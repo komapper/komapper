@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class SqlCommenterTest {
-
     @Test
     fun inspect() {
         val inspector = SqlCommenter()

@@ -13,7 +13,6 @@ import org.komapper.tx.r2dbc.R2dbcTransactionManagement
  */
 @ThreadSafe
 interface ContextualR2dbcTransactionManager {
-
     context(R2dbcTransactionContext)
     suspend fun getConnection(): Connection
 
@@ -58,7 +57,6 @@ internal class ContextualR2dbcTransactionManagerImpl(
     connectionFactory: ConnectionFactory,
     loggerFacade: LoggerFacade,
 ) : ContextualR2dbcTransactionManager {
-
     private val management: R2dbcTransactionManagement =
         R2dbcTransactionManagement(connectionFactory, loggerFacade)
 

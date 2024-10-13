@@ -12,15 +12,24 @@ import java.sql.SQLXML
 
 @KomapperEntity
 @KomapperTable("array_data")
-data class ArrayData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Array?)
+data class ArrayData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Array?
+)
 
 @KomapperEntity
 @KomapperTable("blob_data")
-data class BlobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Blob?)
+data class BlobData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Blob?
+)
 
 @KomapperEntity
 @KomapperTable("clob_data")
-data class ClobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Clob?)
+data class ClobData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Clob?
+)
 
 @KomapperEntity
 @KomapperTable("clob_data")
@@ -32,4 +41,7 @@ data class ClobStringData(
 
 @KomapperEntity
 @KomapperTable("sqlxml_data")
-data class SqlXmlData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: SQLXML?)
+data class SqlXmlData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: SQLXML?
+)

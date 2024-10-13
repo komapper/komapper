@@ -11,7 +11,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : R2dbcRunner<Long> {
-
     private val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context)
 
     override fun check(config: DatabaseConfig) {

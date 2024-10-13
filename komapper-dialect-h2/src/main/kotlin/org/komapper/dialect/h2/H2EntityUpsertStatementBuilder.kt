@@ -23,7 +23,6 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
-
     private val target = context.target
     private val excluded = context.excluded
     private val aliasManager = UpsertAliasManager(target, excluded)
@@ -109,7 +108,6 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
         val target: TableExpression<*>,
         val excluded: TableExpression<*>,
     ) : AliasManager {
-
         override val index: Int = 0
 
         override fun getAlias(expression: TableExpression<*>): String {
@@ -126,7 +124,6 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
         val context: EntityUpsertContext<ENTITY, ID, META>,
         val entities: List<ENTITY>,
     ) {
-
         private val buf = StatementBuffer()
 
         fun build(): Statement {

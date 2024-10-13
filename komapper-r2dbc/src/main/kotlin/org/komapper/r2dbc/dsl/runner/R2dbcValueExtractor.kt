@@ -20,7 +20,6 @@ internal class R2dbcIndexedValueExtractor(private val dataOperator: R2dbcDataOpe
 }
 
 internal class R2dbcNamedValueExtractor(private val dataOperator: R2dbcDataOperator, private val row: Row) : R2dbcValueExtractor {
-
     override fun <EXTERIOR : Any, INTERIOR : Any> execute(expression: ColumnExpression<EXTERIOR, INTERIOR>): EXTERIOR? {
         return ValueExtractor.getByName(expression) {
             dataOperator.getValue(row, expression.columnName, expression.interiorType)

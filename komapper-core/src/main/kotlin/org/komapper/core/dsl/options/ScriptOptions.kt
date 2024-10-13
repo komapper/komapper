@@ -5,7 +5,6 @@ data class ScriptOptions(
     override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
 ) : QueryOptions {
-
     companion object {
         val DEFAULT = ScriptOptions(
             separator = ";",

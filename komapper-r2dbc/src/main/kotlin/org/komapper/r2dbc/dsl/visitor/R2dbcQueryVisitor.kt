@@ -61,7 +61,6 @@ import org.komapper.r2dbc.dsl.runner.R2dbcTemplateExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectRunner
 
 object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
-
     @Suppress("UNCHECKED_CAST")
     override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): R2dbcRunner<S> {
         val leftRunner = left.accept(this) as R2dbcRunner<T>
@@ -112,16 +111,14 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcSelectRunner(context, transform, collect)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityDeleteBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): R2dbcRunner<Unit> {
         return R2dbcEntityDeleteBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityDeleteSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<Unit> {
@@ -254,16 +251,14 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityInsertSingleReturningRunner(context, entity, transform)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpdateBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): R2dbcRunner<List<ENTITY>> {
         return R2dbcEntityUpdateBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpdateSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<ENTITY> {
@@ -305,16 +300,14 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityUpdateSingleReturningRunner(context, entity, transform)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): R2dbcRunner<List<Long>> {
         return R2dbcEntityUpsertBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertMultipleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): R2dbcRunner<Long> {
@@ -356,8 +349,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityUpsertMultipleReturningRunner(context, entities, transform)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<Long> {
@@ -435,8 +427,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcScriptExecuteRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    relationSelectQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): R2dbcRunner<R> {

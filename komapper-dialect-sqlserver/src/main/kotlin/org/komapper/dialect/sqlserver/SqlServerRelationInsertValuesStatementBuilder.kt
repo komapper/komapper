@@ -14,7 +14,6 @@ class SqlServerRelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META
     dialect: BuilderDialect,
     context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
-
     private val builder = DefaultRelationInsertValuesStatementBuilder(dialect, context)
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 

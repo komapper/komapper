@@ -7,7 +7,6 @@ import java.nio.CharBuffer
  */
 @ThreadSafe
 interface NamingStrategy {
-
     /**
      * Applies the naming strategy to the given [name].
      * @param name the name
@@ -20,7 +19,6 @@ interface NamingStrategy {
  * Converts the camel case name to the lower snake case name.
  */
 object CamelToLowerSnakeCase : NamingStrategy {
-
     private val camelToSnakeCase = CamelToSnakeCase(Char::lowercaseChar)
 
     override fun apply(name: String): String {
@@ -32,7 +30,6 @@ object CamelToLowerSnakeCase : NamingStrategy {
  * Converts the camel case name to the upper snake case name.
  */
 object CamelToUpperSnakeCase : NamingStrategy {
-
     private val camelToSnakeCase = CamelToSnakeCase(Char::uppercaseChar)
 
     override fun apply(name: String): String {
@@ -41,7 +38,6 @@ object CamelToUpperSnakeCase : NamingStrategy {
 }
 
 private class CamelToSnakeCase(private val mapper: (Char) -> Char) {
-
     fun apply(name: String): String {
         val builder = StringBuilder()
         val buf = CharBuffer.wrap(name)
@@ -74,7 +70,6 @@ object Implicit : NamingStrategy {
  * Converts the snake case name to the lower camel case name.
  */
 object SnakeToLowerCamelCase : NamingStrategy {
-
     private val snakeToCamelCase = SnakeToCamelCase(Char::lowercaseChar)
 
     override fun apply(name: String): String {
@@ -86,7 +81,6 @@ object SnakeToLowerCamelCase : NamingStrategy {
  * Converts the snake case name to the upper camel case name.
  */
 object SnakeToUpperCamelCase : NamingStrategy {
-
     private val snakeToCamelCase = SnakeToCamelCase(Char::uppercaseChar)
 
     override fun apply(name: String): String {
@@ -95,7 +89,6 @@ object SnakeToUpperCamelCase : NamingStrategy {
 }
 
 private class SnakeToCamelCase(private val mapper: (Char) -> Char) : NamingStrategy {
-
     override fun apply(name: String): String {
         if (name.isBlank()) {
             return name

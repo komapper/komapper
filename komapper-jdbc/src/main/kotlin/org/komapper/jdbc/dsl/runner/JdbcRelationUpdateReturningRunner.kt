@@ -14,7 +14,6 @@ internal class JdbcRelationUpdateReturningRunner<ENTITY : Any, ID : Any, META : 
     private val context: RelationUpdateContext<ENTITY, ID, META>,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
 ) : JdbcRunner<List<T>> {
-
     private val runner: RelationUpdateReturningRunner<ENTITY, ID, META> = RelationUpdateReturningRunner(context)
 
     override fun check(config: DatabaseConfig) {

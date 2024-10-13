@@ -13,7 +13,6 @@ internal data class PairNotNullColumnsSetOperationQuery<A : Any, B : Any>(
     override val context: SetOperationContext,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
 ) : FlowSetOperationQuery<Pair<A, B>> {
-
     private val support: SetOperationQuerySupport<Pair<A, B>> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

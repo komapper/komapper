@@ -4,7 +4,6 @@ import integration.core.Setting
 import org.komapper.r2dbc.R2dbcDatabase
 
 object R2dbcSettingProvider {
-
     fun get(): Setting<R2dbcDatabase> {
         val identifier = System.getProperty("identifier") ?: error("The identifier property is not found.")
         val url = System.getProperty("url") ?: error("The url property is not found.")

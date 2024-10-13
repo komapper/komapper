@@ -18,7 +18,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectSubqueryTest(private val db: JdbcDatabase) {
-
     @Test
     fun subquery_selectClause() {
         val d = Meta.department

@@ -8,7 +8,6 @@ import org.komapper.jdbc.JdbcDialects
 
 @Suppress("unused")
 class JdbcPostgreSqlSetting(url: String) : PostgreSqlSetting<JdbcDatabase> {
-
     override val database: JdbcDatabase by lazy {
         val dataTypeProvider = JdbcDataTypeProvider(PostgreSqlJsonType())
         JdbcDatabase(

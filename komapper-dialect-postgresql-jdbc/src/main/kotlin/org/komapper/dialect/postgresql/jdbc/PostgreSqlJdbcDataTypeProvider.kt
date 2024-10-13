@@ -28,7 +28,6 @@ import org.komapper.jdbc.JdbcUShortType
 
 class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
     AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
-
     companion object {
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcArrayType("text[]"),

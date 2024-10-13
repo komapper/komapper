@@ -6,7 +6,6 @@ import org.komapper.core.DataOperator
 import kotlin.reflect.KType
 
 interface R2dbcDataOperator : DataOperator {
-
     /**
      * Returns the value.
      *
@@ -56,7 +55,6 @@ interface R2dbcDataOperator : DataOperator {
 
 class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val dataTypeProvider: R2dbcDataTypeProvider) :
     R2dbcDataOperator {
-
     override fun <T : Any> getValue(row: Row, index: Int, type: KType): T? {
         val dataType = getDataType<T>(type)
         return dataType.getValue(row, index)

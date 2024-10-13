@@ -18,7 +18,6 @@ import java.util.UUID
  */
 @ThreadSafe
 interface R2dbcDatabaseConfig : DatabaseConfig {
-
     /**
      * The dialect.
      */
@@ -48,7 +47,6 @@ open class DefaultR2dbcDatabaseConfig(
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ) : R2dbcDatabaseConfig,
     AbstractDatabaseConfig<R2dbcDialect>(dialect, clockProvider, executionOptions) {
-
     override val session: R2dbcSession by lazy {
         R2dbcSessions.get(connectionFactory, loggerFacade)
     }

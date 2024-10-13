@@ -29,7 +29,6 @@ interface Binder {
 }
 
 object DefaultBinder : Binder {
-
     override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
         return org.komapper.core.Statement.createBindVariable(index, value)
     }
@@ -40,7 +39,6 @@ object DefaultBinder : Binder {
 }
 
 object IndexedBinder : Binder {
-
     override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
         return "$${index + 1}"
     }
@@ -51,7 +49,6 @@ object IndexedBinder : Binder {
 }
 
 object AtSignBinder : Binder {
-
     override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
         return "@p${index + 1}"
     }

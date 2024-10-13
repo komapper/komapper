@@ -10,7 +10,6 @@ class EntityInsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) {
         checkBatchExecutionOfParameterizedStatement(config)
         checkBatchExecutionReturningGeneratedValues(config, context.target)

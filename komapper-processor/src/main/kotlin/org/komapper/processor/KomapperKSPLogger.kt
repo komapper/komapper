@@ -6,7 +6,6 @@ import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.NonExistLocation
 
 class KomapperKSPLogger(private val logger: KSPLogger) : KSPLogger {
-
     override fun logging(message: String, symbol: KSNode?) {
         logger.logging(convertMessage(message, symbol))
     }

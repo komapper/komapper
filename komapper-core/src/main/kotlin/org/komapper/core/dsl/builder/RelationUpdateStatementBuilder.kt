@@ -26,7 +26,6 @@ class DefaultRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : Entit
     private val dialect: BuilderDialect,
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : RelationUpdateStatementBuilder<ENTITY, ID, META> {
-
     private val aliasManager = if (dialect.supportsAliasForUpdateStatement()) {
         DefaultAliasManager(context)
     } else {

@@ -12,7 +12,6 @@ internal class JdbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : Entity
     private val entities: List<ENTITY>,
 ) :
     JdbcRunner<Unit> {
-
     private val runner: EntityDeleteBatchRunner<ENTITY, ID, META> =
         EntityDeleteBatchRunner(context, entities)
 

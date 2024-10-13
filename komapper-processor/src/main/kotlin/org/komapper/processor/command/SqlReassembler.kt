@@ -29,7 +29,6 @@ internal class SqlReassembler(
     private val nodeFactory: SqlNodeFactory = NoCacheSqlNodeFactory(),
     private val exprValidator: ExprValidator = ExprValidator(context),
 ) {
-
     fun assemble(): String {
         val node = nodeFactory.get(sql)
         val buf = StringBuilder(sql.length + 100)
@@ -158,7 +157,9 @@ internal class SqlReassembler(
 
     private fun getPartialSql(classDeclaration: KSClassDeclaration, qualifiedName: String, node: SqlNode.PartialDirective): String {
         val partial = classDeclaration.findAnnotation(KomapperPartial::class)
-            ?: throw SqlPartialAnnotationNotFoundException("The declaration \"${qualifiedName}\" of expression \"${node.expression}\" must be annotated with @KomapperPartial at ${node.location}")
+            ?: throw SqlPartialAnnotationNotFoundException(
+                "The declaration \"${qualifiedName}\" of expression \"${node.expression}\" must be annotated with @KomapperPartial at ${node.location}"
+            )
         return partial.findValue("sql")?.toString()?.trimIndent()
             ?: throw SqlPartialAnnotationElementNotFoundException("The sql element of @KomapperPartial is not found at ${node.location}")
     }
@@ -175,7 +176,9 @@ internal class SqlReassembler(
                 val binaryName = "$packageName.$packageRemovedBinaryName"
 
                 val sql = getPartialSql(subclassDeclaration, qualifiedName, node)
-                buf.append("/*%if ${node.expression} is @$binaryName@ *//*%with ${node.expression} as @$binaryName@ */$sql/*%end *//*%end */")
+                buf.append(
+                    "/*%if ${node.expression} is @$binaryName@ *//*%with ${node.expression} as @$binaryName@ */$sql/*%end *//*%end */"
+                )
             }
         }
     }

@@ -16,7 +16,6 @@ internal class JdbcEntityUpsertSingleReturningRunner<ENTITY : Any, ID : Any, MET
     private val transform: (JdbcDataOperator, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcRunner<R> {
-
     private val runner: EntityUpsertSingleReturningRunner<ENTITY, ID, META> =
         EntityUpsertSingleReturningRunner(context, entity)
 

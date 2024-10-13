@@ -11,7 +11,6 @@ internal class PairNotNullColumnsSelectQuery<A : Any, B : Any>(
     override val context: SelectContext<*, *, *>,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
 ) : FlowSubquery<Pair<A, B>> {
-
     private val support: FlowSubquerySupport<Pair<A, B>> =
         FlowSubquerySupport(context) { PairNotNullColumnsSetOperationQuery(it, expressions = expressions) }
 

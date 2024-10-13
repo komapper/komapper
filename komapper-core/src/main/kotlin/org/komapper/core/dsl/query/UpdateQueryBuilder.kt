@@ -71,7 +71,6 @@ internal data class UpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     private val context: EntityUpdateContext<ENTITY, ID, META>,
 ) :
     UpdateQueryBuilder<ENTITY, ID, META> {
-
     override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(includedProperties = properties.toList()).also {
             checkContext(it)

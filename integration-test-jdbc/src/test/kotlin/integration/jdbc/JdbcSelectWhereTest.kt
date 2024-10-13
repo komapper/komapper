@@ -27,7 +27,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectWhereTest(private val db: JdbcDatabase) {
-
     @Test
     fun isNull() {
         val e = Meta.employee
@@ -773,7 +772,6 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
     }
 
     class MyExtension(private val context: CriteriaContext) {
-
         infix fun <T : Any> ColumnExpression<T, String>.`~`(pattern: T?) {
             if (pattern == null) return
             val o1 = Operand.Column(this)

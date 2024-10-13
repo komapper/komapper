@@ -13,7 +13,6 @@ import org.komapper.processor.Exit
 internal class PartialProcessor(
     private val contextFactory: ContextFactory,
 ) : SymbolProcessor {
-
     private val annotationClass = KomapperPartial::class
 
     override fun process(resolver: Resolver): List<KSAnnotated> {

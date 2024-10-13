@@ -13,7 +13,6 @@ internal data class TripleNotNullColumnsSetOperationQuery<A : Any, B : Any, C : 
     override val context: SetOperationContext,
     private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
 ) : FlowSetOperationQuery<Triple<A, B, C>> {
-
     private val support: SetOperationQuerySupport<Triple<A, B, C>> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

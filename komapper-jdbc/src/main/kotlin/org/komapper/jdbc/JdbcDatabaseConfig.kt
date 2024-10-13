@@ -52,7 +52,6 @@ open class DefaultJdbcDatabaseConfig(
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ) : JdbcDatabaseConfig,
     AbstractDatabaseConfig<JdbcDialect>(dialect, clockProvider, executionOptions) {
-
     override val session: JdbcSession by lazy {
         JdbcSessions.get(dataSource, loggerFacade)
     }

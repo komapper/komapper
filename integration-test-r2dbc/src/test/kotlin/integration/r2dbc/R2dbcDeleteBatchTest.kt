@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {

@@ -23,7 +23,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcTemplateTest(private val db: R2dbcDatabase) {
-
     private val asAddress: (Row) -> Address = { row ->
         Address(
             row.getNotNull("address_id"),
@@ -112,7 +111,10 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             message,
         )
         val causeMessage = ex.cause!!.message
-        assertEquals("The template variable \"street\" is not bound to a value. Make sure the variable name is correct at [street]:1:1", causeMessage)
+        assertEquals(
+            "The template variable \"street\" is not bound to a value. Make sure the variable name is correct at [street]:1:1",
+            causeMessage
+        )
     }
 
     @Test

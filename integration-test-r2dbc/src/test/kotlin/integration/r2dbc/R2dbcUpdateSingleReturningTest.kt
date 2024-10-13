@@ -21,7 +21,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
@@ -109,7 +108,9 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = "NY street", version = address.version + 1)
-        val returningAddress = db.runQuery { QueryDsl.update(a).single(newAddress).returning().options { it.copy(suppressOptimisticLockException = true) } }
+        val returningAddress = db.runQuery {
+            QueryDsl.update(a).single(newAddress).returning().options { it.copy(suppressOptimisticLockException = true) }
+        }
         assertNull(returningAddress)
     }
 

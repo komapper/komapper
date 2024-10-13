@@ -8,7 +8,6 @@ import kotlin.reflect.KClass
 
 open class PostgreSqlSchemaStatementBuilder(dialect: BuilderDialect) :
     AbstractSchemaStatementBuilder(dialect) {
-
     override fun <INTERIOR : Any> resolveDataTypeName(property: PropertyMetamodel<*, *, INTERIOR>): String {
         return if (property.isAutoIncrement()) {
             when (val classifier = property.interiorType.classifier) {

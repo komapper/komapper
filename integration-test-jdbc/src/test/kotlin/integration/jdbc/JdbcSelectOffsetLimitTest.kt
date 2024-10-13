@@ -10,7 +10,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectOffsetLimitTest(private val db: JdbcDatabase) {
-
     @Test
     fun offset() {
         val a = Meta.address

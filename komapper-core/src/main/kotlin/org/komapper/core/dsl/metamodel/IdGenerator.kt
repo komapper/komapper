@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 @ThreadSafe
 sealed class IdGenerator<ENTITY : Any, ID : Any> {
-
     abstract val property: PropertyMetamodel<ENTITY, ID, *>
 
     class AutoIncrement<ENTITY : Any, ID : Any>(
@@ -25,7 +24,6 @@ sealed class IdGenerator<ENTITY : Any, ID : Any> {
         val incrementBy: Int,
     ) :
         IdGenerator<ENTITY, ID>() {
-
         suspend fun generate(
             key: UUID,
             enquote: (String) -> String,

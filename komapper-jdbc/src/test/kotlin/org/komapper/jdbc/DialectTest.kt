@@ -10,9 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class DialectTest {
-
     class MyJdbcDialect : Dialect {
-
         override val driver: String
             get() = throw UnsupportedOperationException()
 

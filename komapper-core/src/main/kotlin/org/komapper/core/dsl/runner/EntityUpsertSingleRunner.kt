@@ -10,7 +10,6 @@ class EntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : Runner {
-
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
 

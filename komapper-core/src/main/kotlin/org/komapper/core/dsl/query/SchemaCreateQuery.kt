@@ -21,7 +21,6 @@ interface SchemaCreateQuery : Query<Unit> {
 internal data class SchemaCreateQueryImpl(
     private val context: SchemaContext,
 ) : SchemaCreateQuery {
-
     override fun options(configure: (SchemaOptions) -> SchemaOptions): SchemaCreateQuery {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
