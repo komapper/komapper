@@ -42,6 +42,7 @@ allprojects {
     }
 
     spotless {
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
         kotlinGradle {
             ktlint(ktlintVersion)
         }
