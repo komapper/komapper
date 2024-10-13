@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    val kotlinxDatetime: String by project
     ksp(project(":komapper-processor"))
     implementation(project(":komapper-starter-r2dbc"))
     implementation(libs.kotlinx.datetime)
