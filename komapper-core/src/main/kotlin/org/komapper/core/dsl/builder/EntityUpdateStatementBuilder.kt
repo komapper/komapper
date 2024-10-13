@@ -18,7 +18,6 @@ class DefaultEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
-
     override fun build(): Statement {
         val buf = StatementBuffer()
         buf.append(buildUpdateSet())

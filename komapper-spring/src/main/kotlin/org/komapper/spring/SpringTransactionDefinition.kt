@@ -8,7 +8,6 @@ class SpringTransactionDefinition(
     private val transactionProperty: TransactionProperty,
     private val transactionAttribute: TransactionAttribute,
 ) : TransactionDefinition by TransactionDefinition.withDefaults() {
-
     override fun getPropagationBehavior(): Int {
         return when (transactionAttribute) {
             TransactionAttribute.REQUIRED -> TransactionDefinition.PROPAGATION_REQUIRED

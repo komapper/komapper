@@ -17,7 +17,6 @@ internal class JdbcRelationInsertValuesReturningRunner<ENTITY : Any, ID : Any, M
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
 ) : JdbcRunner<T> {
-
     private val runner: RelationInsertValuesReturningRunner<ENTITY, ID, META> = RelationInsertValuesReturningRunner(context)
 
     private val support: JdbcRelationInsertValuesSupport<ENTITY, ID, META> = JdbcRelationInsertValuesSupport(context)

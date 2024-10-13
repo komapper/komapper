@@ -13,7 +13,6 @@ import org.testcontainers.jdbc.ConnectionUrl
 @Suppress("unused")
 class R2dbcMariaDbSetting(private val url: String) :
     MariaDbSetting<R2dbcDatabase> {
-
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
         val container = MariaDBContainerProvider().newInstance(connectionUrl) as MariaDBContainer<*>

@@ -23,7 +23,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test_list() {

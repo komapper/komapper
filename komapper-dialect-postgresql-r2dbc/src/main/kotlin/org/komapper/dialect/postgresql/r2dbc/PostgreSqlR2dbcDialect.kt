@@ -7,7 +7,6 @@ import org.komapper.r2dbc.IndexedBinder
 import org.komapper.r2dbc.R2dbcDialect
 
 interface PostgreSqlR2dbcDialect : PostgreSqlDialect, R2dbcDialect {
-
     override fun getBinder(): Binder {
         return IndexedBinder
     }

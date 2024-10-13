@@ -13,7 +13,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
 
 class R2dbcDialectsTest {
-
     @Test
     fun extractR2dbcDriver() {
         val driver = R2dbcDialects.extractR2dbcDriver("r2dbc:h2:mem:///testdb")

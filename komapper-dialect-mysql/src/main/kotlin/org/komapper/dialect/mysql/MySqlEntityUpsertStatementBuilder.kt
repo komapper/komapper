@@ -22,7 +22,6 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
     private val entities: List<ENTITY>,
     private val version: MySqlVersion = MySqlVersion.V8,
 ) : EntityUpsertStatementBuilder<ENTITY> {
-
     private val target = context.target
     private val excluded = context.excluded
     private val aliasManager = UpsertAliasManager(dialect, target, excluded)
@@ -94,7 +93,6 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
         target: TableExpression<*>,
         excluded: TableExpression<*>,
     ) : AliasManager {
-
         private val aliasMap: Map<TableExpression<*>, String> = mapOf(
             target to target.getCanonicalTableName(dialect::enquote),
             excluded to excluded.tableName(),

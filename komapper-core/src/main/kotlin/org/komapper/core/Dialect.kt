@@ -29,7 +29,6 @@ import java.util.regex.Pattern
  */
 @ThreadSafe
 interface Dialect {
-
     companion object {
         const val OPEN_QUOTE = "\""
         const val CLOSE_QUOTE = "\""
@@ -388,7 +387,6 @@ interface Dialect {
 }
 
 object DryRunDialect : Dialect {
-
     override val driver: String = "dry_run"
 
     override fun getSequenceSql(sequenceName: String): String {

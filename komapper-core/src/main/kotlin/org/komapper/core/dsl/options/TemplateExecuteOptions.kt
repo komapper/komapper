@@ -11,7 +11,6 @@ data class TemplateExecuteOptions(
     override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
 ) : QueryOptions {
-
     companion object {
         val DEFAULT = TemplateExecuteOptions(
             escapeSequence = null,

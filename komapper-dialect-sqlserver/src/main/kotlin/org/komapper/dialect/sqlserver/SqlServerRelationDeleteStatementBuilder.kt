@@ -12,7 +12,6 @@ class SqlServerRelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     dialect: BuilderDialect,
     context: RelationDeleteContext<ENTITY, ID, META>,
 ) : RelationDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val builder = DefaultRelationDeleteStatementBuilder(dialect, context)
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 

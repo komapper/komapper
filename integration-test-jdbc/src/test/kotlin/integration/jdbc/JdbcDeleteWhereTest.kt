@@ -12,7 +12,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(JdbcEnv::class)
 class JdbcDeleteWhereTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val a = Meta.address

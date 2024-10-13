@@ -20,7 +20,6 @@ internal data class RelationSetOperationQueryImpl<ENTITY : Any>(
     override val context: SetOperationContext,
     private val metamodel: EntityMetamodel<ENTITY, *, *>,
 ) : RelationSetOperationQuery<ENTITY> {
-
     private val support: SetOperationQuerySupport<ENTITY> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

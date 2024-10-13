@@ -11,7 +11,6 @@ internal class SingleNotNullColumnSelectQuery<A : Any>(
     override val context: SelectContext<*, *, *>,
     private val expression: ColumnExpression<A, *>,
 ) : FlowSubquery<A> {
-
     private val support: FlowSubquerySupport<A> =
         FlowSubquerySupport(context) { SingleNotNullColumnSetOperationQuery(it, expression = expression) }
 

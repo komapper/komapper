@@ -37,7 +37,6 @@ private class R2dbcTransactionManagementImpl(
     private val connectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade,
 ) : R2dbcTransactionManagement {
-
     override suspend fun getConnection(tx: R2dbcTransaction?): Connection {
         return tx?.connection ?: connectionFactory.create().asFlow().single()
     }

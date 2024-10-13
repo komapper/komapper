@@ -38,13 +38,15 @@ interface TemplateSelectQueryBuilder : TemplateBinder<TemplateSelectQueryBuilder
      * @param strategy the projection strategy
      * @return the query that returns a list of entity
      */
-    fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>, strategy: ProjectionType = ProjectionType.INDEX): TemplateSelectQuery<ENTITY>
+    fun <ENTITY : Any> selectAsEntity(
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        strategy: ProjectionType = ProjectionType.INDEX,
+    ): TemplateSelectQuery<ENTITY>
 }
 
 internal data class TemplateSelectQueryBuilderImpl(
     private val context: TemplateSelectContext,
 ) : TemplateSelectQueryBuilder {
-
     override fun options(configure: (TemplateSelectOptions) -> TemplateSelectOptions): TemplateSelectQueryBuilder {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

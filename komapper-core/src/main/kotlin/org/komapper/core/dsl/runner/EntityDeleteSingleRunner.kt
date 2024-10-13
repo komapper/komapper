@@ -10,7 +10,6 @@ class EntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     context: EntityDeleteContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     private val support: EntityDeleteRunnerSupport<ENTITY, ID, META> =

@@ -6,7 +6,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class TransactionOptionTest {
-
     @Test
     fun plus_same_keys() {
         val option =

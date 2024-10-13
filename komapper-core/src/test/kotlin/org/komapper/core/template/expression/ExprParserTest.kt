@@ -6,7 +6,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class ExprParserTest {
-
     @Test
     fun classRef() {
         when (val expr = ExprParser("@aaa.bbb.Ccc@").parse()) {

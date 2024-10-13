@@ -10,7 +10,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcSchemaDropRunner(
     private val context: SchemaContext,
 ) : R2dbcRunner<Unit> {
-
     private val runner = SchemaDropRunner(context)
 
     override fun check(config: DatabaseConfig) {

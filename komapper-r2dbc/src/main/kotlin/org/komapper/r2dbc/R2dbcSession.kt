@@ -14,7 +14,6 @@ import org.komapper.tx.core.FlowTransactionOperator
  */
 @ThreadSafe
 interface R2dbcSession {
-
     val connectionFactory: ConnectionFactory
 
     val coroutineTransactionOperator: CoroutineTransactionOperator
@@ -51,7 +50,6 @@ interface R2dbcSession {
 }
 
 class DefaultR2dbcSession(override val connectionFactory: ConnectionFactory) : R2dbcSession {
-
     override val coroutineTransactionOperator: CoroutineTransactionOperator
         get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 

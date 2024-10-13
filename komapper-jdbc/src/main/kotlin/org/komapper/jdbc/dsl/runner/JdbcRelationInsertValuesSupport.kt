@@ -8,7 +8,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcRelationInsertValuesSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) {
-
     fun <R> handleIdGenerator(config: JdbcDatabaseConfig, callback: Callback<ENTITY, ID, R>): R {
         return when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.AutoIncrement<ENTITY, ID> -> {

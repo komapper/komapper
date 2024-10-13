@@ -6,7 +6,6 @@ import org.komapper.tx.core.TransactionProperty
 
 @ThreadSafe
 interface ContextualJdbcTransactionOperator {
-
     /**
      * Begins a REQUIRED transaction.
      *
@@ -18,7 +17,8 @@ interface ContextualJdbcTransactionOperator {
     context(JdbcContext)
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext)() -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R
 
     /**
@@ -32,7 +32,8 @@ interface ContextualJdbcTransactionOperator {
     context(JdbcContext)
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext)() -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R
 
     /**
@@ -52,11 +53,11 @@ internal class ContextualJdbcTransactionOperatorImpl(
     private val transactionManager: ContextualJdbcTransactionManager,
     private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : ContextualJdbcTransactionOperator {
-
     context(JdbcContext)
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) () -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R {
         return if (transactionManager.isActive()) {
             block(this@JdbcContext)
@@ -68,7 +69,8 @@ internal class ContextualJdbcTransactionOperatorImpl(
     context(JdbcContext)
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) () -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R {
         return if (transactionManager.isActive()) {
             val transactionContext = transactionManager.suspend()
@@ -95,7 +97,8 @@ internal class ContextualJdbcTransactionOperatorImpl(
     context(JdbcContext)
     private fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) () -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R {
         val transactionContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         val jdbcContext = JdbcContext(database, transactionOperator, transactionContext.transaction)

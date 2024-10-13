@@ -8,7 +8,6 @@ internal class JdbcTransactionOperator(
     private val transactionManager: JdbcTransactionManager,
     private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : TransactionOperator {
-
     override fun <R> required(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R,

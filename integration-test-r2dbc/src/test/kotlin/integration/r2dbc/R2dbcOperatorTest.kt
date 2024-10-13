@@ -24,7 +24,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcOperatorTest(private val db: R2dbcDatabase) {
-
     @Test
     fun plus(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

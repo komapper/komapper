@@ -8,7 +8,6 @@ data class SelectOptions(
     override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
 ) : FetchOptions, WhereOptions {
-
     companion object {
         val DEFAULT = SelectOptions(
             allowMissingWhereClause = true,

@@ -18,7 +18,6 @@ internal data class TemplateSelectQueryImpl<T>(
     private val context: TemplateSelectContext,
     private val transform: (Row) -> T,
 ) : TemplateSelectQuery<T> {
-
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.templateSelectQuery(context, transform)
     }
@@ -35,7 +34,6 @@ internal data class TemplateEntityProjectionSelectQuery<ENTITY : Any>(
     private val metamodel: EntityMetamodel<ENTITY, *, *>,
     private val strategy: ProjectionType,
 ) : TemplateSelectQuery<ENTITY> {
-
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.templateEntityProjectionSelectQuery(context, metamodel, strategy)
     }

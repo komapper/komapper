@@ -26,7 +26,6 @@ import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
 
 class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
-
     companion object {
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),

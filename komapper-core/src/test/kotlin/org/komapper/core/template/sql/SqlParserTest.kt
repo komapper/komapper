@@ -7,7 +7,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class SqlParserTest {
-
     @Test
     fun empty() {
         val sql = ""
@@ -234,12 +233,13 @@ class SqlParserTest {
     inner class CommentTest {
         @Test
         fun multiLineComment() {
-            val sql = """
-            /**
-             * multi-line
-             * comment
-             */
-            """.trimIndent()
+            val sql =
+                """
+                /**
+                 * multi-line
+                 * comment
+                 */
+                """.trimIndent()
             val node = SqlParser(sql).parse()
             assertEquals(sql, node.toText())
         }
@@ -268,7 +268,6 @@ class SqlParserTest {
 
     @Nested
     inner class SetTest {
-
         @Test
         fun simple() {
             val sql = "select * from person union select * from employee"
@@ -292,7 +291,6 @@ class SqlParserTest {
 
     @Nested
     inner class ParenTest {
-
         @Test
         fun empty() {
             val sql = "select date()"
@@ -317,7 +315,6 @@ class SqlParserTest {
 
     @Nested
     inner class IfBlockTest {
-
         @Test
         fun `if`() {
             val sql = "/*%if a*/ b /*%end*/ h"
@@ -440,7 +437,6 @@ class SqlParserTest {
 
     @Nested
     inner class ForBlockTest {
-
         @Test
         fun simple() {
             val sql = "/*%for a in aaa*/ b /*%end*/ h"
@@ -507,7 +503,6 @@ class SqlParserTest {
 
     @Nested
     inner class WithBlockTest {
-
         @Test
         fun simple() {
             val sql = "/*%with a */ b /*%end*/ h"

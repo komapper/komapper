@@ -32,7 +32,6 @@ import org.komapper.jdbc.JdbcUShortType
 
 class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
     AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
-
     companion object {
         private val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcAnyType("java_object"),

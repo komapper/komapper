@@ -26,7 +26,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
-
     @Test
     fun box(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.boxData
@@ -185,7 +184,7 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
             1,
             Json.of(
                 """
-            {"a": 100, "b": "Hello"}
+                {"a": 100, "b": "Hello"}
                 """.trimIndent(),
             ),
         )

@@ -14,7 +14,6 @@ internal class R2dbcSetOperationFlowBuilder<T>(
     private val context: SetOperationContext,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcFlowBuilder<T> {
-
     private val runner: SetOperationRunner = SetOperationRunner(context)
 
     override fun check(config: DatabaseConfig) {

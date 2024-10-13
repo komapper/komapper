@@ -7,7 +7,6 @@ import org.komapper.core.StatementBuffer
  * The scope for SQL building.
  */
 interface SqlBuilderScope {
-
     val dialect: Dialect
 
     /**

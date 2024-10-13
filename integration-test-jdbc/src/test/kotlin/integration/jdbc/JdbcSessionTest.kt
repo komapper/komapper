@@ -7,7 +7,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSessionTest(private val db: JdbcDatabase) {
-
     @Test
     fun dataSource() {
         assertNotNull(db.config.session.dataSource)

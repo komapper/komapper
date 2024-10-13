@@ -112,7 +112,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcDataTypeTest(val db: JdbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2])
     @Test
     fun any() {
@@ -447,7 +446,10 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
-        assertEquals("Failed to map the value \"unknown\" to the property \"name\" of the enum class \"integration.core.enumclass.Direction\".", cause2.message)
+        assertEquals(
+            "Failed to map the value \"unknown\" to the property \"name\" of the enum class \"integration.core.enumclass.Direction\".",
+            cause2.message
+        )
     }
 
     @Test
@@ -487,13 +489,19 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             }
             Unit
         }
-        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumOrdinalData\".", ex.message)
+        assertEquals(
+            "Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumOrdinalData\".",
+            ex.message
+        )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
         assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
-        assertEquals("Failed to map the value \"90\" to the property \"ordinal\" of the enum class \"integration.core.enumclass.Direction\".", cause2.message)
+        assertEquals(
+            "Failed to map the value \"90\" to the property \"ordinal\" of the enum class \"integration.core.enumclass.Direction\".",
+            cause2.message
+        )
     }
 
     @Test
@@ -533,13 +541,19 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             }
             Unit
         }
-        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumPropertyData\".", ex.message)
+        assertEquals(
+            "Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumPropertyData\".",
+            ex.message
+        )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
         assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
-        assertEquals("Failed to map the value \"90\" to the property \"value\" of the enum class \"integration.core.enumclass.Color\".", cause2.message)
+        assertEquals(
+            "Failed to map the value \"90\" to the property \"value\" of the enum class \"integration.core.enumclass.Color\".",
+            cause2.message
+        )
     }
 
     @Test

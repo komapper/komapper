@@ -12,7 +12,6 @@ import javax.sql.DataSource
  */
 @ThreadSafe
 interface JdbcTransactionManager {
-
     fun getConnection(): Connection
 
     /**
@@ -51,7 +50,6 @@ internal class JdbcTransactionManagerImpl(
     dataSource: DataSource,
     loggerFacade: LoggerFacade,
 ) : JdbcTransactionManager {
-
     private val transactionContext = ThreadLocal<JdbcTransaction>()
 
     private val management: JdbcTransactionManagement =

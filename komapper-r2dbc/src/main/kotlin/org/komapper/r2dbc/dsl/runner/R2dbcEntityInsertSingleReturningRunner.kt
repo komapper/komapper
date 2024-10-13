@@ -15,7 +15,6 @@ internal class R2dbcEntityInsertSingleReturningRunner<ENTITY : Any, ID : Any, ME
     private val entity: ENTITY,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcRunner<T> {
-
     private val runner: EntityInsertSingleReturningRunner<ENTITY, ID, META> =
         EntityInsertSingleReturningRunner(context, entity)
 

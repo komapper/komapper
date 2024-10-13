@@ -12,7 +12,6 @@ class PostgreSqlRelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : En
     dialect: BuilderDialect,
     context: RelationDeleteContext<ENTITY, ID, META>,
 ) : RelationDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultRelationDeleteStatementBuilder(dialect, context)
     private val support = PostgreSqlStatementBuilderSupport(dialect, context)

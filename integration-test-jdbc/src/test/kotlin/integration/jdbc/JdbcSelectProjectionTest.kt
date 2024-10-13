@@ -25,7 +25,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
-
     @Test
     fun selectSingleColumn() {
         val a = Meta.address

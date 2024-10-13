@@ -61,7 +61,6 @@ import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectRunner
 
 object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
-
     @Suppress("UNCHECKED_CAST")
     override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): JdbcRunner<S> {
         val leftRunner = left.accept(this) as JdbcRunner<T>
@@ -98,15 +97,13 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         }
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityStoreQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>,
     ): JdbcRunner<EntityStore> {
         return JdbcEntityStoreRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    entitySelectQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): JdbcRunner<R> {
@@ -114,16 +111,14 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcSelectRunner(context, transformer, collect)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityDeleteBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): JdbcRunner<Unit> {
         return JdbcEntityDeleteBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityDeleteSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<Unit> {
@@ -256,16 +251,14 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityInsertSingleReturningRunner(context, entity, transform)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpdateBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): JdbcRunner<List<ENTITY>> {
         return JdbcEntityUpdateBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpdateSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<ENTITY> {
@@ -307,16 +300,14 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityUpdateSingleReturningRunner(context, entity, transform)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): JdbcRunner<List<Long>> {
         return JdbcEntityUpsertBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertMultipleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): JdbcRunner<Long> {
@@ -358,8 +349,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityUpsertMultipleReturningRunner(context, entities, transform)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<Long> {
@@ -405,16 +395,14 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertSingleUpdateQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<ENTITY> {
         return JdbcEntityUpsertSingleUpdateRunner(context, entity)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertSingleIgnoreQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<ENTITY?> {
@@ -439,8 +427,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcScriptExecuteRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    relationSelectQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): JdbcRunner<R> {

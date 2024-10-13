@@ -21,7 +21,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
-
     @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test() {
@@ -109,7 +108,9 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = "NY street", version = address.version + 1)
-        val returningAddress = db.runQuery { QueryDsl.update(a).single(newAddress).returning().options { it.copy(suppressOptimisticLockException = true) } }
+        val returningAddress = db.runQuery {
+            QueryDsl.update(a).single(newAddress).returning().options { it.copy(suppressOptimisticLockException = true) }
+        }
         assertNull(returningAddress)
     }
 

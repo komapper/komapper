@@ -12,7 +12,6 @@ internal class JdbcEntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : Ent
     private val entities: List<ENTITY>,
 ) :
     JdbcRunner<List<ENTITY>> {
-
     private val runner: EntityInsertMultipleRunner<ENTITY, ID, META> =
         EntityInsertMultipleRunner(context, entities)
 

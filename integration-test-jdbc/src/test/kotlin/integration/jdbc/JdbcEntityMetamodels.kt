@@ -14,7 +14,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcEntityMetamodels {
-
     @Test
     fun all() {
         val list = EntityMetamodels.all().map { it.second }

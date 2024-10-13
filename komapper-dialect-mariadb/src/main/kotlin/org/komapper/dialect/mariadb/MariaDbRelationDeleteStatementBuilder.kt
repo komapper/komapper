@@ -12,7 +12,6 @@ class MariaDbRelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : Entit
     dialect: BuilderDialect,
     context: RelationDeleteContext<ENTITY, ID, META>,
 ) : RelationDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultRelationDeleteStatementBuilder(dialect, context)
     private val support = MariaDbStatementBuilderSupport(dialect, context)

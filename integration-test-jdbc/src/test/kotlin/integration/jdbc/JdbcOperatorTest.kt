@@ -35,7 +35,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcOperatorTest(private val db: JdbcDatabase) {
-
     @Test
     fun plus() {
         val a = Meta.address

@@ -19,7 +19,6 @@ interface JdbcDataFactory {
 }
 
 class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory {
-
     /**
      * Creates Array objects.
      *
@@ -36,7 +35,7 @@ class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory
      * Creates a Blob object.
      */
     override fun createBlob(): Blob {
-        return session.useConnection() {
+        return session.useConnection {
             it.createBlob()
         }
     }

@@ -83,7 +83,6 @@ internal class TypeArgumentResolver(
     typeParameters: List<KSTypeParameter> = emptyList(),
     typeArguments: List<KSTypeArgument> = emptyList(),
 ) {
-
     private val context = typeParameters.map { it.name.asString() }.zip(typeArguments).toMap()
 
     fun resolve(declaration: KSDeclaration): KSTypeArgument? {

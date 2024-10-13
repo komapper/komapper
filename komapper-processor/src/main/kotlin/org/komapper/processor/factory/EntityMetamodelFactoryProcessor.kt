@@ -15,7 +15,6 @@ internal class EntityMetamodelFactoryProcessor(
     private val environment: SymbolProcessorEnvironment,
 ) :
     SymbolProcessor {
-
     private val fileMap: MutableMap<String, KSFile> = mutableMapOf()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {

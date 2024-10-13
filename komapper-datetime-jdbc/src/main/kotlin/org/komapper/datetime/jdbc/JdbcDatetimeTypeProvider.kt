@@ -18,7 +18,6 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class JdbcDatetimeTypeProvider(val next: JdbcDataTypeProvider) : JdbcDataTypeProvider {
-
     override fun <T : Any> get(type: KType): JdbcDataType<T>? {
         val dataType: JdbcDataType<*>? = when (type.classifier) {
             Instant::class -> {

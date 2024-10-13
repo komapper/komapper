@@ -23,7 +23,6 @@ internal class ExprValidator(
     private val context: Context,
     private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory(),
 ) {
-
     private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType
     private val unitType = context.resolver.builtIns.unitType
@@ -190,7 +189,10 @@ internal class ExprValidator(
         return visitClassRef(rightNode, paramMap)
     }
 
-    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>): KSType {
+    private fun visitClassRef(
+        node: ExprNode.ClassRef,
+        @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>,
+    ): KSType {
         // convert the binary class name to the kotlin class name
         val name = node.name.replace("$", ".")
         val classDeclaration = context.getClassDeclaration(name) {
@@ -236,7 +238,9 @@ internal class ExprValidator(
     private fun getParamType(name: String, location: ExprLocation, paramMap: Map<String, KSType>): KSType {
         referencedParams.add(name)
         return paramMap[name]
-            ?: throw ParameterNotFoundException("The parameter \"${name}\" is not found at $location. Available parameters are: ${paramMap.keys}.")
+            ?: throw ParameterNotFoundException(
+                "The parameter \"${name}\" is not found at $location. Available parameters are: ${paramMap.keys}."
+            )
     }
 
     private fun visitProperty(node: ExprNode.Property, paramMap: Map<String, KSType>): KSType {
@@ -282,7 +286,9 @@ internal class ExprValidator(
         }
         return findFunction(node.name, receiver, argList)
             ?: findExtensionFunction(node.name, receiver, argList)
-            ?: throw FunctionNotFoundException("The function \"${node.name}\" (parameter size is ${argList.size}) is not found at ${node.location}")
+            ?: throw FunctionNotFoundException(
+                "The function \"${node.name}\" (parameter size is ${argList.size}) is not found at ${node.location}"
+            )
     }
 
     private fun findFunction(

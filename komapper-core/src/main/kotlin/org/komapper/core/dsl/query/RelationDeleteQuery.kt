@@ -54,7 +54,10 @@ interface RelationDeleteQuery<ENTITY : Any> : Query<Long> {
      * @param expression2 the second property
      * @return the query
      */
-    fun <A : Any, B : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>): RelationDeleteReturningQuery<List<Pair<A?, B?>>>
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): RelationDeleteReturningQuery<List<Pair<A?, B?>>>
 
     /**
      * Indicates to retrieve a property triple.
@@ -64,13 +67,16 @@ interface RelationDeleteQuery<ENTITY : Any> : Query<Long> {
      * @param expression3 the third property
      * @return the query
      */
-    fun <A : Any, B : Any, C : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>, expression3: PropertyMetamodel<ENTITY, C, *>): RelationDeleteReturningQuery<List<Triple<A?, B?, C?>>>
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): RelationDeleteReturningQuery<List<Triple<A?, B?, C?>>>
 }
 
 internal data class RelationDeleteQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
 ) : RelationDeleteQuery<ENTITY> {
-
     override fun where(declaration: WhereDeclaration): RelationDeleteQuery<ENTITY> {
         val newContext = context.copy(where = context.where + declaration)
         return copy(context = newContext)

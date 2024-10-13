@@ -13,7 +13,6 @@ import org.komapper.core.dsl.context.SubqueryContext
 class SetOperationRunner(
     private val context: SetOperationContext,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

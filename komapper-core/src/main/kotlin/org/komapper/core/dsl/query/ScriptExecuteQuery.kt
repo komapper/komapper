@@ -22,7 +22,6 @@ internal data class ScriptExecuteQueryImpl(
     private val context: ScriptContext,
 ) :
     ScriptExecuteQuery {
-
     override fun options(configure: (ScriptOptions) -> ScriptOptions): ScriptExecuteQuery {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)

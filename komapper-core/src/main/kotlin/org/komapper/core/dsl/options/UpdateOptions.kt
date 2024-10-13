@@ -9,7 +9,6 @@ data class UpdateOptions(
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
     override val suppressOptimisticLockException: Boolean = DEFAULT.suppressOptimisticLockException,
 ) : BatchOptions, OptimisticLockOptions, WhereOptions {
-
     companion object {
         val DEFAULT = UpdateOptions(
             allowMissingWhereClause = false,

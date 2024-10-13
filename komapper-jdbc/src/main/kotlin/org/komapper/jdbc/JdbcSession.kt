@@ -10,7 +10,6 @@ import javax.sql.DataSource
  */
 @ThreadSafe
 interface JdbcSession {
-
     val dataSource: DataSource
 
     val transactionOperator: TransactionOperator

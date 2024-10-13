@@ -5,7 +5,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 internal class SpiUtilityTest {
-
     @Test
     fun findByPriority() {
         val factory1 = object : Prioritized {}

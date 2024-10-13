@@ -7,7 +7,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSessionTest(private val db: R2dbcDatabase) {
-
     @Test
     fun connectionFactory() {
         assertNotNull(db.config.session.connectionFactory)

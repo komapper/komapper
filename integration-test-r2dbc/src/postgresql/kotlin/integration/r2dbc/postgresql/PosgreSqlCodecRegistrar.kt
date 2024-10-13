@@ -9,7 +9,6 @@ import io.r2dbc.postgresql.extension.CodecRegistrar
 import org.reactivestreams.Publisher
 
 class PosgreSqlCodecRegistrar : CodecRegistrar {
-
     override fun register(
         connection: PostgresqlConnection,
         allocator: ByteBufAllocator,

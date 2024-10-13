@@ -5,7 +5,6 @@ import org.komapper.dialect.oracle.OracleDialect
 import org.komapper.r2dbc.R2dbcDialect
 
 interface OracleR2dbcDialect : OracleDialect, R2dbcDialect {
-
     override fun isSequenceExistsError(exception: R2dbcException): Boolean {
         return exception.errorCode == OracleDialect.NAME_ALREADY_USED_ERROR_CODE
     }

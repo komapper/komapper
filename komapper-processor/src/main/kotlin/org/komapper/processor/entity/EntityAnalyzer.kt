@@ -12,7 +12,6 @@ internal class EntityAnalyzer(
     private val definitionSourceResolver: EntityDefinitionSourceResolver,
     private val requiresIdValidation: Boolean,
 ) {
-
     fun analyze(symbol: KSAnnotated): EntityAnalysisResult {
         val definitionSource = try {
             definitionSourceResolver.resolve(symbol)

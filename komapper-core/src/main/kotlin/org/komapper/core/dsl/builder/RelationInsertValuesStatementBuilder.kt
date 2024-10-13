@@ -24,7 +24,6 @@ class DefaultRelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META :
     private val dialect: BuilderDialect,
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
-
     private val aliasManager = DefaultAliasManager(context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {

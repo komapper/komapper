@@ -9,7 +9,6 @@ import kotlin.test.assertTrue
 
 @Tag("slow")
 class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
-
     @Test
     fun `The entity class must have at least one id property`() {
         val result = compile(
@@ -550,7 +549,9 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The type of @KomapperVersion annotated property must be either Int, Long, UInt or value class."))
+        assertTrue(
+            result.messages.contains("The type of @KomapperVersion annotated property must be either Int, Long, UInt or value class.")
+        )
     }
 
     @Test
@@ -591,7 +592,11 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The type of @KomapperCreatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."))
+        assertTrue(
+            result.messages.contains(
+                "The type of @KomapperCreatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."
+            )
+        )
     }
 
     @Test
@@ -632,7 +637,11 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The type of @KomapperUpdatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."))
+        assertTrue(
+            result.messages.contains(
+                "The type of @KomapperUpdatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."
+            )
+        )
     }
 
     @Test
@@ -689,7 +698,9 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The type of @KomapperAutoIncrement annotated property must be either Int, Long, UInt or value class."))
+        assertTrue(
+            result.messages.contains("The type of @KomapperAutoIncrement annotated property must be either Int, Long, UInt or value class.")
+        )
     }
 
     @Test
@@ -705,7 +716,9 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The type of @KomapperSequence annotated property must be either Int, Long, UInt or value class."))
+        assertTrue(
+            result.messages.contains("The type of @KomapperSequence annotated property must be either Int, Long, UInt or value class.")
+        )
     }
 
     @Test
@@ -725,7 +738,11 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("When the type of @KomapperAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt."))
+        assertTrue(
+            result.messages.contains(
+                "When the type of @KomapperAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt."
+            )
+        )
     }
 
     @Test
@@ -1013,7 +1030,9 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The property \"unknown\" is not found in the test.Color. KomapperEnum's hint property is incorrect."))
+        assertTrue(
+            result.messages.contains("The property \"unknown\" is not found in the test.Color. KomapperEnum's hint property is incorrect.")
+        )
     }
 
     @Test
@@ -1113,7 +1132,11 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The property \"number\" is invalid. The property type does not match the parameter property type in \"test.ClobString\"."))
+        assertTrue(
+            result.messages.contains(
+                "The property \"number\" is invalid. The property type does not match the parameter property type in \"test.ClobString\"."
+            )
+        )
     }
 
     @Test
@@ -1155,7 +1178,11 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The property \"color\" is invalid. The parameter property type does not match between \"test.Color\" and \"test.ClobString\"."))
+        assertTrue(
+            result.messages.contains(
+                "The property \"color\" is invalid. The parameter property type does not match between \"test.Color\" and \"test.ClobString\"."
+            )
+        )
     }
 
     @Test

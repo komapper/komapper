@@ -11,7 +11,6 @@ class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     private val entities: List<ENTITY>,
 ) :
     Runner {
-
     private val support: EntityDeleteRunnerSupport<ENTITY, ID, META> =
         EntityDeleteRunnerSupport(context)
 

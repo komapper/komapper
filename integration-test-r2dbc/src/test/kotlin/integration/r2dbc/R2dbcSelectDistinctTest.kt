@@ -12,7 +12,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectDistinctTest(private val db: R2dbcDatabase) {
-
     @Test
     fun distinct(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department

@@ -13,7 +13,6 @@ class SqlServerEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : Entit
     context: EntityInsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
-
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 

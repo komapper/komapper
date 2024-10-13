@@ -18,7 +18,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
-
     @Test
     fun innerJoin(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

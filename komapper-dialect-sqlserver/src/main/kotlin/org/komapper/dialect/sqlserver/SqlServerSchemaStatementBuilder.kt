@@ -7,7 +7,6 @@ import org.komapper.core.dsl.metamodel.isAutoIncrement
 
 open class SqlServerSchemaStatementBuilder(dialect: BuilderDialect) :
     AbstractSchemaStatementBuilder(dialect) {
-
     override fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
         return if (property.isAutoIncrement()) " identity" else ""
     }

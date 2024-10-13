@@ -17,7 +17,6 @@ import kotlin.coroutines.coroutineContext
 
 internal class SpringR2dbcCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager, private val transaction: ReactiveTransaction? = null) :
     CoroutineTransactionOperator {
-
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R,

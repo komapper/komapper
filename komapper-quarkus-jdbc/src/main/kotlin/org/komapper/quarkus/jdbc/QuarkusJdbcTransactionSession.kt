@@ -1,14 +1,14 @@
 package org.komapper.quarkus.jdbc
 
+import jakarta.transaction.TransactionManager
 import org.komapper.jdbc.JdbcSession
 import org.komapper.tx.core.TransactionOperator
 import java.sql.Connection
 import javax.sql.DataSource
-import jakarta.transaction.TransactionManager
 
 class QuarkusJdbcTransactionSession(
     transactionManager: TransactionManager,
-    override val dataSource: DataSource
+    override val dataSource: DataSource,
 ) : JdbcSession {
     override val transactionOperator: TransactionOperator = QuarkusJdbcTransactionOperator(transactionManager)
 

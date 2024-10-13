@@ -14,7 +14,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(JdbcEnv::class)
 class JdbcDeleteSingleTest(private val db: JdbcDatabase) {
-
     @Test
     fun optimisticLockException() {
         val a = Meta.address

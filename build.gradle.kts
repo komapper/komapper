@@ -116,6 +116,10 @@ configure(javaProjects) {
         java {
             googleJavaFormat("1.13.0")
         }
+        kotlin {
+            ktlint(ktlintVersion)
+            targetExclude("build/**")
+        }
     }
 
     tasks {

@@ -13,7 +13,6 @@ class SpringJdbcTransactionOperator(
     private val transactionManager: PlatformTransactionManager,
     private val status: TransactionStatus? = null,
 ) : TransactionOperator {
-
     override fun <R> required(transactionProperty: TransactionProperty, block: (TransactionOperator) -> R): R {
         val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)

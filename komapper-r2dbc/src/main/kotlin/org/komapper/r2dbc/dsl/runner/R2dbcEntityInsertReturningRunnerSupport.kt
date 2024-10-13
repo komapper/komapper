@@ -9,7 +9,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcEntityInsertReturningRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
 ) {
-
     suspend fun preInsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
         val newEntity = when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.Sequence<ENTITY, ID> -> {

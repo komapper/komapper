@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class TemplateBuiltinExtensionsTest {
-
     private val extensions = TemplateBuiltinExtensions { it }
 
     @Test

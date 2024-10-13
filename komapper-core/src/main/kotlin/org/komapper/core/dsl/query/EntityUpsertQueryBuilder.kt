@@ -28,7 +28,6 @@ internal interface EntityUpsertQueryBuilderNullable<ENTITY : Any, ID : Any, META
 internal data class EntityUpsertQueryBuilderNonNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : EntityUpsertQueryBuilderNonNull<ENTITY, ID, META> {
-
     override fun single(entity: ENTITY): EntityUpsertSingleQueryNonNull<ENTITY> {
         return EntityUpsertSingleQueryNonNullImpl(context, entity)
     }
@@ -45,7 +44,6 @@ internal data class EntityUpsertQueryBuilderNonNullImpl<ENTITY : Any, ID : Any, 
 internal data class EntityUpsertQueryBuilderNullableImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : EntityUpsertQueryBuilderNullable<ENTITY, ID, META> {
-
     override fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY> {
         return EntityUpsertSingleQueryNullableImpl(context, entity)
     }

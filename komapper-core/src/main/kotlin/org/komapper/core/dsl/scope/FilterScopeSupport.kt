@@ -9,14 +9,14 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.operator.CriteriaContext
-import java.util.*
+import java.util.Deque
+import java.util.LinkedList
 
 class FilterScopeSupport<F : FilterScope<F>>(
     private val constructFilterScope: (FilterScopeSupport<F>) -> F,
     private val deque: Deque<MutableList<Criterion>> = LinkedList(),
     private val criteria: MutableList<Criterion> = mutableListOf(),
 ) : FilterScope<F> {
-
     fun toList(): List<Criterion> {
         return criteria.toList()
     }

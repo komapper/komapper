@@ -35,7 +35,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcValueClassTest(val db: JdbcDatabase) {
-
     @Test
     fun list() {
         val a = Meta.vAddress

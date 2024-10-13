@@ -12,7 +12,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
-
     @Test
     fun json() {
         val m = Meta.jsonData
@@ -20,7 +19,7 @@ class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
             1,
             Json(
                 """
-            {"a": 100, "b": "Hello"}
+                {"a": 100, "b": "Hello"}
                 """.trimIndent(),
             ),
         )

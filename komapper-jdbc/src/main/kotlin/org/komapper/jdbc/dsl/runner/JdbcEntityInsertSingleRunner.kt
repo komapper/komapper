@@ -11,7 +11,6 @@ internal class JdbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Entit
     context: EntityInsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : JdbcRunner<ENTITY> {
-
     private val runner: EntityInsertSingleRunner<ENTITY, ID, META> =
         EntityInsertSingleRunner(context, entity)
 

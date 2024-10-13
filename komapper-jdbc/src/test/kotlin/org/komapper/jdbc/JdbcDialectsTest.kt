@@ -5,7 +5,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class JdbcDialectsTest {
-
     @Test
     fun extractJdbcDriver() {
         val driver = JdbcDialects.extractJdbcDriver("jdbc:aaa:bbb")

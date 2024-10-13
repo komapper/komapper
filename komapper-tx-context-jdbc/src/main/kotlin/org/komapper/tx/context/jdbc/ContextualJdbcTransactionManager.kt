@@ -10,7 +10,6 @@ import javax.sql.DataSource
 
 @ThreadSafe
 interface ContextualJdbcTransactionManager {
-
     context(JdbcTransactionContext)
     fun getConnection(): Connection
 
@@ -58,7 +57,6 @@ internal class ContextualJdbcTransactionManagerImpl(
     dataSource: DataSource,
     loggerFacade: LoggerFacade,
 ) : ContextualJdbcTransactionManager {
-
     private val management: JdbcTransactionManagement = JdbcTransactionManagement(dataSource, loggerFacade)
 
     context(JdbcTransactionContext)

@@ -20,7 +20,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcCompositionTest(private val db: R2dbcDatabase) {
-
     @Test
     fun plus(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

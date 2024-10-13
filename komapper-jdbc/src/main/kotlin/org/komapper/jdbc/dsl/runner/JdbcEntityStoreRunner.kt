@@ -13,7 +13,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
 ) : JdbcRunner<EntityStore> {
-
     private val runner: SelectRunner = SelectRunner(context)
     private val factory: EntityStoreFactory = EntityStoreFactory()
 

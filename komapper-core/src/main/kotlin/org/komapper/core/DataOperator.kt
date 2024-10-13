@@ -25,7 +25,6 @@ interface DataOperator {
 }
 
 object DryRunDataOperator : DataOperator {
-
     override fun <T : Any> formatValue(value: T?, type: KType, masking: Boolean): String {
         return if (masking) {
             "*****"

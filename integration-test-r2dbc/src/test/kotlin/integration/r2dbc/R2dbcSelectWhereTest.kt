@@ -20,7 +20,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
-
     @Test
     fun isNull(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee

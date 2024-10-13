@@ -42,7 +42,6 @@ internal class SqlParser constructor(
     val sql: String,
     private val tokenizer: SqlTokenizer = SqlTokenizer(sql),
 ) {
-
     private val reducers: LinkedList<SqlReducer> = LinkedList()
     private var tokenType: SqlTokenType = EOF
     private var token: String = ""

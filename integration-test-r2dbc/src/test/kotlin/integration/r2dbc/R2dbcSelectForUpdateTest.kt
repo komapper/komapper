@@ -13,7 +13,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectForUpdateTest(private val db: R2dbcDatabase) {
-
     @Test
     fun forUpdate(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

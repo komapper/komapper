@@ -119,7 +119,9 @@ class SelectStatementBuilder(
                 is LockOption.Nowait -> if (dialect.supportsLockOptionNowait()) {
                     buf.append(", nowait")
                 } else {
-                    throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the nowait option. sql=$buf")
+                    throw UnsupportedOperationException(
+                        "The dialect(driver=${dialect.driver}) does not support the nowait option. sql=$buf"
+                    )
                 }
 
                 else -> Unit
@@ -245,7 +247,9 @@ class SelectStatementBuilder(
                         }
                     }
 
-                    else -> throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf")
+                    else -> throw UnsupportedOperationException(
+                        "The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf"
+                    )
                 }
             }
         }

@@ -13,7 +13,6 @@ internal data class MultipleColumnsSetOperationQuery(
     override val context: SetOperationContext,
     private val expressions: List<ColumnExpression<*, *>>,
 ) : FlowSetOperationQuery<Record> {
-
     private val support: SetOperationQuerySupport<Record> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

@@ -20,7 +20,6 @@ internal class SqlValidator(
     private val nodeFactory: SqlNodeFactory = NoCacheSqlNodeFactory(),
     private val exprValidator: ExprValidator = ExprValidator(context),
 ) {
-
     private val intType = context.resolver.builtIns.intType
     private val booleanType = context.resolver.builtIns.booleanType
     private val iterableType = context.resolver.builtIns.iterableType
@@ -86,14 +85,18 @@ internal class SqlValidator(
         is SqlNode.IfBlock -> {
             val ifEvalResult = validateExpression(node.ifDirective.location, node.ifDirective.expression, paramMap)
             if (ifEvalResult.type != booleanType) {
-                throw ExprMustBeBooleanException("The expression must be a Boolean at ${ifEvalResult.location} at ${node.ifDirective.location}.")
+                throw ExprMustBeBooleanException(
+                    "The expression must be a Boolean at ${ifEvalResult.location} at ${node.ifDirective.location}."
+                )
             }
             val ifParamMap = node.ifDirective.nodeList.fold(paramMap, ::visit)
 
             val elseifParamMap = node.elseifDirectives.fold(ifParamMap) { map, elseifDirective ->
                 val elseifEvalResult = validateExpression(elseifDirective.location, elseifDirective.expression, map)
                 if (elseifEvalResult.type != booleanType) {
-                    throw ExprMustBeBooleanException("The expression must be a Boolean at ${elseifEvalResult.location} at ${elseifDirective.location}.")
+                    throw ExprMustBeBooleanException(
+                        "The expression must be a Boolean at ${elseifEvalResult.location} at ${elseifDirective.location}."
+                    )
                 }
                 elseifDirective.nodeList.fold(map, ::visit)
             }
@@ -113,10 +116,14 @@ internal class SqlValidator(
             }
             val typeArg = typeArgs.first()
             if (typeArg.variance == Variance.STAR) {
-                throw StarProjectionNotSupportedException("Specifying a star projection for Iterable is not supported at ${evalResult.location} at ${forDirective.location}.")
+                throw StarProjectionNotSupportedException(
+                    "Specifying a star projection for Iterable is not supported at ${evalResult.location} at ${forDirective.location}."
+                )
             }
             val type = typeArg.type?.resolve()
-                ?: throw CannotResolveTypeArgumentException("Cannot resolve type argument of Iterable at ${evalResult.location} at ${forDirective.location}.")
+                ?: throw CannotResolveTypeArgumentException(
+                    "Cannot resolve type argument of Iterable at ${evalResult.location} at ${forDirective.location}."
+                )
             val newParamMap = paramMap + mapOf(
                 id to type,
                 id + "_index" to intType,

@@ -20,7 +20,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectJoinTest(private val db: JdbcDatabase) {
-
     @Test
     fun innerJoin() {
         val a = Meta.address

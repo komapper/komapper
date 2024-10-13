@@ -17,7 +17,6 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 interface ContextualJdbcDatabase : Database {
-
     val dataFactory: JdbcDataFactory
 
     /**
@@ -48,7 +47,8 @@ interface ContextualJdbcDatabase : Database {
     fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext) () -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R
 
     fun unwrap(): JdbcDatabase
@@ -59,7 +59,6 @@ internal class ContextualJdbcDatabaseImpl(
     private val transactionManager: ContextualJdbcTransactionManager,
     private val transactionOperator: ContextualJdbcTransactionOperator,
 ) : ContextualJdbcDatabase {
-
     override val config: JdbcDatabaseConfig
         get() = database.config
 
@@ -101,7 +100,8 @@ internal class ContextualJdbcDatabaseImpl(
     override fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) () -> R,
+        block: context(JdbcContext)
+        () -> R,
     ): R {
         val context = JdbcContext(this, transactionOperator)
         with(context) {

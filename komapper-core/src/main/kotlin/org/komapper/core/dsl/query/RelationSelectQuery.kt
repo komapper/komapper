@@ -27,7 +27,6 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     override val context: SelectContext<ENTITY, ID, META>,
 ) :
     RelationSelectQuery<ENTITY> {
-
     private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
     private val subquerySupport: FlowSubquerySupport<ENTITY> =

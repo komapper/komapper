@@ -9,7 +9,6 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
  */
 @ThreadSafe
 object Meta {
-
     /**
      * Retrieves a list of all entity metamodels.
      *

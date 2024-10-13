@@ -10,7 +10,6 @@ class EntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : Runner {
-
     private val support: EntityUpdateRunnerSupport<ENTITY, ID, META> =
         EntityUpdateRunnerSupport(context)
 

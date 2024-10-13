@@ -13,7 +13,6 @@ class MariaDbEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     context: EntityInsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
     private val support = MariaDbStatementBuilderSupport(dialect, context)

@@ -38,7 +38,6 @@ import org.komapper.processor.resolveLiteralTag
 internal class AnnotationSupport(
     private val context: Context,
 ) {
-
     private val namingStrategy: NamingStrategy = context.config.namingStrategy
 
     fun getTable(definitionSource: EntityDefinitionSource): Table {

@@ -16,12 +16,14 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 
 abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProvider) {
-
     @TempDir
     @JvmField
     protected var tempDir: Path? = null
 
-    protected fun compile(@Language("kotlin") contents: String, vararg additionalProviders: SymbolProcessorProvider): JvmCompilationResult {
+    protected fun compile(
+        @Language("kotlin") contents: String,
+        vararg additionalProviders: SymbolProcessorProvider,
+    ): JvmCompilationResult {
         val sourceFile = SourceFile.kotlin("source.kt", contents)
         val providers = providers.toList() + additionalProviders
         val compilation = KotlinCompilation()
@@ -39,7 +41,10 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
         return compilation.compile()
     }
 
-    protected fun compile(@Language("kotlin") contents: String, block: (SymbolProcessorEnvironment, Resolver) -> List<KSAnnotated>): JvmCompilationResult {
+    protected fun compile(
+        @Language("kotlin") contents: String,
+        block: (SymbolProcessorEnvironment, Resolver) -> List<KSAnnotated>,
+    ): JvmCompilationResult {
         val provider = SymbolProcessorProvider { env ->
             object : SymbolProcessor {
                 override fun process(resolver: Resolver): List<KSAnnotated> {

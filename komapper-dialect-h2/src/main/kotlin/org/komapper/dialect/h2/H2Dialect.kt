@@ -17,7 +17,6 @@ import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface H2Dialect : Dialect {
-
     companion object : Dialect.Identifier {
         private const val DRIVER = "h2"
 

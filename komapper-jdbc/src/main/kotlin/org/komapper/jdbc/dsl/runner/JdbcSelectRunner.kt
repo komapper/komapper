@@ -15,7 +15,6 @@ internal class JdbcSelectRunner<T, R>(
     private val collect: suspend (Flow<T>) -> R,
 ) :
     JdbcRunner<R> {
-
     private val runner: SelectRunner = SelectRunner(context)
 
     override fun check(config: DatabaseConfig) {

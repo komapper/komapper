@@ -10,7 +10,6 @@ class EntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : Runner {
-
     private val runner: EntityUpdateSingleRunner<ENTITY, ID, META> =
         EntityUpdateSingleRunner(context, entity)
 

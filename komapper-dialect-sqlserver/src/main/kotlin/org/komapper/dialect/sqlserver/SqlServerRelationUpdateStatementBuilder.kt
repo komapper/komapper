@@ -14,7 +14,6 @@ class SqlServerRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     dialect: BuilderDialect,
     context: RelationUpdateContext<ENTITY, ID, META>,
 ) : RelationUpdateStatementBuilder<ENTITY, ID, META> {
-
     private val builder = DefaultRelationUpdateStatementBuilder(dialect, context)
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 

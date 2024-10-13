@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
-
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

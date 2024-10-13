@@ -11,7 +11,6 @@ internal class R2dbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Enti
     context: EntityInsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : R2dbcRunner<ENTITY> {
-
     private val runner: EntityInsertSingleRunner<ENTITY, ID, META> =
         EntityInsertSingleRunner(context, entity)
 

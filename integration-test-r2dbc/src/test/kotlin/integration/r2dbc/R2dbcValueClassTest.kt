@@ -37,7 +37,6 @@ import kotlin.test.assertNotNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcValueClassTest(val db: R2dbcDatabase) {
-
     @Test
     fun list(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.vAddress

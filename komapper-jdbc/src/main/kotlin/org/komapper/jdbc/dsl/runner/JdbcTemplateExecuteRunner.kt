@@ -9,7 +9,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcTemplateExecuteRunner(
     private val context: TemplateExecuteContext,
 ) : JdbcRunner<Long> {
-
     private val runner = TemplateExecuteRunner(context)
 
     override fun check(config: DatabaseConfig) {

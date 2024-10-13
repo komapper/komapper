@@ -18,7 +18,6 @@ import javax.sql.DataSource
 @Suppress("MemberVisibilityCanBePrivate")
 @ThreadSafe
 class SimpleDataSource(val url: String, val user: String = "", val password: String = "") : DataSource {
-
     override fun setLogWriter(out: PrintWriter?) {
         throw SQLFeatureNotSupportedException()
     }

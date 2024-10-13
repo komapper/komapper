@@ -10,7 +10,6 @@ internal class JdbcScriptExecuteRunner(
     private val context: ScriptContext,
 ) :
     JdbcRunner<Unit> {
-
     private val runner = ScriptExecuteRunner(context)
 
     override fun check(config: DatabaseConfig) {

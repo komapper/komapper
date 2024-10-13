@@ -19,7 +19,6 @@ internal class PartialFactory(
     private val annotationClass: KClass<*>,
     private val symbol: KSAnnotated,
 ) {
-
     fun create(): Partial {
         val classDeclaration = symbol as? KSClassDeclaration
             ?: report("The annotated element is not a class.", symbol)

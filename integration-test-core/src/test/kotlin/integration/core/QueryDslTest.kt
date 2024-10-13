@@ -16,7 +16,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class QueryDslTest {
-
     @Test
     fun objectReference() {
         val dsl1 = QueryDsl

@@ -12,7 +12,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 internal class JdbcScriptTest(private val db: JdbcDatabase) {
-
     @Run(unless = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_double_quote() {

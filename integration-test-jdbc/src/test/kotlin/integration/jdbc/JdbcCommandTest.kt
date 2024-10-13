@@ -101,7 +101,6 @@ object OrderBy
 
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
-
     @KomapperCommand(
         """
         insert into address 
@@ -296,7 +295,10 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         order by address_id
         """,
     )
-    data class Escape(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address>({ select(asAddress) }) {
+    data class Escape(
+        val street: String,
+        @KomapperUnused val asAddress: (Row) -> Address,
+    ) : Many<Address>({ select(asAddress) }) {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -906,7 +908,9 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals(15, addresses.first().addressId)
     }
 
-    abstract class GetSingleAddress(@KomapperUnused val unknown: Int) : One<Address>({ select(asAddress).single() })
+    abstract class GetSingleAddress(
+        @KomapperUnused val unknown: Int,
+    ) : One<Address>({ select(asAddress).single() })
 
     @KomapperCommand(
         """

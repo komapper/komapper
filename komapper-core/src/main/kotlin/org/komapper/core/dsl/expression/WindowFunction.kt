@@ -129,7 +129,9 @@ data class WindowFrame(
 )
 
 enum class WindowFrameKind {
-    GROUPS, RANGE, ROWS,
+    GROUPS,
+    RANGE,
+    ROWS,
 }
 
 sealed interface WindowFrameBound {

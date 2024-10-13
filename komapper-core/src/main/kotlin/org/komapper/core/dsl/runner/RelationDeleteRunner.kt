@@ -10,7 +10,6 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

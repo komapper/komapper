@@ -19,7 +19,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcFlowTest(val db: R2dbcDatabase) {
-
     @Test
     fun singleEntity(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {

@@ -15,7 +15,6 @@ class SetOperationStatementBuilder(
     private val aliasManager: AliasManager,
     private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true },
 ) {
-
     private val buf = StatementBuffer()
     private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager, buf)
 
@@ -35,7 +34,9 @@ class SetOperationStatementBuilder(
                         if (dialect.supportsSetOperationIntersect()) {
                             "intersect"
                         } else {
-                            throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"intersect\" set operation.")
+                            throw UnsupportedOperationException(
+                                "The dialect(driver=${dialect.driver}) does not support the \"intersect\" set operation."
+                            )
                         }
                     }
                     SetOperationKind.EXCEPT -> {
@@ -44,7 +45,9 @@ class SetOperationStatementBuilder(
                         } else if (dialect.supportsSetOperationMinus()) {
                             "minus"
                         } else {
-                            throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"except\" and \"minus\" set operations.")
+                            throw UnsupportedOperationException(
+                                "The dialect(driver=${dialect.driver}) does not support the \"except\" and \"minus\" set operations."
+                            )
                         }
                     }
                     SetOperationKind.UNION -> "union"

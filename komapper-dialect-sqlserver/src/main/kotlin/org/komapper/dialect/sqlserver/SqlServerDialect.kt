@@ -23,7 +23,6 @@ import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface SqlServerDialect : Dialect {
-
     companion object : Dialect.Identifier {
         private const val DRIVER = "sqlserver"
         const val OPEN_QUOTE = "["

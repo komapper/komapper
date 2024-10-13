@@ -29,7 +29,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcUpdateSetTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val a = Meta.address

@@ -16,7 +16,6 @@ import kotlin.test.Test
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSchemaTest(private val db: R2dbcDatabase) {
-
     private val metamodels =
         listOf(
             Meta.aaa,

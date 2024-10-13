@@ -7,7 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class EntityMetamodelTest {
-
     @Test
     fun get() {
         val a = Meta.address

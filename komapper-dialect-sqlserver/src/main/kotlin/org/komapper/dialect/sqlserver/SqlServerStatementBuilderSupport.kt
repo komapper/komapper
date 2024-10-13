@@ -10,7 +10,6 @@ class SqlServerStatementBuilderSupport(
     private val dialect: BuilderDialect,
     private val returningProvider: ReturningProvider,
 ) {
-
     fun buildOutput(tablePrefix: TablePrefix = TablePrefix.INSERTED): Statement {
         val buf = StatementBuffer()
         with(buf) {
@@ -39,6 +38,7 @@ class SqlServerStatementBuilderSupport(
     }
 
     enum class TablePrefix {
-        DELETED, INSERTED
+        DELETED,
+        INSERTED,
     }
 }

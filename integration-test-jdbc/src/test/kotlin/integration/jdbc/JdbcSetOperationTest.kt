@@ -23,7 +23,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSetOperationTest(private val db: JdbcDatabase) {
-
     @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun except_entity() {

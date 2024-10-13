@@ -14,7 +14,6 @@ internal class JdbcRelationDeleteReturningRunner<ENTITY : Any, ID : Any, META : 
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
 ) : JdbcRunner<List<T>> {
-
     private val runner: RelationDeleteReturningRunner<ENTITY, ID, META> = RelationDeleteReturningRunner(context)
 
     override fun check(config: DatabaseConfig) {

@@ -9,7 +9,6 @@ import org.komapper.jdbc.JdbcExecutor
 internal class JdbcEntityInsertReturningRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
 ) {
-
     fun preInsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         val newEntity = when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.Sequence<ENTITY, ID> ->

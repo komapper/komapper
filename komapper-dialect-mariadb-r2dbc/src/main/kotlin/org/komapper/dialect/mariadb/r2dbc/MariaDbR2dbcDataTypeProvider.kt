@@ -27,7 +27,6 @@ import org.komapper.r2dbc.R2dbcUShortType
 
 class MariaDbR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
     AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
-
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),

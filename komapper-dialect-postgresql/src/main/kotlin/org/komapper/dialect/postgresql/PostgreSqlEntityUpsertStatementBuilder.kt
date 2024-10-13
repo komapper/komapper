@@ -23,7 +23,6 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
-
     private val target = context.target
     private val excluded = context.excluded
     private val aliasManager = UpsertAliasManager(target, excluded)
@@ -122,7 +121,6 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
         target: TableExpression<*>,
         excluded: TableExpression<*>,
     ) : AliasManager {
-
         private val aliasMap: Map<TableExpression<*>, String> = mapOf(
             target to "t0_",
             excluded to excluded.tableName(),

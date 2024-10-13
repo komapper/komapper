@@ -11,20 +11,32 @@ import org.komapper.core.type.ClobString
 @Suppress("ArrayInDataClass")
 @KomapperEntity
 @KomapperTable("array_data")
-data class ArrayData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Array<String>?)
+data class ArrayData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Array<String>?,
+)
 
 @Suppress("ArrayInDataClass")
 @KomapperEntity
 @KomapperTable("array_data")
-data class ArrayOfNullableData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Array<String?>?)
+data class ArrayOfNullableData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Array<String?>?,
+)
 
 @KomapperEntity
 @KomapperTable("blob_data")
-data class BlobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Blob?)
+data class BlobData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Blob?,
+)
 
 @KomapperEntity
 @KomapperTable("clob_data")
-data class ClobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Clob?)
+data class ClobData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: Clob?,
+)
 
 @KomapperEntity
 @KomapperTable("clob_data")

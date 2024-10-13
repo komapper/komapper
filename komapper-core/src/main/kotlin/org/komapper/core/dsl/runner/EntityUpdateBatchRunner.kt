@@ -11,7 +11,6 @@ class EntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     private val entities: List<ENTITY>,
 ) :
     Runner {
-
     private val support: EntityUpdateRunnerSupport<ENTITY, ID, META> =
         EntityUpdateRunnerSupport(context)
 

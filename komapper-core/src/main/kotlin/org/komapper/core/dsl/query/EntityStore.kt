@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentMap
  */
 @ThreadSafe
 interface EntityStore {
-
     /**
      * Whether the entity metamodel is contained in this store.
      *
@@ -133,7 +132,6 @@ internal class EntityStoreImpl(
     private val entitySets: Map<EntityMetamodel<*, *, *>, Set<Any>>,
     private val rows: List<Map<EntityMetamodel<*, *, *>, EntityRef<*, *, *>>>,
 ) : EntityStore {
-
     private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *, *>, Set<*>>> = ConcurrentHashMap()
     private val manyToOneCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *, *>, *>> = ConcurrentHashMap()
 

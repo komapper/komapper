@@ -26,7 +26,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcTemplateTest(private val db: JdbcDatabase) {
-
     data class NullAddress(val addressId: Int?, val street: String?, val version: String?)
 
     private val asAddress: (Row) -> Address = { row ->
@@ -170,7 +169,10 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             message,
         )
         val causeMessage = ex.cause!!.message
-        assertEquals("The template variable \"street\" is not bound to a value. Make sure the variable name is correct at [street]:1:1", causeMessage)
+        assertEquals(
+            "The template variable \"street\" is not bound to a value. Make sure the variable name is correct at [street]:1:1",
+            causeMessage
+        )
     }
 
     @Test
@@ -378,13 +380,14 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     @Run(unless = [Dbms.H2, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
     fun insertReturning() {
         val address = db.runQuery {
-            val sql = """
+            val sql =
+                """
                 insert into address
                     (address_id, street, version)
                 values
                     (/*id*/0, /*street*/'', /*version*/0)
                 returning address_id, street, version
-            """.trimIndent()
+                """.trimIndent()
             QueryDsl.executeTemplate(sql)
                 .returning()
                 .bind("id", 16)

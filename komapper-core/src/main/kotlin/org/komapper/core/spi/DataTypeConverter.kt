@@ -6,7 +6,6 @@ import kotlin.reflect.KType
  * A converter that converts a data type between an exterior type and an interior type.
  */
 interface DataTypeConverter<EXTERIOR : Any, INTERIOR : Any> {
-
     /**
      * The exterior type.
      * [KType.isMarkedNullable] must be false.

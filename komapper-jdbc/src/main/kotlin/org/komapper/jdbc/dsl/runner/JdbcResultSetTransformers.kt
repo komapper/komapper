@@ -9,8 +9,11 @@ import org.komapper.jdbc.JdbcDataOperator
 import java.sql.ResultSet
 
 internal object JdbcResultSetTransformers {
-
-    fun <T : Any> singleEntity(metamodel: EntityMetamodel<T, *, *>, columns: List<ColumnExpression<*, *>> = emptyList(), strategy: ProjectionType = ProjectionType.INDEX): (JdbcDataOperator, ResultSet) -> T =
+    fun <T : Any> singleEntity(
+        metamodel: EntityMetamodel<T, *, *>,
+        columns: List<ColumnExpression<*, *>> = emptyList(),
+        strategy: ProjectionType = ProjectionType.INDEX,
+    ): (JdbcDataOperator, ResultSet) -> T =
         { dataOperator, rs ->
             val mapper = JdbcEntityMapper(strategy, dataOperator, rs)
             val entity = mapper.execute(metamodel, columns, true)

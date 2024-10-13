@@ -41,7 +41,6 @@ import java.util.UUID
 @ConditionalOnClass(R2dbcDatabase::class)
 @ImportAutoConfiguration(value = [R2dbcAutoConfiguration::class, R2dbcTransactionManagerAutoConfiguration::class])
 open class KomapperR2dbcAutoConfiguration {
-
     companion object {
         private const val R2DBC_URL_PROPERTY = "spring.r2dbc.url"
     }

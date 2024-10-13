@@ -13,7 +13,6 @@ import org.testcontainers.r2dbc.R2DBCDatabaseContainer
 
 @Suppress("unused")
 class R2dbcOracleSetting(private val url: String) : OracleSetting<R2dbcDatabase> {
-
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
         val container = OracleContainerProvider().newInstance(connectionUrl) as OracleContainer

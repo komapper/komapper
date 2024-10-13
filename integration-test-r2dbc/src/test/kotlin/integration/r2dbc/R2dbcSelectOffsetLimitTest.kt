@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSelectOffsetLimitTest(private val db: R2dbcDatabase) {
-
     @Test
     fun offset(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

@@ -96,7 +96,6 @@ internal class SelfDefinitionSourceResolver(private val context: Context) : Enti
 }
 
 internal class SeparateProjectionDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
-
     override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
         val defDeclaration = symbol as? KSClassDeclaration
             ?: report("@${KomapperProjectionDef::class.simpleName} cannot be applied to this element.", symbol)

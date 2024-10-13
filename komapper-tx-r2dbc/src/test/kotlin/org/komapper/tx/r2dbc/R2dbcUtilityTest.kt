@@ -9,7 +9,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class R2dbcUtilityTest {
-
     @Test
     fun standardStyle() {
         val property = TransactionProperty.IsolationLevel.READ_COMMITTED

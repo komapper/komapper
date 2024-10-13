@@ -43,7 +43,6 @@ class DefaultJdbcExecutor(
     executionOptionProvider: ExecutionOptionsProvider,
     private val generatedColumn: String?,
 ) : JdbcExecutor {
-
     private val executionOptions = config.executionOptions + executionOptionProvider.getExecutionOptions()
 
     override fun <T> executeQuery(

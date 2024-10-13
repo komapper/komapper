@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @EnableWebMvc
 @Configuration
 class WebConfig : WebMvcConfigurer {
-
     @Bean
     fun sqlInterceptor(): SpringSQLCommenterInterceptor {
         return SpringSQLCommenterInterceptor()

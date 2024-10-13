@@ -19,7 +19,6 @@ class R2dbcEnv :
     AfterTestExecutionCallback,
     ParameterResolver,
     ExecutionCondition {
-
     companion object {
         @Volatile
         private var initialized: Boolean = false

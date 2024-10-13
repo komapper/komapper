@@ -17,7 +17,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectOrderByTest(private val db: JdbcDatabase) {
-
     @Test
     fun orderBy() {
         val e = Meta.employee

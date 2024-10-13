@@ -9,7 +9,6 @@ import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(JdbcEnv::class)
 class JdbcPostgreSqlMappingTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         db.runQuery {

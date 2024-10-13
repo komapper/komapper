@@ -116,7 +116,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcDataTypeTest(val db: R2dbcDatabase) {
-
     @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
     fun array(info: TestInfo) = inTransaction(db, info) {
@@ -461,7 +460,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
-        assertEquals("Failed to map the value \"unknown\" to the property \"name\" of the enum class \"integration.core.enumclass.Direction\".", cause2.message)
+        assertEquals(
+            "Failed to map the value \"unknown\" to the property \"name\" of the enum class \"integration.core.enumclass.Direction\".",
+            cause2.message
+        )
     }
 
     @Test
@@ -501,13 +503,19 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             }
             Unit
         }
-        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumOrdinalData\".", ex.message)
+        assertEquals(
+            "Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumOrdinalData\".",
+            ex.message
+        )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
         assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
-        assertEquals("Failed to map the value \"90\" to the property \"ordinal\" of the enum class \"integration.core.enumclass.Direction\".", cause2.message)
+        assertEquals(
+            "Failed to map the value \"90\" to the property \"ordinal\" of the enum class \"integration.core.enumclass.Direction\".",
+            cause2.message
+        )
     }
 
     @Test
@@ -547,13 +555,19 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             }
             Unit
         }
-        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumPropertyData\".", ex.message)
+        assertEquals(
+            "Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumPropertyData\".",
+            ex.message
+        )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
         assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
-        assertEquals("Failed to map the value \"90\" to the property \"value\" of the enum class \"integration.core.enumclass.Color\".", cause2.message)
+        assertEquals(
+            "Failed to map the value \"90\" to the property \"value\" of the enum class \"integration.core.enumclass.Color\".",
+            cause2.message
+        )
     }
 
     @Test

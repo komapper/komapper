@@ -56,7 +56,6 @@ import org.komapper.core.dsl.runner.TemplateSelectRunner
 
 @ThreadSafe
 internal object DefaultQueryVisitor : QueryVisitor<Runner> {
-
     override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): Runner {
         val leftRunner = left.accept(this)
         val rightRunner = right.accept(this)
@@ -97,16 +96,14 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityDeleteBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): Runner {
         return EntityDeleteBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityDeleteSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): Runner {
@@ -227,16 +224,14 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return EntityInsertSingleReturningRunner(context, entity)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpdateBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): Runner {
         return EntityUpdateBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpdateSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): Runner {
@@ -274,16 +269,14 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return EntityUpdateSingleReturningRunner(context, entity)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): Runner {
         return EntityUpsertBatchRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertMultipleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): Runner {
@@ -321,8 +314,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return EntityUpsertMultipleReturningRunner(context, entities)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): Runner {
@@ -396,8 +388,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return ScriptExecuteRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    relationSelectQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): Runner {

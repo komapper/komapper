@@ -9,7 +9,6 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 internal class EntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
 ) {
-
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         val builder = config.dialect.getEntityUpdateStatementBuilder(BuilderDialect(config), context, entity)
         return builder.build()

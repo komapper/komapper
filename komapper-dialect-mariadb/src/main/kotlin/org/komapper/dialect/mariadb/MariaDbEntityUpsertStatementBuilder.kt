@@ -21,7 +21,6 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
-
     private val target = context.target
     private val aliasManager = UpsertAliasManager(dialect, target, context.excluded)
     private val buf = StatementBuffer()
@@ -85,7 +84,6 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
         target: TableExpression<*>,
         excluded: TableExpression<*>,
     ) : AliasManager {
-
         private val aliasMap: Map<TableExpression<*>, String> = mapOf(
             target to target.getCanonicalTableName(dialect::enquote),
             excluded to excluded.tableName(),

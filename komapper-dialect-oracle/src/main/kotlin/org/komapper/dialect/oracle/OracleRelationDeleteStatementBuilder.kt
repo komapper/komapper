@@ -12,7 +12,6 @@ class OracleRelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : Entity
     dialect: BuilderDialect,
     context: RelationDeleteContext<ENTITY, ID, META>,
 ) : RelationDeleteStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = DefaultRelationDeleteStatementBuilder(dialect, context)
     private val support = OracleStatementBuilderSupport(dialect, context)

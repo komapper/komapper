@@ -9,7 +9,6 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface MySqlDialect : Dialect {
-
     companion object : Dialect.Identifier {
         const val DRIVER = "mysql"
 

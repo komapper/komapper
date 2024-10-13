@@ -16,7 +16,6 @@ import java.util.ServiceLoader
  * ```
  */
 object EntityMetamodels {
-
     /**
      * Returns a list of entity metamodel unit and entity metamodel pairs.
      *

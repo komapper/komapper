@@ -30,7 +30,6 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     val where: WhereDeclaration = {},
     override val returning: Returning = Returning.Expressions(emptyList()),
 ) : WhereProvider, TablesProvider, ReturningProvider {
-
     override val options: WhereOptions
         get() = insertContext.options
 
@@ -50,5 +49,6 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 }
 
 enum class DuplicateKeyType {
-    UPDATE, IGNORE
+    UPDATE,
+    IGNORE,
 }

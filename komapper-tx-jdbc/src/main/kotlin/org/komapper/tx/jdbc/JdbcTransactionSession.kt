@@ -16,7 +16,6 @@ class JdbcTransactionSession(
     loggerFacade: LoggerFacade,
     transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : JdbcSession {
-
     val transactionManager: JdbcTransactionManager =
         JdbcTransactionManagerImpl(dataSource, loggerFacade)
 

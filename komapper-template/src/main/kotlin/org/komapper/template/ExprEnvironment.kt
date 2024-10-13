@@ -24,7 +24,6 @@ internal interface ExprEnvironment {
 
 @Suppress("DEPRECATION")
 internal class DefaultExprEnvironment(override val ctx: Map<String, Value<*>> = emptyMap()) : ExprEnvironment {
-
     override val topLevelPropertyExtensions: List<KProperty<*>> by lazy {
         listOf(
             CharSequence::lastIndex,

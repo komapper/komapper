@@ -8,7 +8,6 @@ import org.komapper.core.dsl.query.EntityStoreImpl
 
 @ThreadSafe
 class EntityStoreFactory {
-
     fun create(
         metamodels: Set<EntityMetamodel<*, *, *>>,
         rows: List<Map<EntityMetamodel<*, *, *>, Any>>,

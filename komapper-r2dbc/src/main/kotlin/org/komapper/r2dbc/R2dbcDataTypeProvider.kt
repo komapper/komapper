@@ -12,7 +12,6 @@ abstract class AbstractR2dbcDataTypeProvider(
     private val next: R2dbcDataTypeProvider,
     dataTypes: List<R2dbcDataType<*>>,
 ) : R2dbcDataTypeProvider {
-
     private val dataTypeMap: Map<KType, R2dbcDataType<*>> = dataTypes.associateBy { it.type }
 
     override fun <T : Any> get(type: KType): R2dbcDataType<T>? {

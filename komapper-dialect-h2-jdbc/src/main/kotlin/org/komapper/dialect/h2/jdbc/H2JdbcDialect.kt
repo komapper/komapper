@@ -5,7 +5,6 @@ import org.komapper.jdbc.JdbcDialect
 import java.sql.SQLException
 
 interface H2JdbcDialect : H2Dialect, JdbcDialect {
-
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
             it.errorCode == H2Dialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE

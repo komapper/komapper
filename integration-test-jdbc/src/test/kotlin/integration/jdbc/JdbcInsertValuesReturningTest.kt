@@ -20,7 +20,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
-
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test() {

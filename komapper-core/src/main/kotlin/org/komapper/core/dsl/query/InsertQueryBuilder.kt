@@ -23,7 +23,9 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param keys the keys used for duplicate checking
      * @return the query
      */
-    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
+    fun onDuplicateKeyUpdate(
+        vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray(),
+    ): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
 
     /**
      * Creates a builder of the query that inserts or updates entities.
@@ -40,7 +42,9 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param keys the keys used for duplicate checking
      * @return the query
      */
-    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META>
+    fun onDuplicateKeyIgnore(
+        vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray(),
+    ): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META>
 
     /**
      * Creates a builder of the query that inserts entities and ignores duplicate keys.
@@ -120,8 +124,9 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     private val context: EntityInsertContext<ENTITY, ID, META>,
 ) :
     InsertQueryBuilder<ENTITY, ID, META> {
-
-    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
+    override fun onDuplicateKeyUpdate(
+        vararg keys: PropertyMetamodel<ENTITY, *, *>,
+    ): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
         return InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl(newContext)
     }

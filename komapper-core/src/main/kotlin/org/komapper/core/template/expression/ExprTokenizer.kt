@@ -39,7 +39,6 @@ import org.komapper.core.template.expression.ExprTokenType.WHITESPACE
 import java.nio.CharBuffer
 
 class ExprTokenizer(private val expression: String) {
-
     companion object {
         const val LOOKAHEAD_SIZE: Int = 5
     }

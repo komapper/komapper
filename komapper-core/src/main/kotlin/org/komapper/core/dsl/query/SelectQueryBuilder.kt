@@ -32,7 +32,6 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     override val context: SelectContext<ENTITY, ID, META>,
 ) :
     SelectQueryBuilder<ENTITY, ID, META> {
-
     private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
     override fun distinct(): EntitySelectQuery<ENTITY> {

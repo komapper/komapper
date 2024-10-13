@@ -20,7 +20,6 @@ class SpringR2dbcTransactionSession(
     override val connectionFactory: ConnectionFactory,
 ) :
     R2dbcSession {
-
     override val coroutineTransactionOperator: CoroutineTransactionOperator =
         SpringR2dbcCoroutineTransactionOperator(transactionManager)
 

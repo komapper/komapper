@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SqlLocationTest {
-
     @Test
     fun `line=1,column=3,length=5`() {
         val sql = """

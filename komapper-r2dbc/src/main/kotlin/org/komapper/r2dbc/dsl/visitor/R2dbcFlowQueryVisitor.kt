@@ -17,7 +17,6 @@ import org.komapper.r2dbc.dsl.runner.R2dbcTemplateEntityProjectionSelectFlowBuil
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectFlowBuilder
 
 object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
-
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
     ): R2dbcFlowBuilder<ENTITY> {

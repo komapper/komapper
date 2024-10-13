@@ -10,7 +10,6 @@ class MariaDbStatementBuilderSupport(
     private val dialect: BuilderDialect,
     private val returningProvider: ReturningProvider,
 ) {
-
     fun buildReturning(): Statement {
         return with(StatementBuffer()) {
             val expressions = returningProvider.returning.expressions()

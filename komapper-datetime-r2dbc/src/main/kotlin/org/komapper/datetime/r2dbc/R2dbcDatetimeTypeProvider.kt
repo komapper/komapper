@@ -19,7 +19,6 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataTypeProvider {
-
     override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
         val dataType: R2dbcDataType<*>? = when (type.classifier as KClass<*>) {
             Instant::class -> {

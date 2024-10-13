@@ -14,7 +14,6 @@ import kotlin.test.assertEquals
 
 @Tag("slow")
 class SqlValidatorTest : AbstractKspTest() {
-
     @Test
     fun `bind variable - success`() {
         val result = compile("") { env, resolver ->

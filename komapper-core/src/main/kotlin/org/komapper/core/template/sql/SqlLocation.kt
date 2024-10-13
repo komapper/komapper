@@ -17,7 +17,7 @@ class SqlLocation(
         |[
         |${highlightSql()}
         |]:$lineNumber:$columnNumber
-    """.trimMargin()
+        """.trimMargin()
 
     private fun highlightSql(): String {
         val lineIndex = lineNumber - 1

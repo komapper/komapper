@@ -17,7 +17,6 @@ import kotlin.test.assertEquals
 
 @Tag("slow")
 class ExprValidatorTest : AbstractKspTest() {
-
     sealed interface Color {
         object Red : Color
         object Green : Color

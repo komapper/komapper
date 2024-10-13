@@ -19,7 +19,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
-
     @Test
     fun period(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.periodData

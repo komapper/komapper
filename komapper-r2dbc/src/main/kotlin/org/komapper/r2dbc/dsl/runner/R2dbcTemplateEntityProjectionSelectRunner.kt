@@ -13,7 +13,6 @@ internal class R2dbcTemplateEntityProjectionSelectRunner<T, R>(
     transform: (R2dbcDataOperator, Row) -> T,
     private val collect: suspend (Flow<T>) -> R,
 ) : R2dbcRunner<R> {
-
     private val flowBuilder = R2dbcTemplateEntityProjectionSelectFlowBuilder(context, transform)
 
     override fun check(config: DatabaseConfig) {

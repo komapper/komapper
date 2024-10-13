@@ -9,7 +9,6 @@ import org.komapper.core.dsl.expression.SubqueryExpression
 internal data class SetOperationQuerySupport<T : Any?>(
     private val context: SetOperationContext,
 ) {
-
     fun except(other: SubqueryExpression<T>): SetOperationContext {
         return setOperation(SetOperationKind.EXCEPT, other)
     }

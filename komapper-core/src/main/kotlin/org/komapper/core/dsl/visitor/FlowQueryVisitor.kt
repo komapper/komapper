@@ -11,7 +11,6 @@ import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
 interface FlowQueryVisitor<VISIT_RESULT> {
-
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
     ): VISIT_RESULT
@@ -61,14 +60,12 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
 
-    fun <A : Any, B : Any, C : Any>
-    tripleColumnsSelectQuery(
+    fun <A : Any, B : Any, C : Any> tripleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
 
-    fun <A : Any, B : Any, C : Any>
-    tripleNotNullColumnsSelectQuery(
+    fun <A : Any, B : Any, C : Any> tripleNotNullColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT

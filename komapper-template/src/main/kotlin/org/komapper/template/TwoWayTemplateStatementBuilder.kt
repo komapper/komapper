@@ -26,7 +26,6 @@ internal class TwoWayTemplateStatementBuilder(
     private val sqlNodeFactory: SqlNodeFactory,
     private val exprEvaluator: ExprEvaluator,
 ) : TemplateStatementBuilder {
-
     private val clauseRegex = Regex(
         """^(select|from|where|group by|having|order by|for update|option)\s""",
         RegexOption.IGNORE_CASE,
@@ -130,7 +129,9 @@ internal class TwoWayTemplateStatementBuilder(
                         when (o) {
                             is Pair<*, *> -> {
                                 if (!dialect.supportsMultipleColumnsInInPredicate()) {
-                                    throw UnsupportedOperationException("Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate.")
+                                    throw UnsupportedOperationException(
+                                        "Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate."
+                                    )
                                 }
                                 val (f, s) = o
                                 state.append("(")
@@ -140,7 +141,9 @@ internal class TwoWayTemplateStatementBuilder(
 
                             is Triple<*, *, *> -> {
                                 if (!dialect.supportsMultipleColumnsInInPredicate()) {
-                                    throw UnsupportedOperationException("Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate.")
+                                    throw UnsupportedOperationException(
+                                        "Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate."
+                                    )
                                 }
                                 val (f, s, t) = o
                                 state.append("(")
@@ -257,7 +260,9 @@ internal class TwoWayTemplateStatementBuilder(
             if (receiver == null) {
                 throw SqlException("The expression \"${withDirective.expression}\" is null at ${withDirective.location}")
             }
-            val klass = type.classifier as? KClass<*> ?: throw SqlException("The expression \"${withDirective.expression}\" is not a class at ${withDirective.location}")
+            val klass =
+                type.classifier as? KClass<*>
+                    ?: throw SqlException("The expression \"${withDirective.expression}\" is not a class at ${withDirective.location}")
             val preserved = HashMap(state.valueMap)
             for (property in klass.memberProperties) {
                 val v = property.call(receiver)
@@ -317,7 +322,6 @@ internal class TwoWayTemplateStatementBuilder(
     }
 
     inner class State(private val ctx: ExprContext) {
-
         private val blankNodes = mutableListOf<SqlNode.Blank>()
         private var eolNodeCount = 0
 

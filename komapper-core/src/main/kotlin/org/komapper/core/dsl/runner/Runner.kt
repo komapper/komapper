@@ -11,7 +11,6 @@ interface Runner {
     fun dryRun(config: DatabaseConfig): DryRunStatement
 
     data class AndThen(private val left: Runner, private val right: Runner) : Runner {
-
         override fun check(config: DatabaseConfig) {
             left.check(config)
             right.check(config)
@@ -23,7 +22,6 @@ interface Runner {
     }
 
     data class Map(private val runner: Runner) : Runner {
-
         override fun check(config: DatabaseConfig) {
             runner.check(config)
         }
@@ -34,7 +32,6 @@ interface Runner {
     }
 
     data class Zip(private val left: Runner, private val right: Runner) : Runner {
-
         override fun check(config: DatabaseConfig) {
             left.check(config)
             right.check(config)
@@ -46,7 +43,6 @@ interface Runner {
     }
 
     data class FlatMap(private val runner: Runner) : Runner {
-
         override fun check(config: DatabaseConfig) {
             runner.check(config)
         }
@@ -57,7 +53,6 @@ interface Runner {
     }
 
     data class FlatZip(private val runner: Runner) : Runner {
-
         override fun check(config: DatabaseConfig) {
             runner.check(config)
         }

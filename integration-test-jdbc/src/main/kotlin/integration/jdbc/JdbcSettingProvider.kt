@@ -4,7 +4,6 @@ import integration.core.Setting
 import org.komapper.jdbc.JdbcDatabase
 
 object JdbcSettingProvider {
-
     fun get(): Setting<JdbcDatabase> {
         val identifier = System.getProperty("identifier") ?: error("The identifier property is not found.")
         val url = System.getProperty("url") ?: error("The url property is not found.")

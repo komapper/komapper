@@ -10,7 +10,6 @@ class EntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
     context: EntityDeleteContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : Runner {
-
     private val runner: EntityDeleteSingleRunner<ENTITY, ID, META> =
         EntityDeleteSingleRunner(context, entity)
 

@@ -37,7 +37,6 @@ internal class DefaultExprEvaluator(
     @Suppress("DEPRECATION") private val exprEnvironment: ExprEnvironment,
     private val classResolver: (String) -> Class<*> = { Class.forName(it) },
 ) : ExprEvaluator {
-
     // used to distinguish multiple arguments from a single List argument
     class ExprArgList : ArrayList<Any?>()
 
@@ -189,7 +188,8 @@ internal class DefaultExprEvaluator(
         val (left) = visit(leftNode, ctx)
         rightNode as? ExprNode.ClassRef ?: throw ExprException("The right operand must be a class reference at $location.")
         val (_, rightType) = visitClassRef(rightNode, ctx)
-        val rightClass = rightType.classifier as? KClass<*> ?: throw ExprException("The right operand is not resolved as a class at $location.")
+        val rightClass =
+            rightType.classifier as? KClass<*> ?: throw ExprException("The right operand is not resolved as a class at $location.")
         return Value(rightClass.isInstance(left), typeOf<Boolean>())
     }
 
@@ -202,11 +202,15 @@ internal class DefaultExprEvaluator(
         val (left) = visit(leftNode, ctx)
         rightNode as? ExprNode.ClassRef ?: throw ExprException("The right operand must be a class reference at $location.")
         val (_, rightType) = visitClassRef(rightNode, ctx)
-        val rightClass = rightType.classifier as? KClass<*> ?: throw ExprException("The right operand is not resolved as a class at $location.")
+        val rightClass =
+            rightType.classifier as? KClass<*> ?: throw ExprException("The right operand is not resolved as a class at $location.")
         return Value(rightClass.cast(left), rightType)
     }
 
-    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): Value<*> {
+    private fun visitClassRef(
+        node: ExprNode.ClassRef,
+        @Suppress("UNUSED_PARAMETER") ctx: ExprContext,
+    ): Value<*> {
         val clazz =
             try {
                 classResolver(node.name)
@@ -242,13 +246,17 @@ internal class DefaultExprEvaluator(
         method.trySetAccessible()
         val resultValue = method.invoke(function, *arguments.toTypedArray())
         val resultType = value.type.arguments.firstOrNull()?.type
-            ?: throw ExprException("The return type for the execution of the value \"${node.name}\" cannot be determined at ${node.location}")
+            ?: throw ExprException(
+                "The return type for the execution of the value \"${node.name}\" cannot be determined at ${node.location}"
+            )
         return Value(resultValue, resultType)
     }
 
     private fun getValue(name: String, location: ExprLocation, ctx: ExprContext): Value<*> {
         return ctx.valueMap[name] ?: exprEnvironment.ctx[name]
-            ?: throw ExprException("The template variable \"${name}\" is not bound to a value. Make sure the variable name is correct at $location")
+            ?: throw ExprException(
+                "The template variable \"${name}\" is not bound to a value. Make sure the variable name is correct at $location"
+            )
     }
 
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value<*> {

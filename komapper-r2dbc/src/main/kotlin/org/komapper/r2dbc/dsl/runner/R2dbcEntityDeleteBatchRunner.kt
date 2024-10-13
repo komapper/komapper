@@ -12,7 +12,6 @@ internal class R2dbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : Entit
     private val entities: List<ENTITY>,
 ) :
     R2dbcRunner<Unit> {
-
     private val runner: EntityDeleteBatchRunner<ENTITY, ID, META> =
         EntityDeleteBatchRunner(context, entities)
 

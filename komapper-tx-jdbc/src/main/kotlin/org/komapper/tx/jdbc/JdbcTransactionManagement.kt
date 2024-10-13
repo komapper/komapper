@@ -32,7 +32,6 @@ private class JdbcTransactionManagementImpl(
     private val loggerFacade: LoggerFacade,
     private val releaseAction: JdbcTransactionReleaseAction,
 ) : JdbcTransactionManagement {
-
     override fun getConnection(tx: JdbcTransaction?): Connection {
         return tx?.connection ?: dataSource.connection
     }

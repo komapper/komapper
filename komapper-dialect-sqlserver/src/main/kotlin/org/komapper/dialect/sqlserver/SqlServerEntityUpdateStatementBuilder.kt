@@ -13,7 +13,6 @@ class SqlServerEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : Entit
     context: EntityUpdateContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
-
     private val builder = DefaultEntityUpdateStatementBuilder(dialect, context, entity)
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 

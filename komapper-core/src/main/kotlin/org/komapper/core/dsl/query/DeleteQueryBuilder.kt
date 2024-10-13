@@ -59,7 +59,6 @@ internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     private val context: EntityDeleteContext<ENTITY, ID, META>,
 ) :
     DeleteQueryBuilder<ENTITY> {
-
     override fun single(entity: ENTITY): EntityDeleteSingleQuery<ENTITY> {
         context.target.checkIdValueNotNull(entity)
         return EntityDeleteSingleQueryImpl(context, entity)

@@ -15,7 +15,6 @@ private class JdbcTransactionConnectionImpl(
     private val isolationLevelProperty: TransactionProperty.IsolationLevel?,
     private val readOnlyProperty: TransactionProperty.ReadOnly?,
 ) : Connection by connection, JdbcTransactionConnection {
-
     @Volatile
     private var isolation: Int? = null
 

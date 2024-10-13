@@ -9,7 +9,6 @@ data class DeleteOptions(
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
     override val suppressOptimisticLockException: Boolean = DEFAULT.suppressOptimisticLockException,
 ) : BatchOptions, OptimisticLockOptions, WhereOptions {
-
     companion object {
         val DEFAULT = DeleteOptions(
             allowMissingWhereClause = false,

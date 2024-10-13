@@ -11,7 +11,6 @@ import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
 class R2dbcPostgreSqlSetting(private val url: String) : PostgreSqlSetting<R2dbcDatabase> {
-
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
         val container = PostgisContainerProvider().newInstance(connectionUrl) as PostgreSQLContainer<*>

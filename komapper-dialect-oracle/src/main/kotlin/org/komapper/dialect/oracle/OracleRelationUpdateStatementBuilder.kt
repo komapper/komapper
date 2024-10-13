@@ -13,7 +13,6 @@ class OracleRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : Entity
     private val dialect: BuilderDialect,
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : RelationUpdateStatementBuilder<ENTITY, ID, META> {
-
     private val buf = StatementBuffer()
     private val builder = RelationUpdateStatementBuilder(dialect, context)
     private val support = OracleStatementBuilderSupport(dialect, context)

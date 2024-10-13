@@ -34,7 +34,6 @@ fun TemplateBuiltinExtensions(escape: (String) -> String): TemplateBuiltinExtens
 }
 
 internal class DefaultTemplateBuiltinExtensions(val escape: (String) -> String) : TemplateBuiltinExtensions {
-
     override fun String?.escape(): String? {
         return this?.let { escape(it) }
     }

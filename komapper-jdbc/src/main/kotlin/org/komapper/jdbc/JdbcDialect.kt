@@ -8,7 +8,6 @@ import java.sql.SQLException
  * Represents a dialect for JDBC access.
  */
 interface JdbcDialect : Dialect {
-
     fun createExecutor(
         config: JdbcDatabaseConfig,
         executionOptionProvider: ExecutionOptionsProvider,

@@ -17,7 +17,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcLiteralTest(val db: R2dbcDatabase) {
-
     @Test
     fun test_boolean(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.booleanData

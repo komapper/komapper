@@ -16,7 +16,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcDryRunTest(private val db: JdbcDatabase) {
-
     @Test
     fun dryRunQuery() {
         val a = Meta.address

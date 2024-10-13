@@ -16,7 +16,6 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class R2dbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
 ) : R2dbcRunner<EntityStore> {
-
     private val runner: SelectRunner = SelectRunner(context)
     private val factory: EntityStoreFactory = EntityStoreFactory()
 

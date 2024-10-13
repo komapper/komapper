@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
 class JdbcUnitTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val a = MyMeta.myAddress

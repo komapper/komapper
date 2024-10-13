@@ -13,7 +13,6 @@ import kotlin.test.assertNotNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class JdbcDeclarativeTxControllerTest {
-
     private val baseUri = "http://localhost/declarative"
     private val restTemplate = TestRestTemplate()
     private val typedReference: ParameterizedTypeReference<List<Message>> =

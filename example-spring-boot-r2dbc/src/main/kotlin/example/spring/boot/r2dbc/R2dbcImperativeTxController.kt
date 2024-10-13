@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/imperative")
 class R2dbcImperativeTxController(private val db: R2dbcDatabase) {
-
     @GetMapping("")
     fun list(): Flow<Message> = db.flowTransaction {
         val value = db.flowQuery {
@@ -28,7 +27,9 @@ class R2dbcImperativeTxController(private val db: R2dbcDatabase) {
     }
 
     @GetMapping(value = [""], params = ["text"])
-    suspend fun add(@RequestParam text: String): Message = db.withTransaction {
+    suspend fun add(
+        @RequestParam text: String,
+    ): Message = db.withTransaction {
         val message = Message(text = text)
         db.runQuery {
             val m = Meta.message
@@ -37,7 +38,9 @@ class R2dbcImperativeTxController(private val db: R2dbcDatabase) {
     }
 
     @DeleteMapping(value = ["/{id}"])
-    suspend fun delete(@PathVariable id: Int) = db.withTransaction {
+    suspend fun delete(
+        @PathVariable id: Int,
+    ) = db.withTransaction {
         db.runQuery {
             val m = Meta.message
             QueryDsl.delete(m).where { m.id eq id }

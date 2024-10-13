@@ -26,7 +26,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertBatchTest(private val db: JdbcDatabase) {
-
     @Test
     fun test() {
         val a = Meta.address

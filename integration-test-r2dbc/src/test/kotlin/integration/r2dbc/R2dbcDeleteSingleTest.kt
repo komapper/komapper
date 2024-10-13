@@ -14,7 +14,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcDeleteSingleTest(private val db: R2dbcDatabase) {
-
     @Test
     fun optimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

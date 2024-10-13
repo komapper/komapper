@@ -5,7 +5,6 @@ package org.komapper.core
  */
 @ThreadSafe
 interface Database {
-
     /**
      * The database configuration.
      */

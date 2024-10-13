@@ -29,7 +29,6 @@ import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcCompositionTest(private val db: JdbcDatabase) {
-
     @Test
     fun plus() {
         val a = Meta.address

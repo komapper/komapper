@@ -20,7 +20,6 @@ internal class JdbcIndexedValueExtractor(private val dataOperator: JdbcDataOpera
 }
 
 internal class JdbcNamedValueExtractor(private val dataOperator: JdbcDataOperator, private val resultSet: ResultSet) : JdbcValueExtractor {
-
     override fun <EXTERIOR : Any, INTERIOR : Any> execute(expression: ColumnExpression<EXTERIOR, INTERIOR>): EXTERIOR? {
         return ValueExtractor.getByName(expression) {
             dataOperator.getValue(resultSet, expression.columnName, expression.interiorType)

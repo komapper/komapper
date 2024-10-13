@@ -26,7 +26,6 @@ import org.komapper.tx.core.TransactionProperty
  * Represents a database accessed by R2DBC.
  */
 interface R2dbcDatabase : Database {
-
     /**
      * The database configuration.
      */

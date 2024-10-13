@@ -19,7 +19,6 @@ import kotlin.test.assertNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
-
     @Test
     fun onDuplicateKeyUpdate_insert(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department

@@ -11,7 +11,6 @@ internal class JdbcEntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : Entit
     context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : JdbcRunner<ENTITY> {
-
     private val runner: EntityUpdateSingleRunner<ENTITY, ID, META> =
         EntityUpdateSingleRunner(context, entity)
 

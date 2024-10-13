@@ -7,7 +7,6 @@ import org.komapper.r2dbc.Binder
 import org.komapper.r2dbc.R2dbcDialect
 
 interface SqlServerR2dbcDialect : SqlServerDialect, R2dbcDialect {
-
     override fun getBinder(): Binder {
         return AtSignBinder
     }

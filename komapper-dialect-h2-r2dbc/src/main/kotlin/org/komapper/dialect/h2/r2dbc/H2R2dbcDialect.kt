@@ -5,7 +5,6 @@ import org.komapper.dialect.h2.H2Dialect
 import org.komapper.r2dbc.R2dbcDialect
 
 interface H2R2dbcDialect : H2Dialect, R2dbcDialect {
-
     override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
         return exception.errorCode == H2Dialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
     }

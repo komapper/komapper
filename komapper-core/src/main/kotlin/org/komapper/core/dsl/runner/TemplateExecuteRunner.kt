@@ -9,7 +9,6 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 class TemplateExecuteRunner(
     private val context: TemplateExecuteContext,
 ) : Runner {
-
     override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

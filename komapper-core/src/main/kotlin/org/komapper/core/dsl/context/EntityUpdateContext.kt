@@ -18,7 +18,6 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     override val returning: Returning = Returning.Expressions(emptyList()),
     override val options: UpdateOptions,
 ) : TablesProvider, WhereProvider, ReturningProvider {
-
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)
     }

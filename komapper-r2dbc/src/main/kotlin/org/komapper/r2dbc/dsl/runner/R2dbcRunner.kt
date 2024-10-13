@@ -12,7 +12,6 @@ sealed interface R2dbcRunner<T> : Runner {
         private val left: R2dbcRunner<LEFT>,
         private val right: R2dbcRunner<RIGHT>,
     ) : R2dbcRunner<RIGHT> {
-
         private val runner: Runner.AndThen = Runner.AndThen(left, right)
 
         override fun check(config: DatabaseConfig) {
@@ -34,11 +33,10 @@ sealed interface R2dbcRunner<T> : Runner {
         private val runner: R2dbcRunner<T>,
         private val transform: (T) -> S,
     ) : R2dbcRunner<S> {
-
-        private val _runner: Runner.Map = Runner.Map(runner)
+        private val coreRunner: Runner.Map = Runner.Map(runner)
 
         override fun check(config: DatabaseConfig) {
-            _runner.check(config)
+            coreRunner.check(config)
         }
 
         override suspend fun run(config: R2dbcDatabaseConfig): S {
@@ -47,7 +45,7 @@ sealed interface R2dbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return _runner.dryRun(config)
+            return coreRunner.dryRun(config)
         }
     }
 
@@ -55,7 +53,6 @@ sealed interface R2dbcRunner<T> : Runner {
         private val left: R2dbcRunner<T>,
         private val right: R2dbcRunner<S>,
     ) : R2dbcRunner<Pair<T, S>> {
-
         private val runner: Runner.Zip = Runner.Zip(left, right)
 
         override fun check(config: DatabaseConfig) {
@@ -76,11 +73,10 @@ sealed interface R2dbcRunner<T> : Runner {
         val runner: R2dbcRunner<T>,
         val transform: (T) -> R2dbcRunner<S>,
     ) : R2dbcRunner<S> {
-
-        private val _runner: Runner.FlatMap = Runner.FlatMap(runner)
+        private val coreRunner: Runner.FlatMap = Runner.FlatMap(runner)
 
         override fun check(config: DatabaseConfig) {
-            _runner.check(config)
+            coreRunner.check(config)
         }
 
         override suspend fun run(config: R2dbcDatabaseConfig): S {
@@ -89,7 +85,7 @@ sealed interface R2dbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return _runner.dryRun(config)
+            return coreRunner.dryRun(config)
         }
     }
 
@@ -97,11 +93,10 @@ sealed interface R2dbcRunner<T> : Runner {
         val runner: R2dbcRunner<T>,
         val transform: (T) -> R2dbcRunner<S>,
     ) : R2dbcRunner<Pair<T, S>> {
-
-        private val _runner: Runner.FlatZip = Runner.FlatZip(runner)
+        private val coreRunner: Runner.FlatZip = Runner.FlatZip(runner)
 
         override fun check(config: DatabaseConfig) {
-            _runner.check(config)
+            coreRunner.check(config)
         }
 
         override suspend fun run(config: R2dbcDatabaseConfig): Pair<T, S> {
@@ -110,7 +105,7 @@ sealed interface R2dbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return _runner.dryRun(config)
+            return coreRunner.dryRun(config)
         }
     }
 }

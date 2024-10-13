@@ -17,7 +17,6 @@ import kotlin.test.assertFailsWith
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSelectForUpdateTest(private val db: JdbcDatabase) {
-
     @Test
     fun forUpdate() {
         val a = Meta.address

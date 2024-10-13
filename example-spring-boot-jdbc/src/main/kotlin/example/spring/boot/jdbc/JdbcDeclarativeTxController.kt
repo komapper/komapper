@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 @Transactional
 @RequestMapping("/declarative")
 class JdbcDeclarativeTxController(private val db: JdbcDatabase) {
-
     @GetMapping("")
     fun list(): List<Message> {
         val list = db.runQuery {
@@ -28,7 +27,9 @@ class JdbcDeclarativeTxController(private val db: JdbcDatabase) {
     }
 
     @GetMapping(value = [""], params = ["text"])
-    fun add(@RequestParam text: String): Message {
+    fun add(
+        @RequestParam text: String,
+    ): Message {
         val message = Message(text = text)
         return db.runQuery {
             val m = Meta.message
@@ -37,7 +38,9 @@ class JdbcDeclarativeTxController(private val db: JdbcDatabase) {
     }
 
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable id: Int) {
+    fun delete(
+        @PathVariable id: Int,
+    ) {
         db.runQuery {
             val m = Meta.message
             QueryDsl.delete(m).where { m.id eq id }

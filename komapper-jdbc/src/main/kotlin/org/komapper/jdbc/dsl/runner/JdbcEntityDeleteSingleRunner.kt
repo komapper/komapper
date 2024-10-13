@@ -11,7 +11,6 @@ internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : Entit
     context: EntityDeleteContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : JdbcRunner<Unit> {
-
     private val runner: EntityDeleteSingleRunner<ENTITY, ID, META> =
         EntityDeleteSingleRunner(context, entity)
 

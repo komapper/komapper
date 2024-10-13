@@ -17,7 +17,6 @@ interface R2dbcTransactionConnection : Connection {
 private class R2dbcTransactionConnectionImpl(
     private val connection: Connection,
 ) : Connection by connection, R2dbcTransactionConnection {
-
     override suspend fun dispose() {
         val isValid = connection.validate(ValidationDepth.LOCAL).asFlow().single()
         if (isValid) {
