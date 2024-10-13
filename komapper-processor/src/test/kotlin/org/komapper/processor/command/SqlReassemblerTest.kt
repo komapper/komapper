@@ -18,39 +18,40 @@ class SqlReassemblerTest : AbstractKspTest() {
     fun success() {
         val result = compile("") { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
-            val sql = """
-            /**
-             * multi line comment
-             */
-            -- single line comment
-            select
-                *
-            from
-                dept
-            where
-                /*%for id in list */
-                id = /* id */1
-                /*%if id_has_next *//*# "or" *//*%end */
+            val sql =
+                """
+                /**
+                 * multi line comment
+                 */
+                -- single line comment
+                select
+                    *
+                from
+                    dept
+                where
+                    /*%for id in list */
+                    id = /* id */1
+                    /*%if id_has_next *//*# "or" *//*%end */
+                    /*%end */
+                union all
+                select
+                    * 
+                from
+                    emp 
+                where 
+                    id = /* id */1
+                    and
+                    name = /*^ name */'foo'
+                /*%if orderBy != null*/
+                /*# orderBy */
+                /*%elseif orderBy == "hoge" */
+                order by hoge
+                /*%elseif orderBy == "foo" */
+                order by foo
+                /*%else */
+                order by id
                 /*%end */
-            union all
-            select
-                * 
-            from
-                emp 
-            where 
-                id = /* id */1
-                and
-                name = /*^ name */'foo'
-            /*%if orderBy != null*/
-            /*# orderBy */
-            /*%elseif orderBy == "hoge" */
-            order by hoge
-            /*%elseif orderBy == "foo" */
-            order by foo
-            /*%else */
-            order by id
-            /*%end */
-            """.trimIndent()
+                """.trimIndent()
             val newSql = SqlReassembler(context, sql, emptyMap()).assemble()
             assertEquals(sql, newSql)
 
@@ -71,21 +72,22 @@ class SqlReassemblerTest : AbstractKspTest() {
         ) { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val paginationType = context.getClassDeclaration("test.Pagination") { error(it) }.asType(emptyList())
-            val sql = """
-            select
-                *
-            from
-                dept
-            /*> pagination */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    dept
+                /*> pagination */
+                """.trimIndent()
             val newSql = SqlReassembler(context, sql, mapOf("pagination" to paginationType)).assemble()
             assertEquals(
                 """
-            select
-                *
-            from
-                dept
-            /*%if pagination != null *//*%with pagination */limit /* limit */0 offset /* offset */0/*%end *//*%end */
+                select
+                    *
+                from
+                    dept
+                /*%if pagination != null *//*%with pagination */limit /* limit */0 offset /* offset */0/*%end *//*%end */
                 """.trimIndent(),
                 newSql,
             )
@@ -107,21 +109,22 @@ class SqlReassemblerTest : AbstractKspTest() {
         ) { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val partialType = context.getClassDeclaration("test.Partial") { error(it) }.asType(emptyList())
-            val sql = """
-            select
-                *
-            from
-                dept
-            /*> partial */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    dept
+                /*> partial */
+                """.trimIndent()
             val newSql = SqlReassembler(context, sql, mapOf("partial" to partialType)).assemble()
             assertEquals(
                 """
-            select
-                *
-            from
-                dept
-            /*%if partial != null *//*%with partial *//*# value *//*%end *//*%end */
+                select
+                    *
+                from
+                    dept
+                /*%if partial != null *//*%with partial *//*# value *//*%end *//*%end */
                 """.trimIndent(),
                 newSql,
             )
@@ -143,21 +146,22 @@ class SqlReassemblerTest : AbstractKspTest() {
         ) { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val partialType = context.getClassDeclaration("test.Partial") { error(it) }.asType(emptyList())
-            val sql = """
-            select
-                *
-            from
-                dept
-            /*> partial */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    dept
+                /*> partial */
+                """.trimIndent()
             val newSql = SqlReassembler(context, sql, mapOf("partial" to partialType)).assemble()
             assertEquals(
                 """
-            select
-                *
-            from
-                dept
-            /*%if partial != null *//*%with partial *//*^ value */''/*%end *//*%end */
+                select
+                    *
+                from
+                    dept
+                /*%if partial != null *//*%with partial *//*^ value */''/*%end *//*%end */
                 """.trimIndent(),
                 newSql,
             )
@@ -179,21 +183,22 @@ class SqlReassemblerTest : AbstractKspTest() {
         ) { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val partial = context.getClassDeclaration("test.Partial") { error(it) }.asType(emptyList())
-            val sql = """
-            select
-                *
-            from
-                x
-            /*> partial */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    x
+                /*> partial */
+                """.trimIndent()
             val newSql = SqlReassembler(context, sql, mapOf("partial" to partial)).assemble()
             assertEquals(
                 """
-            select
-                *
-            from
-                x
-            /*%if partial != null *//*%with partial *//*%if value == 0 */0/*%elseif value == 1 */1/*%elseif value == 2 */2/*%else */3/*%end *//*%end *//*%end */
+                select
+                    *
+                from
+                    x
+                /*%if partial != null *//*%with partial *//*%if value == 0 */0/*%elseif value == 1 */1/*%elseif value == 2 */2/*%else */3/*%end *//*%end *//*%end */
                 """.trimIndent(),
                 newSql,
             )
@@ -215,21 +220,22 @@ class SqlReassemblerTest : AbstractKspTest() {
         ) { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val partial = context.getClassDeclaration("test.Partial") { error(it) }.asType(emptyList())
-            val sql = """
-            select
-                *
-            from
-                x
-            /*> partial */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    x
+                /*> partial */
+                """.trimIndent()
             val newSql = SqlReassembler(context, sql, mapOf("partial" to partial)).assemble()
             assertEquals(
                 """
-            select
-                *
-            from
-                x
-            /*%if partial != null *//*%with partial *//*%for item in items *//* item */''/*%end *//*%end *//*%end */
+                select
+                    *
+                from
+                    x
+                /*%if partial != null *//*%with partial *//*%for item in items *//* item */''/*%end *//*%end *//*%end */
                 """.trimIndent(),
                 newSql,
             )
@@ -243,13 +249,14 @@ class SqlReassemblerTest : AbstractKspTest() {
     fun `error - SqlPartialEvaluationException`() {
         val result = compile("") { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
-            val sql = """
-            select
-                *
-            from
-                dept
-            /*> orderBy */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    dept
+                /*> orderBy */
+                """.trimIndent()
             val e = assertThrows<SqlException> {
                 SqlReassembler(context, sql, emptyMap()).assemble()
             }
@@ -270,13 +277,14 @@ class SqlReassemblerTest : AbstractKspTest() {
         ) { env, resolver ->
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val orderByType = context.getClassDeclaration("test.OrderBy") { error(it) }.asType(emptyList())
-            val sql = """
-            select
-                *
-            from
-                dept
-            /*> orderBy */
-            """.trimIndent()
+            val sql =
+                """
+                select
+                    *
+                from
+                    dept
+                /*> orderBy */
+                """.trimIndent()
             val e = assertThrows<SqlReassembler.SqlPartialAnnotationNotFoundException> {
                 SqlReassembler(context, sql, mapOf("orderBy" to orderByType)).assemble()
             }

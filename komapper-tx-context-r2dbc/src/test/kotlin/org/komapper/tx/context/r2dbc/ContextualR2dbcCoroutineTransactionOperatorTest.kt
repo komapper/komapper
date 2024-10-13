@@ -330,7 +330,8 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
 
     @BeforeTest
     fun before() {
-        val sql = """
+        val sql =
+            """
             CREATE TABLE ADDRESS(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
             INSERT INTO ADDRESS VALUES(1,'STREET 1',1);
             INSERT INTO ADDRESS VALUES(2,'STREET 2',1);
@@ -347,7 +348,7 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
             INSERT INTO ADDRESS VALUES(13,'STREET 13',1);
             INSERT INTO ADDRESS VALUES(14,'STREET 14',1);
             INSERT INTO ADDRESS VALUES(15,'STREET 15',1);
-        """.trimIndent()
+            """.trimIndent()
 
         runBlocking {
             db.withTransaction {

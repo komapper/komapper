@@ -233,12 +233,13 @@ class SqlParserTest {
     inner class CommentTest {
         @Test
         fun multiLineComment() {
-            val sql = """
-            /**
-             * multi-line
-             * comment
-             */
-            """.trimIndent()
+            val sql =
+                """
+                /**
+                 * multi-line
+                 * comment
+                 */
+                """.trimIndent()
             val node = SqlParser(sql).parse()
             assertEquals(sql, node.toText())
         }

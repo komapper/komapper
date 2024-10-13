@@ -184,7 +184,7 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
             1,
             Json.of(
                 """
-            {"a": 100, "b": "Hello"}
+                {"a": 100, "b": "Hello"}
                 """.trimIndent(),
             ),
         )

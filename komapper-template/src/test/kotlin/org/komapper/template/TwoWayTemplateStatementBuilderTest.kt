@@ -263,17 +263,18 @@ class TwoWayTemplateStatementBuilderTest {
 
         @Test
         fun nestedProperty() {
-            val template = """
-            /*%for item in items*/
-                SELECT
-                    /*item.a.b.c*/0 AS id,
-                    /*item.description*/'' AS description
-                FROM DUAL
-                /*%if item_has_next*/
-                    /*# "UNION"*/
-                /*%end */
-            /*%end*/
-            """.trimIndent()
+            val template =
+                """
+                /*%for item in items*/
+                    SELECT
+                        /*item.a.b.c*/0 AS id,
+                        /*item.description*/'' AS description
+                    FROM DUAL
+                    /*%if item_has_next*/
+                        /*# "UNION"*/
+                    /*%end */
+                /*%end*/
+                """.trimIndent()
             val items = listOf(
                 Item(Product1(Product2(1)), "Item1"),
                 Item(Product1(Product2(2)), "Item2"),
@@ -438,20 +439,22 @@ class TwoWayTemplateStatementBuilderTest {
 
         @Test
         fun `Handle multiple 'union' keywords`() {
-            val template = """
+            val template =
+                """
                 select name from a
                 union
                 select name from b
                 union
                 select name from c
-            """.trimIndent()
+                """.trimIndent()
             val statement = statementBuilder.build(template, emptyMap(), extensions)
             assertEquals(template, statement.toSql())
         }
 
         @Test
         fun `Handle multiple 'union' keywords and remove a 'union' keyword automatically`() {
-            val template = """
+            val template =
+                """
                 select name from a
                 union
                 /*%if false*/
@@ -459,7 +462,7 @@ class TwoWayTemplateStatementBuilderTest {
                 /*%end*/
                 union
                 select name from c
-            """.trimIndent()
+                """.trimIndent()
             val statement = statementBuilder.build(template, emptyMap(), extensions)
             assertEquals(
                 """

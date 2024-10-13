@@ -19,7 +19,7 @@ class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
             1,
             Json(
                 """
-            {"a": 100, "b": "Hello"}
+                {"a": 100, "b": "Hello"}
                 """.trimIndent(),
             ),
         )

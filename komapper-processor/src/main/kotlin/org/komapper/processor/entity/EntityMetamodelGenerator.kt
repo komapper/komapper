@@ -748,12 +748,12 @@ internal class EntityMetamodelGenerator(
             if (context.config.enableEntityStoreContext) {
                 w.println(
                     """
-                context($EntityStoreContext)
-                @$KomapperExperimentalAssociation
-                public fun $entityTypeName.`${association.navigator}`(
-                    source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
-                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,
-                    ): $returnType {
+                    context($EntityStoreContext)
+                    @$KomapperExperimentalAssociation
+                    public fun $entityTypeName.`${association.navigator}`(
+                        source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
+                        target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,
+                        ): $returnType {
                     """.trimIndent(),
                 )
                 w.println("    return $expression")
@@ -768,10 +768,10 @@ internal class EntityMetamodelGenerator(
         val targetEntity = aggregateRoot.targetEntity
         w.println(
             """
-                @$KomapperExperimentalAssociation
-                public fun $EntityStore.`${aggregateRoot.navigator}`(
-                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
-                    ): Set<${targetEntity.typeName}> {
+            @$KomapperExperimentalAssociation
+            public fun $EntityStore.`${aggregateRoot.navigator}`(
+                target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
+                ): Set<${targetEntity.typeName}> {
             """.trimIndent(),
         )
         w.println("    return this[target]")

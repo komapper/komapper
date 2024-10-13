@@ -304,13 +304,14 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     @Run(unless = [Dbms.H2, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
     fun insertReturning(info: TestInfo) = inTransaction(db, info) {
         val address = db.runQuery {
-            val sql = """
+            val sql =
+                """
                 insert into address
                     (address_id, street, version)
                 values
                     (/*id*/0, /*street*/'', /*version*/0)
                 returning address_id, street, version
-            """.trimIndent()
+                """.trimIndent()
             QueryDsl.executeTemplate(sql)
                 .returning()
                 .bind("id", 16)
