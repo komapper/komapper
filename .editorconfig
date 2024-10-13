@@ -9,7 +9,6 @@ ktlint_standard_max-line-length = disabled
 ktlint_standard_no-blank-line-in-list = disabled
 ktlint_standard_discouraged-comment-location = disabled
 ktlint_standard_if-else-wrapping = disabled
-ktlint_standard_statement-wrapping = disabled
 ktlint_standard_function-expression-body = disabled
 ktlint_standard_property-naming = disabled
 ktlint_standard_backing-property-naming = disabled
