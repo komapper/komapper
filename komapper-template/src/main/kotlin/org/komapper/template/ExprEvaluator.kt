@@ -209,7 +209,7 @@ internal class DefaultExprEvaluator(
 
     private fun visitClassRef(
         node: ExprNode.ClassRef,
-        @Suppress("UNUSED_PARAMETER") ctx: ExprContext
+        @Suppress("UNUSED_PARAMETER") ctx: ExprContext,
     ): Value<*> {
         val clazz =
             try {

@@ -87,7 +87,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
 interface InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> :
     InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
     override fun set(
-        declaration: AssignmentScope<ENTITY>.(META) -> Unit
+        declaration: AssignmentScope<ENTITY>.(META) -> Unit,
     ): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
 
     /**
@@ -110,7 +110,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY : Any, ID : Any, 
 interface InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> :
     InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
     override fun set(
-        declaration: AssignmentScope<ENTITY>.(META) -> Unit
+        declaration: AssignmentScope<ENTITY>.(META) -> Unit,
     ): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META>
 
     /**

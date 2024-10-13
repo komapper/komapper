@@ -61,7 +61,7 @@ class ExprEvaluatorTest {
         NORTH,
         SOUTH,
         WEST,
-        EAST
+        EAST,
     }
 
     sealed interface Color {

@@ -297,7 +297,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     )
     data class Escape(
         val street: String,
-        @KomapperUnused val asAddress: (Row) -> Address
+        @KomapperUnused val asAddress: (Row) -> Address,
     ) : Many<Address>({ select(asAddress) }) {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
@@ -909,7 +909,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     }
 
     abstract class GetSingleAddress(
-        @KomapperUnused val unknown: Int
+        @KomapperUnused val unknown: Int,
     ) : One<Address>({ select(asAddress).single() })
 
     @KomapperCommand(

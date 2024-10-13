@@ -4,5 +4,5 @@ public enum class Direction {
     NORTH,
     SOUTH,
     EAST,
-    WEST
+    WEST,
 }

@@ -47,6 +47,6 @@ class H2StatementBuilderSupport(
 
     enum class DeltaTableType {
         OLD,
-        FINAL
+        FINAL,
     }
 }

@@ -320,7 +320,7 @@ internal class EntityFactory(
 
     private fun validateEnumClassProperty(
         property: LeafProperty,
-        @Suppress("UNUSED_PARAMETER") enumClass: EnumClass
+        @Suppress("UNUSED_PARAMETER") enumClass: EnumClass,
     ) {
         if (property.column.alternateType != null) {
             report("@KomapperColumn.alternateType is invalid for enum property types.", property.node)

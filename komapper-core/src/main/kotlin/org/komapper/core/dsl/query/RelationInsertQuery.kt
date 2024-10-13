@@ -62,7 +62,7 @@ interface RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamod
      */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
-        expression2: PropertyMetamodel<ENTITY, B, *>
+        expression2: PropertyMetamodel<ENTITY, B, *>,
     ): RelationInsertReturningQuery<Pair<A?, B?>>
 
     /**
@@ -76,7 +76,7 @@ interface RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamod
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
-        expression3: PropertyMetamodel<ENTITY, C, *>
+        expression3: PropertyMetamodel<ENTITY, C, *>,
     ): RelationInsertReturningQuery<Triple<A?, B?, C?>>
 
     override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertValuesQuery<ENTITY, ID, META>

@@ -19,68 +19,68 @@ import org.locationtech.jts.geom.Geometry
 @KomapperTable("box_data")
 data class BoxData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Box?
+    @KomapperColumn(alwaysQuote = true) val value: Box?,
 )
 
 @KomapperEntity
 @KomapperTable("circle_data")
 data class CircleData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Circle?
+    @KomapperColumn(alwaysQuote = true) val value: Circle?,
 )
 
 @KomapperEntity
 @KomapperTable("geometry_data")
 data class GeometryData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Geometry?
+    @KomapperColumn(alwaysQuote = true) val value: Geometry?,
 )
 
 @KomapperEntity
 @KomapperTable("line_data")
 data class LineData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Line?
+    @KomapperColumn(alwaysQuote = true) val value: Line?,
 )
 
 @KomapperEntity
 @KomapperTable("lseg_data")
 data class LsegData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Lseg?
+    @KomapperColumn(alwaysQuote = true) val value: Lseg?,
 )
 
 @KomapperEntity
 @KomapperTable("interval_data")
 data class IntervalData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Interval?
+    @KomapperColumn(alwaysQuote = true) val value: Interval?,
 )
 
 @KomapperEntity
 @KomapperTable("json_data")
 data class JsonData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Json?
+    @KomapperColumn(alwaysQuote = true) val value: Json?,
 )
 
 @KomapperEntity
 @KomapperTable("path_data")
 data class PathData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Path?
+    @KomapperColumn(alwaysQuote = true) val value: Path?,
 )
 
 @KomapperEntity
 @KomapperTable("point_data")
 data class PointData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Point?
+    @KomapperColumn(alwaysQuote = true) val value: Point?,
 )
 
 @KomapperEntity
 @KomapperTable("polygon_data")
 data class PolygonData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Polygon?
+    @KomapperColumn(alwaysQuote = true) val value: Polygon?,
 )

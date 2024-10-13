@@ -41,5 +41,5 @@ enum class SetOperationKind {
     EXCEPT,
     INTERSECT,
     UNION,
-    UNION_ALL
+    UNION_ALL,
 }

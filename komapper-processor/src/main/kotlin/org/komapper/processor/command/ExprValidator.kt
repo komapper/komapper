@@ -191,7 +191,7 @@ internal class ExprValidator(
 
     private fun visitClassRef(
         node: ExprNode.ClassRef,
-        @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>
+        @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>,
     ): KSType {
         // convert the binary class name to the kotlin class name
         val name = node.name.replace("$", ".")

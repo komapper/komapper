@@ -25,7 +25,7 @@ class JdbcImperativeTxController(val db: JdbcDatabase) {
 
     @GetMapping(value = [""], params = ["text"])
     fun add(
-        @RequestParam text: String
+        @RequestParam text: String,
     ): Message = db.withTransaction {
         val message = Message(text = text)
         db.runQuery {
@@ -36,7 +36,7 @@ class JdbcImperativeTxController(val db: JdbcDatabase) {
 
     @DeleteMapping(value = ["/{id}"])
     fun delete(
-        @PathVariable id: Int
+        @PathVariable id: Int,
     ) = db.withTransaction {
         db.runQuery {
             val m = Meta.message

@@ -7,5 +7,5 @@ public enum class Dbms {
     MYSQL,
     ORACLE,
     POSTGRESQL,
-    SQLSERVER
+    SQLSERVER,
 }

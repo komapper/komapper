@@ -50,5 +50,5 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
 enum class DuplicateKeyType {
     UPDATE,
-    IGNORE
+    IGNORE,
 }

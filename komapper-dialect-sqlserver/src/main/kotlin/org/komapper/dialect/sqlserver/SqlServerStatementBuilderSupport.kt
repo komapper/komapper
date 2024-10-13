@@ -39,6 +39,6 @@ class SqlServerStatementBuilderSupport(
 
     enum class TablePrefix {
         DELETED,
-        INSERTED
+        INSERTED,
     }
 }

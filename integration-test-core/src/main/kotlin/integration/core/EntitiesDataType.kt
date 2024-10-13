@@ -30,42 +30,42 @@ import java.util.UUID
 @KomapperEntity
 @KomapperTable("any_person")
 public data class AnyPerson(
-    @KomapperId val name: String
+    @KomapperId val name: String,
 ) : Serializable
 
 @KomapperEntity
 @KomapperTable("any_data")
 public data class AnyData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Any?
+    @KomapperColumn(alwaysQuote = true) val value: Any?,
 )
 
 @KomapperEntity
 @KomapperTable("big_decimal_data")
 public data class BigDecimalData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: BigDecimal?
+    @KomapperColumn(alwaysQuote = true) val value: BigDecimal?,
 )
 
 @KomapperEntity
 @KomapperTable("big_integer_data")
 public data class BigIntegerData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: BigInteger?
+    @KomapperColumn(alwaysQuote = true) val value: BigInteger?,
 )
 
 @KomapperEntity
 @KomapperTable("boolean_data")
 public data class BooleanData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Boolean?
+    @KomapperColumn(alwaysQuote = true) val value: Boolean?,
 )
 
 @KomapperEntity
 @KomapperTable("byte_data")
 public data class ByteData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Byte?
+    @KomapperColumn(alwaysQuote = true) val value: Byte?,
 )
 
 @KomapperEntity
@@ -73,28 +73,28 @@ public data class ByteData(
 @Suppress("ArrayInDataClass")
 public data class ByteArrayData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: ByteArray?
+    @KomapperColumn(alwaysQuote = true) val value: ByteArray?,
 )
 
 @KomapperEntity
 @KomapperTable("double_data")
 public data class DoubleData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Double?
+    @KomapperColumn(alwaysQuote = true) val value: Double?,
 )
 
 @KomapperEntity
 @KomapperTable("duration_data")
 public data class DurationData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Duration?
+    @KomapperColumn(alwaysQuote = true) val value: Duration?,
 )
 
 @KomapperEntity
 @KomapperTable("enum_data")
 public data class EnumData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Direction?
+    @KomapperColumn(alwaysQuote = true) val value: Direction?,
 )
 
 @KomapperEntity
@@ -156,119 +156,119 @@ public data class EmbeddedEnumPropertyData(
 @KomapperTable("float_data")
 public data class FloatData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Float?
+    @KomapperColumn(alwaysQuote = true) val value: Float?,
 )
 
 @KomapperEntity
 @KomapperTable("instant_data")
 public data class InstantData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Instant?
+    @KomapperColumn(alwaysQuote = true) val value: Instant?,
 )
 
 @KomapperEntity
 @KomapperTable("int_data")
 public data class IntData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Int?
+    @KomapperColumn(alwaysQuote = true) val value: Int?,
 )
 
 @KomapperEntity
 @KomapperTable("local_date_time_data")
 public data class LocalDateTimeData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: LocalDateTime?
+    @KomapperColumn(alwaysQuote = true) val value: LocalDateTime?,
 )
 
 @KomapperEntity
 @KomapperTable("local_date_data")
 public data class LocalDateData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: LocalDate?
+    @KomapperColumn(alwaysQuote = true) val value: LocalDate?,
 )
 
 @KomapperEntity
 @KomapperTable("local_time_data")
 public data class LocalTimeData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: LocalTime?
+    @KomapperColumn(alwaysQuote = true) val value: LocalTime?,
 )
 
 @KomapperEntity
 @KomapperTable("long_data")
 public data class LongData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Long?
+    @KomapperColumn(alwaysQuote = true) val value: Long?,
 )
 
 @KomapperEntity
 @KomapperTable("offset_date_time_data")
 public data class OffsetDateTimeData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: OffsetDateTime?
+    @KomapperColumn(alwaysQuote = true) val value: OffsetDateTime?,
 )
 
 @KomapperEntity
 @KomapperTable("string_data")
 public data class PairOfStringData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Pair<String, String>?
+    @KomapperColumn(alwaysQuote = true) val value: Pair<String, String>?,
 )
 
 @KomapperEntity
 @KomapperTable("string_data")
 public data class PairOfIntData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Pair<Int, Int>?
+    @KomapperColumn(alwaysQuote = true) val value: Pair<Int, Int>?,
 )
 
 @KomapperEntity
 @KomapperTable("period_data")
 public data class PeriodData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Period?
+    @KomapperColumn(alwaysQuote = true) val value: Period?,
 )
 
 @KomapperEntity
 @KomapperTable("short_data")
 public data class ShortData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Short?
+    @KomapperColumn(alwaysQuote = true) val value: Short?,
 )
 
 @KomapperEntity
 @KomapperTable("string_data")
 public data class StringData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: String?
+    @KomapperColumn(alwaysQuote = true) val value: String?,
 )
 
 @KomapperEntity
 @KomapperTable("short_data")
 public data class UByteData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: UByte?
+    @KomapperColumn(alwaysQuote = true) val value: UByte?,
 )
 
 @KomapperEntity
 @KomapperTable("long_data")
 public data class UIntData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: UInt?
+    @KomapperColumn(alwaysQuote = true) val value: UInt?,
 )
 
 @KomapperEntity
 @KomapperTable("int_data")
 public data class UShortData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: UShort?
+    @KomapperColumn(alwaysQuote = true) val value: UShort?,
 )
 
 @KomapperEntity
 @KomapperTable("uuid_data")
 public data class UUIDData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: UUID?
+    @KomapperColumn(alwaysQuote = true) val value: UUID?,
 )
 
 @KomapperEntity
@@ -283,7 +283,7 @@ public data class UnsignedAddress(
 
 @JvmInline
 public value class UIntVersion(
-    @KomapperColumn(alwaysQuote = true) public val value: UInt
+    @KomapperColumn(alwaysQuote = true) public val value: UInt,
 )
 
 @KomapperEntity
@@ -317,7 +317,7 @@ public data class UnsignedSequenceStrategy(
 @KomapperTable("int_data")
 public data class UserDefinedIntData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: UserDefinedInt?
+    @KomapperColumn(alwaysQuote = true) val value: UserDefinedInt?,
 )
 
 public data class UserDefinedInt(val value: Int)
@@ -335,7 +335,7 @@ public data class UserDefinedString(val value: String)
 @KomapperTable("string_data")
 public data class WrappedStringData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: WrappedString?
+    @KomapperColumn(alwaysQuote = true) val value: WrappedString?,
 )
 
 public data class WrappedString(val value: String)

@@ -40,7 +40,7 @@ interface TemplateSelectQueryBuilder : TemplateBinder<TemplateSelectQueryBuilder
      */
     fun <ENTITY : Any> selectAsEntity(
         metamodel: EntityMetamodel<ENTITY, *, *>,
-        strategy: ProjectionType = ProjectionType.INDEX
+        strategy: ProjectionType = ProjectionType.INDEX,
     ): TemplateSelectQuery<ENTITY>
 }
 

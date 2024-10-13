@@ -14,14 +14,14 @@ import org.komapper.annotation.KomapperUpdatedAt
 @KomapperTable("instant_data")
 public data class KotlinInstantData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: Instant
+    @KomapperColumn(alwaysQuote = true) val value: Instant,
 )
 
 @KomapperEntity
 @KomapperTable("local_date_data")
 public data class KotlinLocalDateData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: LocalDate
+    @KomapperColumn(alwaysQuote = true) val value: LocalDate,
 )
 
 @KomapperEntity

@@ -24,7 +24,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @return the query
      */
     fun onDuplicateKeyUpdate(
-        vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()
+        vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray(),
     ): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
 
     /**
@@ -43,7 +43,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @return the query
      */
     fun onDuplicateKeyIgnore(
-        vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()
+        vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray(),
     ): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META>
 
     /**
@@ -125,7 +125,7 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
 ) :
     InsertQueryBuilder<ENTITY, ID, META> {
     override fun onDuplicateKeyUpdate(
-        vararg keys: PropertyMetamodel<ENTITY, *, *>
+        vararg keys: PropertyMetamodel<ENTITY, *, *>,
     ): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
         return InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl(newContext)

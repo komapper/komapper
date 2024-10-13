@@ -53,7 +53,7 @@ interface EntityInsertSingleQuery<ENTITY : Any> : EntityInsertQuery<ENTITY> {
      */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
-        expression2: PropertyMetamodel<ENTITY, B, *>
+        expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityInsertReturningQuery<Pair<A?, B?>>
 
     /**
@@ -67,7 +67,7 @@ interface EntityInsertSingleQuery<ENTITY : Any> : EntityInsertQuery<ENTITY> {
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
-        expression3: PropertyMetamodel<ENTITY, C, *>
+        expression3: PropertyMetamodel<ENTITY, C, *>,
     ): EntityInsertReturningQuery<Triple<A?, B?, C?>>
 
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertSingleQuery<ENTITY>
@@ -103,7 +103,7 @@ interface EntityInsertMultipleQuery<ENTITY : Any> : EntityInsertQuery<List<ENTIT
      */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
-        expression2: PropertyMetamodel<ENTITY, B, *>
+        expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityInsertReturningQuery<List<Pair<A?, B?>>>
 
     /**
@@ -117,7 +117,7 @@ interface EntityInsertMultipleQuery<ENTITY : Any> : EntityInsertQuery<List<ENTIT
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
-        expression3: PropertyMetamodel<ENTITY, C, *>
+        expression3: PropertyMetamodel<ENTITY, C, *>,
     ): EntityInsertReturningQuery<List<Triple<A?, B?, C?>>>
 
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertMultipleQuery<ENTITY>

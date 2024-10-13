@@ -51,7 +51,7 @@ interface EntityDeleteSingleQuery<ENTITY : Any> : EntityDeleteQuery {
      */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
-        expression2: PropertyMetamodel<ENTITY, B, *>
+        expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityDeleteReturningQuery<Pair<A?, B?>?>
 
     /**
@@ -65,7 +65,7 @@ interface EntityDeleteSingleQuery<ENTITY : Any> : EntityDeleteQuery {
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
-        expression3: PropertyMetamodel<ENTITY, C, *>
+        expression3: PropertyMetamodel<ENTITY, C, *>,
     ): EntityDeleteReturningQuery<Triple<A?, B?, C?>?>
 
     override fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteSingleQuery<ENTITY>

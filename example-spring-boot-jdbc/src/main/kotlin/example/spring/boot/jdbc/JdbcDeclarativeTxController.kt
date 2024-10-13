@@ -28,7 +28,7 @@ class JdbcDeclarativeTxController(private val db: JdbcDatabase) {
 
     @GetMapping(value = [""], params = ["text"])
     fun add(
-        @RequestParam text: String
+        @RequestParam text: String,
     ): Message {
         val message = Message(text = text)
         return db.runQuery {
@@ -39,7 +39,7 @@ class JdbcDeclarativeTxController(private val db: JdbcDatabase) {
 
     @DeleteMapping(value = ["/{id}"])
     fun delete(
-        @PathVariable id: Int
+        @PathVariable id: Int,
     ) {
         db.runQuery {
             val m = Meta.message

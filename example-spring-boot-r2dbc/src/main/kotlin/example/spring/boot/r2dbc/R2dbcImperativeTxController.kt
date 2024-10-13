@@ -28,7 +28,7 @@ class R2dbcImperativeTxController(private val db: R2dbcDatabase) {
 
     @GetMapping(value = [""], params = ["text"])
     suspend fun add(
-        @RequestParam text: String
+        @RequestParam text: String,
     ): Message = db.withTransaction {
         val message = Message(text = text)
         db.runQuery {
@@ -39,7 +39,7 @@ class R2dbcImperativeTxController(private val db: R2dbcDatabase) {
 
     @DeleteMapping(value = ["/{id}"])
     suspend fun delete(
-        @PathVariable id: Int
+        @PathVariable id: Int,
     ) = db.withTransaction {
         db.runQuery {
             val m = Meta.message

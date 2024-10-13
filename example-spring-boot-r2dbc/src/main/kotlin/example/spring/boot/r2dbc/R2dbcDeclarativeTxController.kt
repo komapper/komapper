@@ -28,7 +28,7 @@ class R2dbcDeclarativeTxController(private val db: R2dbcDatabase) {
 
     @GetMapping(value = [""], params = ["text"])
     suspend fun add(
-        @RequestParam text: String
+        @RequestParam text: String,
     ): Message {
         val message = Message(text = text)
         return db.runQuery {
@@ -39,7 +39,7 @@ class R2dbcDeclarativeTxController(private val db: R2dbcDatabase) {
 
     @DeleteMapping(value = ["/{id}"])
     suspend fun delete(
-        @PathVariable id: Int
+        @PathVariable id: Int,
     ) {
         db.runQuery {
             val m = Meta.message

@@ -56,7 +56,7 @@ interface RelationDeleteQuery<ENTITY : Any> : Query<Long> {
      */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
-        expression2: PropertyMetamodel<ENTITY, B, *>
+        expression2: PropertyMetamodel<ENTITY, B, *>,
     ): RelationDeleteReturningQuery<List<Pair<A?, B?>>>
 
     /**
@@ -70,7 +70,7 @@ interface RelationDeleteQuery<ENTITY : Any> : Query<Long> {
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
-        expression3: PropertyMetamodel<ENTITY, C, *>
+        expression3: PropertyMetamodel<ENTITY, C, *>,
     ): RelationDeleteReturningQuery<List<Triple<A?, B?, C?>>>
 }
 

@@ -261,6 +261,6 @@ interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
      */
     fun <ENTITY2 : Any> selectAsEntity(
         metamodel: EntityMetamodel<ENTITY2, *, *>,
-        vararg expressions: ColumnExpression<*, *>
+        vararg expressions: ColumnExpression<*, *>,
     ): FlowSubquery<ENTITY2>
 }

@@ -220,7 +220,7 @@ interface QueryDsl {
      * @return the builder
      */
     fun fromTemplate(
-        @Language("sql") sql: String
+        @Language("sql") sql: String,
     ): TemplateSelectQueryBuilder
 
     /**
@@ -230,7 +230,7 @@ interface QueryDsl {
      * @return the query
      */
     fun executeTemplate(
-        @Language("sql") sql: String
+        @Language("sql") sql: String,
     ): TemplateExecuteQuery
 
     /**
@@ -239,7 +239,7 @@ interface QueryDsl {
      * @param sql the script to execute
      */
     fun executeScript(
-        @Language("sql") sql: String
+        @Language("sql") sql: String,
     ): ScriptExecuteQuery
 
     /**
@@ -371,19 +371,19 @@ internal class QueryDslImpl(
     }
 
     override fun fromTemplate(
-        @Language("sql") sql: String
+        @Language("sql") sql: String,
     ): TemplateSelectQueryBuilder {
         return TemplateSelectQueryBuilderImpl(TemplateSelectContext(sql, options = templateSelectOptions))
     }
 
     override fun executeTemplate(
-        @Language("sql") sql: String
+        @Language("sql") sql: String,
     ): TemplateExecuteQuery {
         return TemplateExecuteQueryImpl(TemplateExecuteContext(sql, options = templateExecuteOptions))
     }
 
     override fun executeScript(
-        @Language("sql") sql: String
+        @Language("sql") sql: String,
     ): ScriptExecuteQuery {
         return ScriptExecuteQueryImpl(ScriptContext(sql, options = scriptOptions))
     }

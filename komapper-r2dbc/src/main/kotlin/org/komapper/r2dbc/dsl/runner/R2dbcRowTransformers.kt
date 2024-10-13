@@ -12,7 +12,7 @@ internal object R2dbcRowTransformers {
     fun <ENTITY : Any> singleEntity(
         metamodel: EntityMetamodel<ENTITY, *, *>,
         columns: List<ColumnExpression<*, *>> = emptyList(),
-        strategy: ProjectionType = ProjectionType.INDEX
+        strategy: ProjectionType = ProjectionType.INDEX,
     ): (R2dbcDataOperator, Row) -> ENTITY =
         { dataOperator, row ->
             val mapper = R2dbcEntityMapper(strategy, dataOperator, row)

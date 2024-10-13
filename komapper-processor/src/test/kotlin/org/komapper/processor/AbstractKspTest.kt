@@ -22,7 +22,7 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
 
     protected fun compile(
         @Language("kotlin") contents: String,
-        vararg additionalProviders: SymbolProcessorProvider
+        vararg additionalProviders: SymbolProcessorProvider,
     ): JvmCompilationResult {
         val sourceFile = SourceFile.kotlin("source.kt", contents)
         val providers = providers.toList() + additionalProviders
@@ -43,7 +43,7 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
 
     protected fun compile(
         @Language("kotlin") contents: String,
-        block: (SymbolProcessorEnvironment, Resolver) -> List<KSAnnotated>
+        block: (SymbolProcessorEnvironment, Resolver) -> List<KSAnnotated>,
     ): JvmCompilationResult {
         val provider = SymbolProcessorProvider { env ->
             object : SymbolProcessor {
