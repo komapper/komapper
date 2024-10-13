@@ -1,15 +1,14 @@
 package org.komapper.quarkus.jdbc
 
-import org.komapper.tx.core.TransactionOperator
-import org.komapper.tx.core.TransactionProperty
 import jakarta.transaction.Status
 import jakarta.transaction.TransactionManager
+import org.komapper.tx.core.TransactionOperator
+import org.komapper.tx.core.TransactionProperty
 
 internal class QuarkusJdbcTransactionOperator(private val transactionManager: TransactionManager) : TransactionOperator {
-
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
             block(this)
@@ -20,7 +19,7 @@ internal class QuarkusJdbcTransactionOperator(private val transactionManager: Tr
 
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
             val tx = transactionManager.suspend()
@@ -31,7 +30,7 @@ internal class QuarkusJdbcTransactionOperator(private val transactionManager: Tr
             }.onFailure { cause ->
                 runCatching {
                     transactionManager.resume(tx)
-                }.onFailure { 
+                }.onFailure {
                     cause.addSuppressed(it)
                 }
             }.getOrThrow()

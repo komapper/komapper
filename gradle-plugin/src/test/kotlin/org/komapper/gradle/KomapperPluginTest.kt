@@ -9,7 +9,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class KomapperPluginTest {
-
     @JvmField
     @TempDir
     var testProjectDir: File? = null

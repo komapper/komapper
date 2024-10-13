@@ -28,7 +28,8 @@ class CodeGeneratorTest {
         }
 
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             data class Address (
@@ -51,7 +52,7 @@ class CodeGeneratorTest {
                 val `val`: String,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -68,7 +69,8 @@ class CodeGeneratorTest {
             generator.generateEntities(writer, true, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             data class Address (
@@ -91,7 +93,7 @@ class CodeGeneratorTest {
                 val `val`: String?,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -108,7 +110,8 @@ class CodeGeneratorTest {
             generator.generateEntities(writer, false, true, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             import org.komapper.annotation.KomapperAutoIncrement
@@ -143,7 +146,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VAL") val `val`: String,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -161,7 +164,8 @@ class CodeGeneratorTest {
         }
 
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             data class Address (
@@ -184,7 +188,7 @@ class CodeGeneratorTest {
                 val `val`: String,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -201,7 +205,8 @@ class CodeGeneratorTest {
             generator.generateDefinitions(writer, false, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             import org.komapper.annotation.KomapperAutoIncrement
@@ -236,7 +241,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VAL") val `val`: Nothing,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -253,7 +258,8 @@ class CodeGeneratorTest {
             generator.generateDefinitions(writer, false, false, false, "version", "createdAt", "updatedAt")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             import org.komapper.annotation.KomapperAutoIncrement
@@ -291,7 +297,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VAL") val `val`: Nothing,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -308,7 +314,8 @@ class CodeGeneratorTest {
             generator.generateDefinitions(writer, false, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             import org.komapper.annotation.KomapperAutoIncrement
@@ -343,7 +350,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VAL") val `val`: Nothing,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -360,7 +367,8 @@ class CodeGeneratorTest {
             generator.generateDefinitions(writer, true, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
-        val expected = """
+        val expected =
+            """
             package entity
             
             import org.komapper.annotation.KomapperAutoIncrement
@@ -395,7 +403,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VAL") val `val`: Nothing,
             )
             
-        """.trimIndent().normalizeLineSeparator()
+            """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -486,7 +494,7 @@ class CodeGeneratorTest {
         tables[0].name = "ADDRESSES"
         tables[1].name = "EMPLOYEES"
         tables[2].name = "CLASSES"
-        return tables;
+        return tables
     }
 
     private fun String.normalizeLineSeparator(): String =

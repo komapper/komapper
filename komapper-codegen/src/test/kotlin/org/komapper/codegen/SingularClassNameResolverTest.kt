@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SingularClassNameResolverTest {
-
     private val converter = SingularClassNameResolver("", "")
 
     @Test
