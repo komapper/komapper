@@ -13,7 +13,6 @@ import integration.core.identityStrategy
 import integration.core.man
 import integration.core.person
 import org.junit.jupiter.api.TestInfo
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
@@ -293,7 +292,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
             IdentityStrategy(null, "CCC"),
         )
         val query = QueryDsl.insert(i).onDuplicateKeyUpdate().multiple(strategies)
-        assertThrows<UnsupportedOperationException> {
+        assertFailsWith<UnsupportedOperationException> {
             db.runQuery { query }
             Unit
         }

@@ -2,7 +2,6 @@ package org.komapper.processor.command
 
 import com.tschuchort.compiletesting.KotlinCompilation
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.template.sql.SqlException
 import org.komapper.processor.AbstractKspTest
 import org.komapper.processor.Config
@@ -11,6 +10,7 @@ import org.komapper.processor.ContextFactory
 import org.komapper.processor.getClassDeclaration
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @Tag("slow")
 class SqlReassemblerTest : AbstractKspTest() {
@@ -257,7 +257,7 @@ class SqlReassemblerTest : AbstractKspTest() {
                     dept
                 /*> orderBy */
                 """.trimIndent()
-            val e = assertThrows<SqlException> {
+            val e = assertFailsWith<SqlException> {
                 SqlReassembler(context, sql, emptyMap()).assemble()
             }
             println(e)
@@ -285,7 +285,7 @@ class SqlReassemblerTest : AbstractKspTest() {
                     dept
                 /*> orderBy */
                 """.trimIndent()
-            val e = assertThrows<SqlReassembler.SqlPartialAnnotationNotFoundException> {
+            val e = assertFailsWith<SqlReassembler.SqlPartialAnnotationNotFoundException> {
                 SqlReassembler(context, sql, mapOf("orderBy" to orderByType)).assemble()
             }
             println(e)

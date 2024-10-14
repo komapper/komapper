@@ -1,13 +1,13 @@
 package integration.jdbc.postgresql
 
 import integration.jdbc.JdbcEnv
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.reflect.typeOf
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)

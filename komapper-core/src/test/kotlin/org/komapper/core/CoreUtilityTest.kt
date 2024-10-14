@@ -1,10 +1,10 @@
 package org.komapper.core
 
-import org.junit.jupiter.api.assertThrows
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class CoreUtilityTest {
     @Test
@@ -14,7 +14,7 @@ class CoreUtilityTest {
 
     @Test
     fun mustNotBeMarkedNullable_nullable() {
-        val th = assertThrows<IllegalStateException> {
+        val th = assertFailsWith<IllegalStateException> {
             MyData.nullable.mustNotBeMarkedNullable(MyData::class.qualifiedName, "nullable")
         }
         val expected = "The 'nullable' property of 'org.komapper.core.MyData' must not be marked as nullable: java.lang.String? (Kotlin reflection is not available)"

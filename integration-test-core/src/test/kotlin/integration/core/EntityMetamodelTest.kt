@@ -1,10 +1,10 @@
 package integration.core
 
-import org.junit.jupiter.api.Assertions.assertNull
 import org.komapper.core.dsl.Meta
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 
 class EntityMetamodelTest {
     @Test

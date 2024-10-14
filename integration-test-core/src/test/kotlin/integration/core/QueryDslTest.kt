@@ -1,6 +1,5 @@
 package integration.core
 
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.options.DeleteOptions
@@ -14,6 +13,7 @@ import org.komapper.core.dsl.options.UpdateOptions
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 
 class QueryDslTest {
     @Test

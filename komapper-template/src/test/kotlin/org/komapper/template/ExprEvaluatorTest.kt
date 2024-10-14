@@ -1,7 +1,6 @@
 package org.komapper.template
 
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
 import org.komapper.core.template.expression.ExprContext
@@ -241,7 +240,7 @@ class ExprEvaluatorTest {
         @Test
         fun as2() {
             val ctx = ExprContext(mapOf("a" to Value(Color.Red, typeOf<Color.Red>())), extensions)
-            val ex = assertThrows<TypeCastException> {
+            val ex = assertFailsWith<TypeCastException> {
                 evaluator.eval("a as @org.komapper.template.ExprEvaluatorTest@", ctx)
             }
             println(ex)

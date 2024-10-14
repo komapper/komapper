@@ -1,8 +1,8 @@
 package integration.jdbc
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 @ExtendWith(JdbcEnv::class)

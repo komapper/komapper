@@ -2,9 +2,9 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.IsolationLevel
 import io.r2dbc.spi.TransactionDefinition
-import org.junit.jupiter.api.Test
 import org.komapper.tx.core.TransactionProperty
 import java.time.Duration
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
