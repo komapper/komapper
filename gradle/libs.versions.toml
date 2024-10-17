@@ -35,7 +35,7 @@ r2dbc-postgresql = { module = "org.postgresql:r2dbc-postgresql", version = "1.0.
 r2dbc-sqlserver = { module = "io.r2dbc:r2dbc-mssql", version = "1.0.0.RELEASE" }
 
 r2dbc-spi = { module = "io.r2dbc:r2dbc-spi", version = "1.0.0.RELEASE" }
-r2dbc-pool = { module = "io.r2dbc:r2dbc-pool", version = "1.0.1.RELEASE" }
+r2dbc-pool = { module = "io.r2dbc:r2dbc-pool", version = "1.0.2.RELEASE" }
 
 annotations = { module = "org.jetbrains:annotations", version = "26.0.1" }
 pluralize = { module = "io.github.encryptorcode:pluralize", version = "1.0.0" }
