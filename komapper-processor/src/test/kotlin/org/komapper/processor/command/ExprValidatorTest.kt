@@ -6,7 +6,6 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Variance
 import com.tschuchort.compiletesting.KotlinCompilation
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.assertThrows
 import org.komapper.processor.AbstractKspTest
 import org.komapper.processor.Config
 import org.komapper.processor.Context
@@ -14,6 +13,7 @@ import org.komapper.processor.ContextFactory
 import org.komapper.processor.getClassDeclaration
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @Tag("slow")
 class ExprValidatorTest : AbstractKspTest() {
@@ -43,7 +43,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to resolver.builtIns.intType)
-            val ex = assertThrows<ExprValidator.NonBooleanTypeException> {
+            val ex = assertFailsWith<ExprValidator.NonBooleanTypeException> {
                 validator.validate("!a", paramMap)
             }
             println(ex)
@@ -80,7 +80,7 @@ class ExprValidatorTest : AbstractKspTest() {
                 "b" to resolver.builtIns.booleanType,
                 "c" to resolver.builtIns.stringType,
             )
-            val ex = assertThrows<ExprValidator.EitherOperandNonBooleanException> {
+            val ex = assertFailsWith<ExprValidator.EitherOperandNonBooleanException> {
                 validator.validate("(a || b) && c", paramMap)
             }
             println(ex)
@@ -110,7 +110,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to resolver.builtIns.intType.makeNullable())
-            val ex = assertThrows<ExprValidator.NonSameTypeException> {
+            val ex = assertFailsWith<ExprValidator.NonSameTypeException> {
                 validator.validate("1 < a", paramMap)
             }
             println(ex)
@@ -126,7 +126,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to resolver.builtIns.intType.makeNullable())
-            val ex = assertThrows<ExprValidator.NonComparableTypeException> {
+            val ex = assertFailsWith<ExprValidator.NonComparableTypeException> {
                 validator.validate("a < a", paramMap)
             }
             println(ex)
@@ -158,7 +158,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val classDeclaration = context.getClassDeclaration("org.komapper.processor.command.ExprValidatorTest.Color.Red") { error(it) }
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to classDeclaration.asType(emptyList()))
-            val ex = assertThrows<ExprValidator.NotClassRefNodeException> {
+            val ex = assertFailsWith<ExprValidator.NotClassRefNodeException> {
                 validator.validate("a is 123", paramMap)
             }
             println(ex)
@@ -188,7 +188,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = emptyMap<String, KSType>()
-            val ex = assertThrows<ExprValidator.ClassNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.ClassNotFoundException> {
                 validator.validate("@kotlin.collections.Unknown@", paramMap)
             }
             println(ex)
@@ -204,7 +204,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = emptyMap<String, KSType>()
-            val ex = assertThrows<ExprValidator.ParameterNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.ParameterNotFoundException> {
                 validator.validate("unknown", paramMap)
             }
             println(ex)
@@ -237,7 +237,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to context.resolver.builtIns.intType)
-            val ex = assertThrows<ExprValidator.InvokeFunctionNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.InvokeFunctionNotFoundException> {
                 validator.validate("a()", paramMap)
             }
             println(ex)
@@ -256,7 +256,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
             val function0Type = context.getClassDeclaration("kotlin.Function0") { error(it) }.asType(listOf(typeArg))
             val paramMap = mapOf("a" to function0Type)
-            val ex = assertThrows<ExprValidator.ArgumentCountMismatchException> {
+            val ex = assertFailsWith<ExprValidator.ArgumentCountMismatchException> {
                 validator.validate("a(1)", paramMap)
             }
             println(ex)
@@ -286,7 +286,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to resolver.builtIns.stringType)
-            val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.PropertyNotFoundException> {
                 validator.validate("a.unknown", paramMap)
             }
             println(ex)
@@ -338,7 +338,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val decl = context.getClassDeclaration("test.MyClass") { error(it) }
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to decl.asType(emptyList()))
-            val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.PropertyNotFoundException> {
                 validator.validate("a.myEnum.unknown", paramMap)
             }
             println(ex)
@@ -396,7 +396,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val classDecl = context.getClassDeclaration("test.MyClass") { error(it) }
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to classDecl.asType(emptyList()))
-            val ex = assertThrows<ExprValidator.PropertyNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.PropertyNotFoundException> {
                 validator.validate("a.myEnum.D", paramMap)
             }
             println(ex)
@@ -427,7 +427,7 @@ class ExprValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val validator = ExprValidator(context)
             val paramMap = mapOf("a" to resolver.builtIns.stringType)
-            val ex = assertThrows<ExprValidator.FunctionNotFoundException> {
+            val ex = assertFailsWith<ExprValidator.FunctionNotFoundException> {
                 validator.validate("a.subSequence(0)", paramMap)
             }
             println(ex)

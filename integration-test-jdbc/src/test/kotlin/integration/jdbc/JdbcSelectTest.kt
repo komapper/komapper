@@ -13,7 +13,6 @@ import integration.core.employee
 import integration.core.location
 import integration.core.robot
 import kotlinx.coroutines.flow.count
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
@@ -38,6 +37,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -254,7 +254,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
-        assertThrows<OptimisticLockException> {
+        assertFailsWith<OptimisticLockException> {
             db.runQuery { QueryDsl.update(a2).single(address) }.run { }
         }
     }
@@ -275,7 +275,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
-        assertThrows<OptimisticLockException> {
+        assertFailsWith<OptimisticLockException> {
             db.runQuery { QueryDsl.delete(a2).single(address) }
         }
     }
@@ -360,7 +360,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
     @Test
     fun options() {
         val myDsl = QueryDsl(selectOptions = SelectOptions(allowMissingWhereClause = false))
-        val e = assertThrows<IllegalStateException> {
+        val e = assertFailsWith<IllegalStateException> {
             db.runQuery {
                 myDsl.select(literal("hello")).single()
             }

@@ -1,7 +1,6 @@
 package org.komapper.template
 
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.BuilderDialect
 import org.komapper.core.DryRunDataOperator
 import org.komapper.core.DryRunDialect
@@ -391,7 +390,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun test_null() {
             val template =
                 "select name, age from person where /*%with item*/name = /*description*/'' and age = /*a.b.c*/0/*%end*/"
-            val e = assertThrows<SqlException> {
+            val e = assertFailsWith<SqlException> {
                 statementBuilder.build(
                     template,
                     mapOf(

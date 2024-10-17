@@ -10,7 +10,6 @@ import integration.core.identityStrategy
 import integration.core.person
 import integration.core.robot
 import integration.core.sequenceStrategy
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -23,6 +22,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -214,8 +214,8 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         assertNull(key)
         val sql = query.dryRun(db.config)
-        Assertions.assertFalse(sql.sql.contains("hiredate"))
-        Assertions.assertFalse(sql.sql.contains("salary"))
+        assertFalse(sql.sql.contains("hiredate"))
+        assertFalse(sql.sql.contains("salary"))
     }
 
     @Test
@@ -233,7 +233,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         assertNull(key)
         val sql = query.dryRun(db.config)
-        Assertions.assertFalse(sql.sql.contains("hiredate"))
+        assertFalse(sql.sql.contains("hiredate"))
         assertTrue(sql.sql.contains("salary"))
     }
 }

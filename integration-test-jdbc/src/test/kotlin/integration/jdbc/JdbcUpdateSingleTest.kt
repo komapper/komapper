@@ -9,7 +9,6 @@ import integration.core.idColumnOnlyAddress
 import integration.core.man
 import integration.core.noVersionDepartment
 import integration.core.person
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
@@ -230,7 +229,7 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
         val a = Meta.idColumnOnlyAddress
         val query = QueryDsl.from(a).limit(1)
         val address = db.runQuery { query.single() }
-        val ex = assertThrows<IllegalArgumentException> {
+        val ex = assertFailsWith<IllegalArgumentException> {
             val updateQuery = QueryDsl.update(a).single(address)
             db.runQuery { updateQuery }.run { }
         }

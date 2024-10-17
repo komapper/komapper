@@ -9,7 +9,6 @@ import integration.core.department
 import integration.core.idColumnOnlyAddress
 import integration.core.man
 import integration.core.person
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
@@ -202,7 +201,7 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
         val a = Meta.idColumnOnlyAddress
         val query = QueryDsl.from(a)
         val address: List<IdColumnOnlyAddress> = db.runQuery { query }
-        val ex = assertThrows<IllegalArgumentException> {
+        val ex = assertFailsWith<IllegalArgumentException> {
             val updateQuery = QueryDsl.update(a).batch(address)
             db.runQuery { updateQuery }.run { }
         }

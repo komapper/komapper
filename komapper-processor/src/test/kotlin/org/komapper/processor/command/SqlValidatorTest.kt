@@ -4,13 +4,13 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Variance
 import com.tschuchort.compiletesting.KotlinCompilation
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.assertThrows
 import org.komapper.processor.AbstractKspTest
 import org.komapper.processor.Config
 import org.komapper.processor.Context
 import org.komapper.processor.ContextFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @Tag("slow")
 class SqlValidatorTest : AbstractKspTest() {
@@ -38,7 +38,7 @@ class SqlValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val sql = "/* items */(1, 2, 3)"
             val paramMap = mapOf("items" to resolver.builtIns.intType)
-            val ex = assertThrows<SqlValidator.ExprMustBeIterableException> {
+            val ex = assertFailsWith<SqlValidator.ExprMustBeIterableException> {
                 SqlValidator(context, sql, paramMap).validate()
             }
             println(ex)
@@ -68,7 +68,7 @@ class SqlValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val sql = "/*%if a */ /*%end */"
             val paramMap = mapOf("a" to resolver.builtIns.stringType)
-            val ex = assertThrows<SqlValidator.ExprMustBeBooleanException> {
+            val ex = assertFailsWith<SqlValidator.ExprMustBeBooleanException> {
                 SqlValidator(context, sql, paramMap).validate()
             }
             println(ex)
@@ -98,7 +98,7 @@ class SqlValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val sql = "/*%if a */ /*%elseif b */ /*%end */"
             val paramMap = mapOf("a" to resolver.builtIns.booleanType, "b" to resolver.builtIns.stringType)
-            val ex = assertThrows<SqlValidator.ExprMustBeBooleanException> {
+            val ex = assertFailsWith<SqlValidator.ExprMustBeBooleanException> {
                 SqlValidator(context, sql, paramMap).validate()
             }
             println(ex)
@@ -150,7 +150,7 @@ class SqlValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val sql = "/*%for item in items */ /*%end */"
             val paramMap = mapOf("items" to resolver.builtIns.stringType)
-            val ex = assertThrows<SqlValidator.ExprMustBeIterableException> {
+            val ex = assertFailsWith<SqlValidator.ExprMustBeIterableException> {
                 SqlValidator(context, sql, paramMap).validate()
             }
             println(ex)
@@ -166,7 +166,7 @@ class SqlValidatorTest : AbstractKspTest() {
             val context = ContextFactory { Context(env, Config.create(env.options), it) }.create(resolver)
             val sql = "/*%for item in items */ /*%end */"
             val paramMap = mapOf("items" to resolver.builtIns.iterableType)
-            val ex = assertThrows<SqlValidator.StarProjectionNotSupportedException> {
+            val ex = assertFailsWith<SqlValidator.StarProjectionNotSupportedException> {
                 SqlValidator(context, sql, paramMap).validate()
             }
             println(ex)
