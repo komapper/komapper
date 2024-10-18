@@ -3,6 +3,7 @@ package integration.r2dbc
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import integration.core.site
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
@@ -80,6 +81,21 @@ class R2dbcDeleteSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(Triple(address.street, address.version, address.addressId), triple)
         val address2 = db.runQuery { query.firstOrNull() }
         assertNull(address2)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun testReturningSingleColumn_null(info: TestInfo) = inTransaction(db, info) {
+        val s = Meta.site
+        val query = QueryDsl.from(s).where { s.id eq 15 }
+        val site = db.runQuery { query.first() }
+        db.runQuery { QueryDsl.update(s).single(site.copy(street = null)) }
+        val site2 = db.runQuery { query.first() }
+        assertNull(site2.street)
+        val street = db.runQuery { QueryDsl.delete(s).single(site2).returning(s.street) }
+        assertNull(street)
+        val site3 = db.runQuery { query.firstOrNull() }
+        assertNull(site3)
     }
 
     @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])

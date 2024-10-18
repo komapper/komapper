@@ -383,3 +383,13 @@ public data class DepartmentDto(
 
 @KomapperProjectionDef(DepartmentDto::class)
 public object DepartmentDtoDef
+
+@KomapperEntity
+@KomapperTable(name = "address")
+public data class Site(
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val id: Int,
+    val street: String?,
+    @KomapperVersion val version: Int,
+)

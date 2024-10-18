@@ -1,6 +1,7 @@
 package org.komapper.jdbc.dsl.runner
 
-import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityUpdateContext
@@ -27,24 +28,26 @@ internal class JdbcEntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, MET
 
     override fun run(config: JdbcDatabaseConfig): T? {
         val newEntity = preUpdate(config, entity)
-        return update(config, newEntity).also {
-            postUpdate(it)
-        }
+        val result = update(config, newEntity)
+        postUpdate(result.size.toLong())
+        return result.singleOrNull()
     }
 
     private fun preUpdate(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         return runner.preUpdate(config, entity)
     }
 
-    private fun update(config: JdbcDatabaseConfig, entity: ENTITY): T? {
+    private fun update(config: JdbcDatabaseConfig, entity: ENTITY): List<T?> {
         val statement = runner.buildStatement(config, entity)
         return support.update(config) { executor ->
-            executor.executeReturning(statement, transform) { it.singleOrNull() }
+            executor.executeReturning(statement, transform) { flow ->
+                flow.take(1).toList()
+            }
         }
     }
 
-    private fun postUpdate(result: Any?) {
-        runner.postUpdate(result)
+    private fun postUpdate(count: Long) {
+        runner.postUpdate(count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

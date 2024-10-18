@@ -1,6 +1,8 @@
 package org.komapper.jdbc.dsl.runner
 
 import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityDeleteContext
@@ -27,15 +29,16 @@ internal class JdbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, MET
 
     override fun run(config: JdbcDatabaseConfig): T? {
         val result = delete(config)
-        val count = if (result == null) 0L else 1L
-        postDelete(count)
-        return result
+        postDelete(result.size.toLong())
+        return result.singleOrNull()
     }
 
-    private fun delete(config: JdbcDatabaseConfig): T? {
+    private fun delete(config: JdbcDatabaseConfig): List<T?> {
         val statement = runner.buildStatement(config)
         return support.delete(config) { executor ->
-            executor.executeReturning(statement, transform) { it.singleOrNull() }
+            executor.executeReturning(statement, transform) { flow ->
+                flow.take(1).toList()
+            }
         }
     }
 
