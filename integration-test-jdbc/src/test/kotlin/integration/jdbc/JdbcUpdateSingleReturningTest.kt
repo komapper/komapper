@@ -3,7 +3,9 @@ package integration.jdbc
 import integration.core.Address
 import integration.core.Dbms
 import integration.core.Run
+import integration.core.Site
 import integration.core.address
+import integration.core.site
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
@@ -98,6 +100,26 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
                 2,
             ),
             address2,
+        )
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun testReturningSingleColumn_null() {
+        val s = Meta.site
+        val query = QueryDsl.from(s).where { s.id eq 15 }
+        val site = db.runQuery { query.first() }
+        val newSite = site.copy(street = null)
+        val street = db.runQuery { QueryDsl.update(s).single(newSite).returning(s.street) }
+        val site2 = db.runQuery { query.firstOrNull() }
+        assertNull(street)
+        assertEquals(
+            Site(
+                15,
+                null,
+                2,
+            ),
+            site2,
         )
     }
 
