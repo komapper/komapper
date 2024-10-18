@@ -2,11 +2,14 @@ package integration.jdbc
 
 import integration.core.Address
 import integration.core.Dbms
+import integration.core.Person
 import integration.core.Run
 import integration.core.Site
 import integration.core.address
+import integration.core.person
 import integration.core.site
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dryRunQuery
@@ -175,5 +178,30 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         val address = Address(addressId = 1, street = "STREET 123", version = 0)
         val query = QueryDsl.update(a).single(address).returning()
         println(db.dryRunQuery(query))
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun throwEntityNotFoundException() {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.update(p).single(person).returning() }
+            Unit
+        }
+        println(ex)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun suppressEntityNotFoundException() {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val result = db.runQuery {
+            QueryDsl.update(p).single(person).returning().options {
+                it.copy(suppressEntityNotFoundException = true)
+            }
+        }
+        assertNull(result)
     }
 }
