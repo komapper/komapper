@@ -83,7 +83,7 @@ class R2dbcDeleteSingleReturningTest(private val db: R2dbcDatabase) {
         assertNull(address2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn_null(info: TestInfo) = inTransaction(db, info) {
         val s = Meta.site

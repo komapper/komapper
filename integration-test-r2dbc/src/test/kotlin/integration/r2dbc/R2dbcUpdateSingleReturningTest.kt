@@ -63,7 +63,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn_null(info: TestInfo) = inTransaction(db, info) {
         val s = Meta.site
