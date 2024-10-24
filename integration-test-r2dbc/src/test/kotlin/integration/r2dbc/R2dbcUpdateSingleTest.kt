@@ -12,6 +12,7 @@ import integration.core.robot
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
@@ -214,5 +215,28 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
                     .single(department2)
             }.let { }
         }
+    }
+
+    @Test
+    fun throwEntityNotFoundException(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.update(p).single(person) }
+            Unit
+        }
+        println(ex)
+    }
+
+    @Test
+    fun suppressEntityNotFoundException(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val result = db.runQuery {
+            QueryDsl.update(p).single(person).options {
+                it.copy(suppressEntityNotFoundException = true)
+            }
+        }
+        assertNotNull(result)
     }
 }

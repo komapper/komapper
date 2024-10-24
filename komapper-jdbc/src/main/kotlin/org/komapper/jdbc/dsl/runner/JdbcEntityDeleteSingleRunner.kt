@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    entity: ENTITY,
+    private val entity: ENTITY,
 ) : JdbcRunner<Unit> {
     private val runner: EntityDeleteSingleRunner<ENTITY, ID, META> =
         EntityDeleteSingleRunner(context, entity)
@@ -23,7 +23,7 @@ internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : Entit
 
     override fun run(config: JdbcDatabaseConfig) {
         val (count) = delete(config)
-        postDelete(count)
+        postDelete(entity, count)
     }
 
     private fun delete(config: JdbcDatabaseConfig): Pair<Long, List<Long>> {
@@ -31,8 +31,8 @@ internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : Entit
         return support.delete(config) { it.executeUpdate(statement) }
     }
 
-    private fun postDelete(count: Long) {
-        runner.postDelete(count)
+    private fun postDelete(entity: ENTITY, count: Long) {
+        runner.postDelete(entity, count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

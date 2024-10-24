@@ -2,10 +2,13 @@ package integration.r2dbc
 
 import integration.core.Address
 import integration.core.Dbms
+import integration.core.Person
 import integration.core.Run
 import integration.core.address
+import integration.core.person
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -109,6 +112,55 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
                 .options {
                     it.copy(suppressOptimisticLockException = true)
                 }
+        }
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun throwEntityNotFoundException(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.person
+        val people = listOf(
+            Person(1, "aaa"),
+            Person(2, "bbb"),
+            Person(3, "ccc")
+        )
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.delete(p).batch(people) }
+        }
+        println(ex)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun throwEntityNotFoundException_at_index_2(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.person
+        db.runQuery {
+            QueryDsl.insert(p).multiple(
+                Person(1, "aaa"),
+                Person(2, "bbb")
+            )
+        }
+        val people = db.runQuery { QueryDsl.from(p).orderBy(p.personId) }
+        assertEquals(2, people.size)
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.delete(p).batch(people + listOf(Person(3, "ccc"))) }
+        }
+        println(ex)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun suppressEntityNotFoundException(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.person
+        val people = listOf(
+            Person(1, "aaa"),
+            Person(2, "bbb"),
+            Person(3, "ccc")
+        )
+        db.runQuery {
+            QueryDsl.delete(p).batch(people).options {
+                it.copy(suppressEntityNotFoundException = true)
+            }
         }
     }
 }

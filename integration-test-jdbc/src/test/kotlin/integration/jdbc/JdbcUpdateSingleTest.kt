@@ -11,6 +11,7 @@ import integration.core.noVersionDepartment
 import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
@@ -234,5 +235,28 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
             db.runQuery { updateQuery }.run { }
         }
         println(ex)
+    }
+
+    @Test
+    fun throwEntityNotFoundException() {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.update(p).single(person) }
+            Unit
+        }
+        println(ex)
+    }
+
+    @Test
+    fun suppressEntityNotFoundException() {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val result = db.runQuery {
+            QueryDsl.update(p).single(person).options {
+                it.copy(suppressEntityNotFoundException = true)
+            }
+        }
+        assertNotNull(result)
     }
 }

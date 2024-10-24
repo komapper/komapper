@@ -29,7 +29,7 @@ internal class JdbcEntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, MET
     override fun run(config: JdbcDatabaseConfig): T? {
         val newEntity = preUpdate(config, entity)
         val result = update(config, newEntity)
-        postUpdate(result.size.toLong())
+        postUpdate(newEntity, result.size.toLong())
         return result.singleOrNull()
     }
 
@@ -46,8 +46,8 @@ internal class JdbcEntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, MET
         }
     }
 
-    private fun postUpdate(count: Long) {
-        runner.postUpdate(count)
+    private fun postUpdate(entity: ENTITY, count: Long) {
+        runner.postUpdate(entity, count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

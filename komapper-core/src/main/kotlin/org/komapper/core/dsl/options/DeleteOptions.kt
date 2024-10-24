@@ -8,7 +8,8 @@ data class DeleteOptions(
     override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
     override val suppressLogging: Boolean = DEFAULT.suppressLogging,
     override val suppressOptimisticLockException: Boolean = DEFAULT.suppressOptimisticLockException,
-) : BatchOptions, OptimisticLockOptions, WhereOptions {
+    override val suppressEntityNotFoundException: Boolean = DEFAULT.suppressEntityNotFoundException,
+) : BatchOptions, OptimisticLockOptions, MutationOptions, WhereOptions {
     companion object {
         val DEFAULT = DeleteOptions(
             allowMissingWhereClause = false,
@@ -18,6 +19,7 @@ data class DeleteOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false,
             suppressOptimisticLockException = false,
+            suppressEntityNotFoundException = false,
         )
     }
 }

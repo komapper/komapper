@@ -14,7 +14,7 @@ import java.sql.ResultSet
 
 internal class JdbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    entity: ENTITY,
+    private val entity: ENTITY,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
 ) : JdbcRunner<T?> {
     private val runner: EntityDeleteSingleReturningRunner<ENTITY, ID, META> =
@@ -29,7 +29,7 @@ internal class JdbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, MET
 
     override fun run(config: JdbcDatabaseConfig): T? {
         val result = delete(config)
-        postDelete(result.size.toLong())
+        postDelete(entity, result.size.toLong())
         return result.singleOrNull()
     }
 
@@ -42,8 +42,8 @@ internal class JdbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, MET
         }
     }
 
-    private fun postDelete(count: Long) {
-        runner.postDelete(count)
+    private fun postDelete(entity: ENTITY, count: Long) {
+        runner.postDelete(entity, count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

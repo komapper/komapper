@@ -1,8 +1,11 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.Person
 import integration.core.address
+import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -35,5 +38,26 @@ class JdbcDeleteSingleTest(private val db: JdbcDatabase) {
         val address = db.runQuery { query.first() }
         db.runQuery { QueryDsl.delete(a).single(address) }
         assertEquals(emptyList<Address>(), db.runQuery { query })
+    }
+
+    @Test
+    fun throwEntityNotFoundException() {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.delete(p).single(person) }
+        }
+        println(ex)
+    }
+
+    @Test
+    fun suppressEntityNotFoundException() {
+        val p = Meta.person
+        val person = Person(1, "aaa")
+        db.runQuery {
+            QueryDsl.delete(p).single(person).options {
+                it.copy(suppressEntityNotFoundException = true)
+            }
+        }
     }
 }

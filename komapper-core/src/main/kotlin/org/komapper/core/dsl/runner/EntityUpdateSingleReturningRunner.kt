@@ -29,9 +29,11 @@ class EntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
         return runner.preUpdate(config, entity)
     }
 
-    fun postUpdate(count: Long) {
+    fun postUpdate(entity: ENTITY, count: Long) {
         if (context.target.versionProperty() != null) {
             checkOptimisticLock(context.options, count, null)
+        } else {
+            checkEntityExistence(context.options, entity, count, null)
         }
     }
 }

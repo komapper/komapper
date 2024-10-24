@@ -14,7 +14,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    entity: ENTITY,
+    private val entity: ENTITY,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcRunner<T?> {
     private val runner: EntityDeleteSingleReturningRunner<ENTITY, ID, META> =
@@ -29,7 +29,7 @@ internal class R2dbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, ME
 
     override suspend fun run(config: R2dbcDatabaseConfig): T? {
         val result = delete(config)
-        postDelete(result.size.toLong())
+        postDelete(entity, result.size.toLong())
         return result.singleOrNull()
     }
 
@@ -41,8 +41,8 @@ internal class R2dbcEntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, ME
         }
     }
 
-    private fun postDelete(count: Long) {
-        runner.postDelete(count)
+    private fun postDelete(entity: ENTITY, count: Long) {
+        runner.postDelete(entity, count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

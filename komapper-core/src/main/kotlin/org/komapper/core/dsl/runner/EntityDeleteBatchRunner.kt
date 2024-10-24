@@ -30,8 +30,9 @@ class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     }
 
     fun postDelete(counts: List<Long>) {
-        for ((i, count) in counts.withIndex()) {
-            support.postDelete(count, i)
+        for ((i, pair) in entities.zip(counts).withIndex()) {
+            val (entity, count) = pair
+            support.postDelete(entity, count, i)
         }
     }
 }
