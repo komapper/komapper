@@ -25,7 +25,7 @@ class EntityDeleteSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
         return runner.buildStatement(config)
     }
 
-    fun postDelete(count: Long) {
-        runner.postDelete(count)
+    fun postDelete(entity: ENTITY, count: Long) {
+        runner.postDelete(entity, count)
     }
 }

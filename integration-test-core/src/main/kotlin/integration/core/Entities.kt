@@ -393,3 +393,14 @@ public data class Site(
     val street: String?,
     @KomapperVersion val version: Int,
 )
+
+@KomapperEntity
+@KomapperTable(name = "address")
+public data class Spot(
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val id: Int,
+    @KomapperColumn(masking = true)
+    val street: String?,
+    @KomapperVersion val version: Int,
+)

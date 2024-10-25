@@ -204,6 +204,18 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
         declaration: EntityMetamodelDeclaration<META>,
         disableAutoIncrement: Boolean = false,
     ): META
+
+    /**
+     * Returns a string representation of the entity.
+     * If the property is set to be masked, its data will be displayed as `*****`.
+     *
+     * @param entity The entity to convert to a string.
+     * @return A string representation of the entity.
+     */
+    fun toText(entity: ENTITY): String {
+        val props = properties().joinToString(", ") { "${it.name}=${if (it.masking) "*****" else it.getter(entity)}" }
+        return "${klass().simpleName}($props)"
+    }
 }
 
 /**

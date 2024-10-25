@@ -1,12 +1,14 @@
 package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.WhereProvider
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.hasAutoIncrementProperty
 import org.komapper.core.dsl.options.InsertOptions
+import org.komapper.core.dsl.options.MutationOptions
 import org.komapper.core.dsl.options.OptimisticLockOptions
 
 fun checkWhereClause(whereProvider: WhereProvider) {
@@ -14,6 +16,23 @@ fun checkWhereClause(whereProvider: WhereProvider) {
         val criteria = whereProvider.getWhereCriteria()
         if (criteria.isEmpty()) {
             error("WHERE clause not found. If this is intentional, enable the allowMissingWhereClause option.")
+        }
+    }
+}
+
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> checkEntityExistence(
+    option: MutationOptions,
+    metamodel: META,
+    entity: ENTITY,
+    count: Long,
+    index: Int?,
+) {
+    if (!option.suppressEntityNotFoundException) {
+        if (count != 1L) {
+            throw EntityNotFoundException(
+                "The specified entity does not exist. " +
+                    "entity=${metamodel.toText(entity)}, count=$count, index=$index."
+            )
         }
     }
 }

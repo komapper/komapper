@@ -1,8 +1,11 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.Person
 import integration.core.address
+import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -111,6 +114,52 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
                 .options {
                     it.copy(disableOptimisticLock = true)
                 }
+        }
+    }
+
+    @Test
+    fun throwEntityNotFoundException() {
+        val p = Meta.person
+        val people = listOf(
+            Person(1, "aaa"),
+            Person(2, "bbb"),
+            Person(3, "ccc")
+        )
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.delete(p).batch(people) }
+        }
+        println(ex)
+    }
+
+    @Test
+    fun throwEntityNotFoundException_at_index_2() {
+        val p = Meta.person
+        db.runQuery {
+            QueryDsl.insert(p).multiple(
+                Person(1, "aaa"),
+                Person(2, "bbb")
+            )
+        }
+        val people = db.runQuery { QueryDsl.from(p).orderBy(p.personId) }
+        assertEquals(2, people.size)
+        val ex = assertFailsWith<EntityNotFoundException> {
+            db.runQuery { QueryDsl.delete(p).batch(people + listOf(Person(3, "ccc"))) }
+        }
+        println(ex)
+    }
+
+    @Test
+    fun suppressEntityNotFoundException() {
+        val p = Meta.person
+        val people = listOf(
+            Person(1, "aaa"),
+            Person(2, "bbb"),
+            Person(3, "ccc")
+        )
+        db.runQuery {
+            QueryDsl.delete(p).batch(people).options {
+                it.copy(suppressEntityNotFoundException = true)
+            }
         }
     }
 }

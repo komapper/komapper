@@ -8,6 +8,13 @@ package org.komapper.core
 class OptimisticLockException(message: String) : RuntimeException(message)
 
 /**
+ * Thrown if an entity is not found.
+ *
+ * @param message the detail message
+ */
+class EntityNotFoundException(message: String) : RuntimeException(message)
+
+/**
  * Thrown if a unique constraint is violated.
  *
  * @param cause the cause exception
