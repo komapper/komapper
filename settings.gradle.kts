@@ -6,12 +6,6 @@ pluginManagement {
     }
 }
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs")
-    }
-}
-
 rootProject.name = "komapper"
 
 // CORE
