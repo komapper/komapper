@@ -37,6 +37,7 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> checkEnti
     }
 }
 
+@Deprecated("Use another overload.", replaceWith = ReplaceWith("checkOptimisticLock(option, metamodel, entity, count, index)"))
 fun checkOptimisticLock(
     option: OptimisticLockOptions,
     count: Long,
@@ -50,6 +51,23 @@ fun checkOptimisticLock(
                 "index=$index, count=$count"
             }
             throw OptimisticLockException(message)
+        }
+    }
+}
+
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> checkOptimisticLock(
+    option: OptimisticLockOptions,
+    metamodel: META,
+    entity: ENTITY,
+    count: Long,
+    index: Int?,
+) {
+    if (!option.disableOptimisticLock && !option.suppressOptimisticLockException) {
+        if (count != 1L) {
+            throw OptimisticLockException(
+                "Optimistic lock failed. " +
+                    "entity=${metamodel.toText(entity)}, count=$count, index=$index."
+            )
         }
     }
 }

@@ -58,7 +58,7 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
                 )
             }
         }
-        assertEquals("index=2, count=0", ex.message)
+        assertEquals("Optimistic lock failed. entity=Address(addressId=18, street=STREET 18, version=1), count=0, index=2.", ex.message)
     }
 
     @Test

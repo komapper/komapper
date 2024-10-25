@@ -22,12 +22,12 @@ internal class EntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
     internal fun postUpdate(entity: ENTITY, count: Long, index: Int? = null): ENTITY {
         val metamodel = context.target
         if (metamodel.versionProperty() != null) {
-            checkOptimisticLock(context.options, count, index)
+            checkOptimisticLock(context.options, metamodel, entity, count, index)
         } else {
             checkEntityExistence(context.options, metamodel, entity, count, index)
         }
         return if (!context.options.disableOptimisticLock) {
-            context.target.postUpdate(entity)
+            metamodel.postUpdate(entity)
         } else {
             entity
         }
