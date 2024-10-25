@@ -20,15 +20,19 @@ fun checkWhereClause(whereProvider: WhereProvider) {
     }
 }
 
-fun checkEntityExistence(
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> checkEntityExistence(
     option: MutationOptions,
-    entity: Any,
+    metamodel: META,
+    entity: ENTITY,
     count: Long,
     index: Int?,
 ) {
     if (!option.suppressEntityNotFoundException) {
         if (count != 1L) {
-            throw EntityNotFoundException("The specified entity does not exist. entity=$entity, count=$count, index=$index.")
+            throw EntityNotFoundException(
+                "The specified entity does not exist. " +
+                    "entity=${metamodel.toText(entity)}, count=$count, index=$index."
+            )
         }
     }
 }
