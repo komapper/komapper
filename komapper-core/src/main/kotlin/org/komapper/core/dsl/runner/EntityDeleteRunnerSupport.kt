@@ -17,7 +17,7 @@ internal class EntityDeleteRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
     internal fun postDelete(entity: ENTITY, count: Long, index: Int? = null) {
         val metamodel = context.target
         if (metamodel.versionProperty() != null) {
-            checkOptimisticLock(context.options, count, index)
+            checkOptimisticLock(context.options, metamodel, entity, count, index)
         } else {
             checkEntityExistence(context.options, metamodel, entity, count, index)
         }

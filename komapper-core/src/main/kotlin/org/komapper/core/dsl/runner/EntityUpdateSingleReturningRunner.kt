@@ -32,7 +32,7 @@ class EntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
     fun postUpdate(entity: ENTITY, count: Long) {
         val metamodel = context.target
         if (metamodel.versionProperty() != null) {
-            checkOptimisticLock(context.options, count, null)
+            checkOptimisticLock(context.options, metamodel, entity, count, null)
         } else {
             checkEntityExistence(context.options, metamodel, entity, count, null)
         }

@@ -122,7 +122,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
                 )
             }.let { }
         }
-        assertEquals("index=2, count=0", ex.message)
+        assertEquals("Optimistic lock failed. entity=Address(addressId=3, street=C, version=2), count=0, index=2.", ex.message)
     }
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])

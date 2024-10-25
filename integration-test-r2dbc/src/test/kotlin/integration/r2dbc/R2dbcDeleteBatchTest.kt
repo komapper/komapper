@@ -83,7 +83,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
                 )
             }
         }
-        assertEquals("index=2, count=0", ex.message)
+        assertEquals("Optimistic lock failed. entity=Address(addressId=18, street=STREET 18, version=1), count=0, index=2.", ex.message)
     }
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
