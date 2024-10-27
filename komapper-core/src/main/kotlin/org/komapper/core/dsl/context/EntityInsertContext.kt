@@ -5,6 +5,7 @@ import org.komapper.core.dsl.element.Returning
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.InsertOptions
@@ -22,24 +23,28 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     fun asEntityUpsertContext(
         keys: List<PropertyMetamodel<ENTITY, *, *>>,
         duplicateKeyType: DuplicateKeyType,
+        indexPredicate: WhereDeclaration?,
     ): EntityUpsertContext<ENTITY, ID, META> {
         return EntityUpsertContext(
             insertContext = this,
             target = target,
             keys = keys,
             duplicateKeyType = duplicateKeyType,
+            indexPredicate = indexPredicate,
         )
     }
 
     fun asEntityUpsertContext(
         conflictTarget: String,
         duplicateKeyType: DuplicateKeyType,
+        indexPredicate: WhereDeclaration?,
     ): EntityUpsertContext<ENTITY, ID, META> {
         return EntityUpsertContext(
             insertContext = this,
             target = target,
             conflictTarget = conflictTarget,
             duplicateKeyType = duplicateKeyType,
+            indexPredicate = indexPredicate,
         )
     }
 

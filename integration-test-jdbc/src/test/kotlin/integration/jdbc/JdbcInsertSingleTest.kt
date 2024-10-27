@@ -13,6 +13,7 @@ import integration.core.IdentityStrategy
 import integration.core.Machine
 import integration.core.MachineInfo1
 import integration.core.Man
+import integration.core.Name
 import integration.core.Person
 import integration.core.Robot
 import integration.core.RobotInfo1
@@ -28,6 +29,7 @@ import integration.core.human
 import integration.core.identityStrategy
 import integration.core.machine
 import integration.core.man
+import integration.core.name
 import integration.core.person
 import integration.core.robot
 import integration.core.sequenceStrategy
@@ -540,5 +542,33 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }
         assertEquals(0, count)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateWithIndexPredicate() {
+        val n = Meta.name
+        val name = Name(1, "first", "last", null)
+        val query = QueryDsl.insert(n).onDuplicateKeyUpdate(n.lastName) {
+            n.deletedAt.isNull()
+        }.single(name)
+        db.runQuery { query }
+        val found = db.runQuery { QueryDsl.from(n).where { n.id eq 1 }.first() }
+        assertNotNull(found)
+    }
+
+    @Run(unless = [Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateWithIndexPredicate_unsupported() {
+        val n = Meta.name
+        val name = Name(1, "first", "last", null)
+        val query = QueryDsl.insert(n).onDuplicateKeyUpdate(n.lastName) {
+            n.deletedAt.isNull()
+        }.single(name)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery(query)
+            Unit
+        }
+        println(ex)
     }
 }

@@ -5,8 +5,10 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
+import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
+import org.komapper.core.dsl.builder.getIndexCriteria
 import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
@@ -96,6 +98,16 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
                 }
                 buf.cutBack(2)
                 buf.append(")")
+            }
+            val criteria = context.getIndexCriteria()
+            if (criteria.isNotEmpty()) {
+                val support = BuilderSupport(dialect, EmptyAliasManager, buf, context.insertContext.options.escapeSequence)
+                buf.append(" where ")
+                for ((index, criterion) in criteria.withIndex()) {
+                    support.visitCriterion(index, criterion)
+                    buf.append(" and ")
+                }
+                buf.cutBack(5)
             }
         }
     }

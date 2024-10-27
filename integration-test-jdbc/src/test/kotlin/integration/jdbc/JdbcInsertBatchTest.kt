@@ -5,12 +5,14 @@ import integration.core.Dbms
 import integration.core.Department
 import integration.core.IdentityStrategy
 import integration.core.Man
+import integration.core.Name
 import integration.core.Person
 import integration.core.Run
 import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
 import integration.core.man
+import integration.core.name
 import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
@@ -272,5 +274,39 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(i).onDuplicateKeyUpdate().batch(strategies)
         val counts = db.runQuery { query }
         assertEquals(listOf(1L, 1L, 1L), counts)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateWithIndexPredicate() {
+        val n = Meta.name
+        val names = listOf(
+            Name(1, "first1", "last1", null),
+            Name(2, "first2", "last2", null),
+        )
+        val query = QueryDsl.insert(n).onDuplicateKeyUpdate(n.lastName) {
+            n.deletedAt.isNull()
+        }.batch(names)
+        db.runQuery { query }
+        val found = db.runQuery { QueryDsl.from(n).where { n.id inList listOf(1, 2) } }
+        assertEquals(2, found.size)
+    }
+
+    @Run(unless = [Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateWithIndexPredicate_unsupported() {
+        val n = Meta.name
+        val names = listOf(
+            Name(1, "first1", "last1", null),
+            Name(2, "first2", "last2", null),
+        )
+        val query = QueryDsl.insert(n).onDuplicateKeyUpdate(n.lastName) {
+            n.deletedAt.isNull()
+        }.batch(names)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery(query)
+            Unit
+        }
+        println(ex)
     }
 }
