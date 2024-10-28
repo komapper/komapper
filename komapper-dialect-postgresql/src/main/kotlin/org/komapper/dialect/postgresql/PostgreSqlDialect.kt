@@ -98,6 +98,8 @@ interface PostgreSqlDialect : Dialect {
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = true
 
+    override fun supportsIndexPredicateInUpsertStatement(): Boolean = true
+
     override fun supportsDeleteReturning(): Boolean = true
 
     override fun supportsLockOfTables(): Boolean = true

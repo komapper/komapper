@@ -5,6 +5,7 @@ import org.komapper.core.EntityNotFoundException
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.WhereProvider
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.hasAutoIncrementProperty
 import org.komapper.core.dsl.options.InsertOptions
@@ -88,6 +89,15 @@ internal fun checkConflictTargetInUpsertStatement(config: DatabaseConfig, confli
     if (!config.dialect.supportsConflictTargetInUpsertStatement() && conflictTarget != null) {
         throw UnsupportedOperationException(
             "The dialect(driver=${dialect.driver}) does not support specifying a conflict target in upsert statements.",
+        )
+    }
+}
+
+internal fun checkIndexPredicateInUpsertStatement(config: DatabaseConfig, indexPredicate: WhereDeclaration?) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsIndexPredicateInUpsertStatement() && indexPredicate != null) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support specifying a index predicate in upsert statements.",
         )
     }
 }
