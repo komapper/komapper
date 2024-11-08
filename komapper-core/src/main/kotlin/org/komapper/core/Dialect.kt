@@ -278,6 +278,11 @@ interface Dialect {
     fun supportsConflictTargetInUpsertStatement(): Boolean = false
 
     /**
+     * Returns whether the index_predicate is supported in the UPSERT statement.
+     */
+    fun supportsIndexPredicateInUpsertStatement(): Boolean = false
+
+    /**
      * Returns whether the "CREATE TABLE/SEQUENCE IF NOT EXISTS" syntax is supported.
      */
     fun supportsCreateIfNotExists(): Boolean = true

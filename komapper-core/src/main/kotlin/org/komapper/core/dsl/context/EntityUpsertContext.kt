@@ -29,6 +29,7 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     val set: AssignmentDeclaration<ENTITY, META> = {},
     val where: WhereDeclaration = {},
     override val returning: Returning = Returning.Expressions(emptyList()),
+    val indexPredicate: WhereDeclaration?,
 ) : WhereProvider, TablesProvider, ReturningProvider {
     override val options: WhereOptions
         get() = insertContext.options

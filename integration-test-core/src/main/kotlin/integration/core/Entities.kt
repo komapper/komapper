@@ -404,3 +404,13 @@ public data class Spot(
     val street: String?,
     @KomapperVersion val version: Int,
 )
+
+@KomapperEntity
+@KomapperTable(name = "names")
+public data class Name(
+    @KomapperId
+    val id: Long,
+    val firstName: String?,
+    val lastName: String?,
+    val deletedAt: Instant?,
+)

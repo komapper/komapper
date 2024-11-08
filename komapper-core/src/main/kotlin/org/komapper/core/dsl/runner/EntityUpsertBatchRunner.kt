@@ -17,6 +17,7 @@ class EntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
         checkBatchExecutionOfParameterizedStatement(config)
         checkSearchConditionInUpsertStatement(config, context)
         checkConflictTargetInUpsertStatement(config, context.conflictTarget)
+        checkIndexPredicateInUpsertStatement(config, context.indexPredicate)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -66,7 +66,15 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
 
             create table if not exists friend(uuid1 uuid, uuid2 uuid, pending boolean, constraint pk_friend primary key(uuid1, uuid2));
             create unique index friend_unique_idx on friend (greatest(uuid1, uuid2), least(uuid1, uuid2));
-            
+
+            create table names(
+                id bigint primary key not null,
+                first_name varchar(255),
+                last_name varchar(255),
+                deleted_at timestamp with time zone null
+            );
+            create unique index idx_uq_last_name on names(last_name) where deleted_at is null;
+
             insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
             insert into department values(2,20,'RESEARCH','DALLAS',1);
             insert into department values(3,30,'SALES','CHICAGO',1);
