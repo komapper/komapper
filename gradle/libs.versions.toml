@@ -41,7 +41,7 @@ annotations = { module = "org.jetbrains:annotations", version = "26.0.1" }
 pluralize = { module = "io.github.encryptorcode:pluralize", version = "1.0.0" }
 hikariCP = { module = "com.zaxxer:HikariCP", version = "6.1.0" }
 sqlcommenter = { module = "com.google.cloud:sqlcommenter", version = "2.0.1" }
-opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "1.43.0" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "1.44.0" }
 jts-core = { module = "org.locationtech.jts:jts-core", version = "1.20.0" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.16" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.12" }
