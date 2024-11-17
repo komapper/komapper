@@ -88,6 +88,18 @@ class KomapperJdbcAutoConfigurationTest {
             }
     }
 
+    @Test
+    fun disabledConfiguration() {
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(KomapperJdbcAutoConfiguration::class.java))
+            .withPropertyValues("spring.datasource.url=jdbc:h2:mem:example")
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .doesNotHaveBean(JdbcDatabase::class.java)
+            }
+    }
+
     @Suppress("unused", "UNCHECKED_CAST")
     @Configuration
     open class CustomConfigure {

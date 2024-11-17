@@ -81,6 +81,18 @@ class KomapperR2dbcAutoConfigurationTest {
             }
     }
 
+    @Test
+    fun disabledConfiguration() {
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(KomapperR2dbcAutoConfiguration::class.java))
+            .withPropertyValues("spring.r2dbc.url=r2dbc:h2:mem:///test")
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .doesNotHaveBean(R2dbcDatabase::class.java)
+            }
+    }
+
     @Suppress("unused")
     @Configuration
     open class CustomConfigure {
