@@ -49,7 +49,7 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment): JdbcDialect {
+    open fun komapperDialect(environment: Environment): JdbcDialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
@@ -60,62 +60,68 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun clockProvider(): ClockProvider {
+    open fun komapperClockProvider(): ClockProvider {
         return DefaultClockProvider()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun executionOptions(): ExecutionOptions {
+    open fun komapperExecutionOptions(): ExecutionOptions {
         return ExecutionOptions()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun logger(): Logger {
+    open fun komapperLogger(): Logger {
         return Loggers.get()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun loggerFacade(logger: Logger): LoggerFacade {
+    open fun komapperLoggerFacade(logger: Logger): LoggerFacade {
         return LoggerFacades.get(logger)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun session(transactionManager: PlatformTransactionManager, dataSource: DataSource): JdbcSession {
+    open fun komapperSession(transactionManager: PlatformTransactionManager, dataSource: DataSource): JdbcSession {
         return SpringJdbcTransactionSession(transactionManager, dataSource)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun statementInspector(): StatementInspector {
+    open fun komapperStatementInspector(): StatementInspector {
         return StatementInspectors.get()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dataFactory(databaseSession: JdbcSession): JdbcDataFactory {
+    open fun komapperDataFactory(databaseSession: JdbcSession): JdbcDataFactory {
         return DefaultJdbcDataFactory(databaseSession)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dataOperator(dialect: JdbcDialect, dataTypeProvider: Optional<JdbcDataTypeProvider>): JdbcDataOperator {
+    open fun komapperDataOperator(
+        dialect: JdbcDialect,
+        dataTypeProvider: Optional<JdbcDataTypeProvider>,
+    ): JdbcDataOperator {
         val provider = JdbcDataTypeProviders.get(dialect.driver, dataTypeProvider.orElse(null))
         return DefaultJdbcDataOperator(dialect, provider)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun templateStatementBuilder(dialect: JdbcDialect, dataOperator: JdbcDataOperator): TemplateStatementBuilder {
+    open fun komapperTemplateStatementBuilder(
+        dialect: JdbcDialect,
+        dataOperator: JdbcDataOperator,
+    ): TemplateStatementBuilder {
         return TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun databaseConfig(
+    open fun komapperDatabaseConfig(
         dialect: JdbcDialect,
         clockProvider: ClockProvider,
         executionOptions: ExecutionOptions,
@@ -146,7 +152,7 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun database(config: JdbcDatabaseConfig): JdbcDatabase {
+    open fun komapperDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
         return JdbcDatabase(config)
     }
 }
