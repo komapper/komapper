@@ -1,5 +1,6 @@
 package org.komapper.spring.boot.autoconfigure.jdbc
 
+import org.assertj.core.api.Assertions.assertThat
 import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
@@ -11,11 +12,12 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcStringType
+import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-import org.springframework.context.annotation.AnnotationConfigApplicationContext
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.MapPropertySource
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,64 +30,74 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class KomapperJdbcAutoConfigurationTest {
-    private val context = AnnotationConfigApplicationContext()
+    private val contextRunner = ApplicationContextRunner()
+        .withConfiguration(
+            AutoConfigurations.of(
+                DataSourceAutoConfiguration::class.java,
+                DataSourceTransactionManagerAutoConfiguration::class.java,
+                KomapperJdbcAutoConfiguration::class.java,
+            )
+        )
+        .withPropertyValues(
+            "spring.datasource.url=jdbc:h2:mem:example",
+        )
 
     @Test
     fun defaultConfiguration() {
-        val source = mapOf("spring.datasource.url" to "jdbc:h2:mem:example")
-        val sources = context.environment.propertySources
-        sources.addFirst(MapPropertySource("test", source))
-        context.register(
-            KomapperJdbcAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java,
-        )
-        context.refresh()
+        contextRunner
+            .run { context ->
+                assertThat(context).hasNotFailed()
 
-        val database = context.getBean(JdbcDatabase::class.java)
-        assertNotNull(database)
-        assertTrue(database.config.dialect is H2JdbcDialect)
-        assertNotNull(database.config.templateStatementBuilder)
+                val database = context.getBean(JdbcDatabase::class.java)
+                assertNotNull(database)
+                assertTrue(database.config.dialect is H2JdbcDialect)
+                assertNotNull(database.config.templateStatementBuilder)
+            }
     }
 
     @Test
     fun customConfiguration() {
-        val source = mapOf("spring.datasource.url" to "jdbc:h2:mem:example")
-        val sources = context.environment.propertySources
-        sources.addFirst(MapPropertySource("test", source))
-        context.register(
-            CustomConfigure::class.java,
-            KomapperJdbcAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java,
-        )
-        context.refresh()
+        contextRunner
+            .withUserConfiguration(CustomConfigure::class.java)
+            .run { context ->
+                assertThat(context).hasNotFailed()
 
-        val database = context.getBean(JdbcDatabase::class.java)
-        assertNotNull(database)
-        val dataType = database.config.dataOperator.getDataType<String>(typeOf<String>())
-        assertEquals("abc", dataType.name)
-        val clock = database.config.clockProvider.now()
-        val timestamp = LocalDateTime.now(clock)
-        assertEquals(LocalDateTime.of(2021, 4, 25, 16, 17, 18), timestamp)
-        val jdbcOption = database.config.executionOptions
-        assertEquals(1234, jdbcOption.queryTimeoutSeconds)
+                val database = context.getBean(JdbcDatabase::class.java)
+                assertNotNull(database)
+                val dataType = database.config.dataOperator.getDataType<String>(typeOf<String>())
+                assertEquals("abc", dataType.name)
+                val clock = database.config.clockProvider.now()
+                val timestamp = LocalDateTime.now(clock)
+                assertEquals(LocalDateTime.of(2021, 4, 25, 16, 17, 18), timestamp)
+                val jdbcOption = database.config.executionOptions
+                assertEquals(1234, jdbcOption.queryTimeoutSeconds)
+            }
     }
 
     @Test
     fun templateStatementBuilderConfiguration() {
-        val source = mapOf("spring.datasource.url" to "jdbc:h2:mem:example")
-        val sources = context.environment.propertySources
-        sources.addFirst(MapPropertySource("test", source))
-        context.register(
-            TemplateStatementBuilderConfigure::class.java,
-            KomapperJdbcAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java,
-        )
-        context.refresh()
+        contextRunner
+            .withUserConfiguration(TemplateStatementBuilderConfigure::class.java)
+            .run { context ->
+                assertThat(context).hasNotFailed()
 
-        val database = context.getBean(JdbcDatabase::class.java)
-        assertNotNull(database)
-        val builder = database.config.templateStatementBuilder
-        assertTrue(builder is MyStatementBuilder)
+                val database = context.getBean(JdbcDatabase::class.java)
+                assertNotNull(database)
+                val builder = database.config.templateStatementBuilder
+                assertTrue(builder is MyStatementBuilder)
+            }
+    }
+
+    @Test
+    fun disabledConfiguration() {
+        ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(KomapperJdbcAutoConfiguration::class.java))
+            .withPropertyValues("spring.datasource.url=jdbc:h2:mem:example")
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .doesNotHaveBean(JdbcDatabase::class.java)
+            }
     }
 
     @Suppress("unused", "UNCHECKED_CAST")

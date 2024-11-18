@@ -24,22 +24,22 @@ import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
 import org.komapper.r2dbc.SimpleR2dbcDatabaseConfig
 import org.komapper.spring.r2dbc.SpringR2dbcTransactionSession
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
+import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.transaction.ReactiveTransactionManager
 import java.util.Optional
 import java.util.UUID
 
 @Suppress("unused")
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = [R2dbcAutoConfiguration::class, R2dbcTransactionManagerAutoConfiguration::class])
 @ConditionalOnClass(R2dbcDatabase::class)
-@ImportAutoConfiguration(value = [R2dbcAutoConfiguration::class, R2dbcTransactionManagerAutoConfiguration::class])
+@ConditionalOnBean(ReactiveTransactionManager::class, ConnectionFactory::class)
 open class KomapperR2dbcAutoConfiguration {
     companion object {
         private const val R2DBC_URL_PROPERTY = "spring.r2dbc.url"
@@ -47,7 +47,7 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment): R2dbcDialect {
+    open fun komapperDialect(environment: Environment): R2dbcDialect {
         val url = environment.getProperty(R2DBC_URL_PROPERTY)
             ?: error(
                 "$R2DBC_URL_PROPERTY is not found. " +
@@ -59,31 +59,31 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun clockProvider(): ClockProvider {
+    open fun komapperClockProvider(): ClockProvider {
         return DefaultClockProvider()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun executionOptions(): ExecutionOptions {
+    open fun komapperExecutionOptions(): ExecutionOptions {
         return ExecutionOptions()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun logger(): Logger {
+    open fun komapperLogger(): Logger {
         return Loggers.get()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun loggerFacade(logger: Logger): LoggerFacade {
+    open fun komapperLoggerFacade(logger: Logger): LoggerFacade {
         return LoggerFacades.get(logger)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun session(
+    open fun komapperSession(
         transactionManager: ReactiveTransactionManager,
         connectionFactory: ConnectionFactory,
     ): R2dbcSession {
@@ -92,20 +92,23 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun statementInspector(): StatementInspector {
+    open fun komapperStatementInspector(): StatementInspector {
         return StatementInspectors.get()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dataOperator(dialect: R2dbcDialect, dataTypeProvider: Optional<R2dbcDataTypeProvider>): R2dbcDataOperator {
+    open fun komapperDataOperator(
+        dialect: R2dbcDialect,
+        dataTypeProvider: Optional<R2dbcDataTypeProvider>,
+    ): R2dbcDataOperator {
         val provider = R2dbcDataTypeProviders.get(dialect.driver, dataTypeProvider.orElse(null))
         return DefaultR2dbcDataOperator(dialect, provider)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    open fun templateStatementBuilder(
+    open fun komapperTemplateStatementBuilder(
         dialect: R2dbcDialect,
         dataOperator: R2dbcDataOperator,
     ): TemplateStatementBuilder {
@@ -114,7 +117,7 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun databaseConfig(
+    open fun komapperDatabaseConfig(
         dialect: R2dbcDialect,
         clockProvider: ClockProvider,
         executionOptions: ExecutionOptions,
@@ -143,7 +146,7 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun r2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
+    open fun komapperR2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
         return R2dbcDatabase(config)
     }
 }

@@ -56,6 +56,7 @@ spring-tx = { module = "org.springframework:spring-tx", version.ref = "springfra
 spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
 
 quarkus-bom = { module = "io.quarkus:quarkus-bom", version.ref = "quarkus" }
 quarkus-core = { module = "io.quarkus:quarkus-core" }
