@@ -29,7 +29,7 @@ internal class R2dbcExecutor(
         statement: Statement,
         transform: (R2dbcDataOperator, Row) -> T,
     ): Flow<T> {
-        return flow {
+        return flow<T> {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
             config.session.useConnection { con ->
