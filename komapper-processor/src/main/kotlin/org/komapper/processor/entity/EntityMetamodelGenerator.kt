@@ -1,5 +1,6 @@
 package org.komapper.processor.entity
 
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.Nullability
 import org.komapper.processor.BackquotedSymbols.Argument
 import org.komapper.processor.BackquotedSymbols.AutoIncrement
@@ -19,10 +20,8 @@ import org.komapper.processor.BackquotedSymbols.EnumMappingException
 import org.komapper.processor.BackquotedSymbols.FlowSubquery
 import org.komapper.processor.BackquotedSymbols.IdContext
 import org.komapper.processor.BackquotedSymbols.IdGenerator
-import org.komapper.processor.BackquotedSymbols.Instant
 import org.komapper.processor.BackquotedSymbols.KClass
 import org.komapper.processor.BackquotedSymbols.KomapperExperimentalAssociation
-import org.komapper.processor.BackquotedSymbols.LocalDateTime
 import org.komapper.processor.BackquotedSymbols.Map
 import org.komapper.processor.BackquotedSymbols.Operand
 import org.komapper.processor.BackquotedSymbols.ProjectionType
@@ -57,6 +56,23 @@ internal class EntityMetamodelGenerator(
     private val entityTypeName: String,
     private val w: PrintWriter,
 ) : Runnable {
+    private val usesKotlinInstant: Boolean
+    private val usesKotlinLocalDateTime: Boolean
+
+    init {
+        fun usesType(property: LeafProperty, typeName: String): Boolean {
+            val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
+                is ValueClass -> kotlinClass.property.typeName
+                else -> property.typeName
+            }
+            return propertyTypeName == typeName
+        }
+
+        val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
+        usesKotlinInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
+        usesKotlinLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
+    }
+
     private val idTypeName: String = if (entity.idProperties.size == 1) {
         entity.idProperties[0].typeName
     } else {
@@ -102,20 +118,9 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun importStatements() {
-        fun usesType(property: LeafProperty, typeName: String): Boolean {
-            val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
-                is ValueClass -> kotlinClass.property.typeName
-                else -> property.typeName
-            }
-            return propertyTypeName == typeName
-        }
-
-        val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
-        val usesInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
-        val usesLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
-        if (usesInstant || usesLocalDateTime) {
-            if (usesInstant) w.println("import $toKotlinInstant")
-            if (usesLocalDateTime) w.println("import $toKotlinLocalDateTime")
+        if (usesKotlinInstant || usesKotlinLocalDateTime) {
+            if (usesKotlinInstant) w.println("import $toKotlinInstant")
+            if (usesKotlinLocalDateTime) w.println("import $toKotlinLocalDateTime")
             w.println()
         }
 
@@ -177,6 +182,8 @@ internal class EntityMetamodelGenerator(
         newEntity()
         newMetamodel()
         clone()
+
+        helpers()
 
         companionObject()
 
@@ -615,36 +622,35 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun now(property: LeafProperty): String {
+        fun escapePackageName(declaration: KSDeclaration): String {
+            val qualifiedName = declaration.qualifiedName?.asString()
+            return if (qualifiedName == null) {
+                declaration.simpleName.asString()
+            } else {
+                val packageName = declaration.packageName.asString()
+                if (packageName.isEmpty()) {
+                    qualifiedName
+                } else {
+                    val remains = qualifiedName.substring(packageName.length)
+                    "`$packageName`$remains"
+                }
+            }
+        }
+
         return when (property.kotlinClass) {
             is ValueClass -> {
                 when (property.kotlinClass.property.typeName) {
-                    KotlinInstant -> {
-                        "${property.typeName}($Instant.now(c).${toKotlinInstant.split(".").last()}())"
-                    }
-
-                    KotlinLocalDateTime -> {
-                        "${property.typeName}($LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}())"
-                    }
-
-                    else -> {
-                        "${property.typeName}(${property.kotlinClass.property.backquotedTypeName}.now(c))"
-                    }
+                    KotlinInstant -> "${property.typeName}(kotlinInstant(c))"
+                    KotlinLocalDateTime -> "${property.typeName}(kotlinDateTime(c))"
+                    else -> "${property.typeName}(${escapePackageName(property.kotlinClass.property.type.declaration)}.now(c))"
                 }
             }
 
             else -> {
                 when (property.typeName) {
-                    KotlinInstant -> {
-                        "$Instant.now(c).${toKotlinInstant.split(".").last()}()"
-                    }
-
-                    KotlinLocalDateTime -> {
-                        "$LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}()"
-                    }
-
-                    else -> {
-                        "${property.exteriorTypeName}.now(c)"
-                    }
+                    KotlinInstant -> "kotlinInstant(c)"
+                    KotlinLocalDateTime -> "kotlinDateTime(c)"
+                    else -> "${escapePackageName(property.kotlinClass.declaration)}.now(c)"
                 }
             }
         }
@@ -694,6 +700,15 @@ internal class EntityMetamodelGenerator(
         w.println(
             "    public fun clone($constructorParamList): $simpleName = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)"
         )
+    }
+
+    private fun helpers() {
+        if (usesKotlinInstant) {
+            w.println("    private fun kotlinInstant(c: java.time.Clock): kotlinx.datetime.Instant = java.time.Instant.now(c).toKotlinInstant()")
+        }
+        if (usesKotlinLocalDateTime) {
+            w.println("    private fun kotlinDateTime(c: java.time.Clock): kotlinx.datetime.LocalDateTime = java.time.LocalDateTime.now(c).toKotlinLocalDateTime()")
+        }
     }
 
     private fun companionObject() {
@@ -797,9 +812,11 @@ internal class EntityMetamodelGenerator(
         w.println("@$EntityMetamodelFactory")
         w.println("public class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
         w.println(
-            "    override fun create(): List<Pair<Any, $EntityMetamodel<*, *, *>>> = listOf(${aliases.joinToString {
-                "$unitTypeName to $simpleName.`$it`"
-            }})"
+            "    override fun create(): List<Pair<Any, $EntityMetamodel<*, *, *>>> = listOf(${
+                aliases.joinToString {
+                    "$unitTypeName to $simpleName.`$it`"
+                }
+            })"
         )
         w.println("}")
         w.println()
