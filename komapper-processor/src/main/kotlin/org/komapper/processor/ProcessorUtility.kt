@@ -132,7 +132,7 @@ internal fun createBackquotedName(declaration: KSDeclaration): String {
             qualifiedName
         } else {
             val remains = qualifiedName.substring(packageName.length)
-            "`$packageName`$remains"
+            packageName.split('.').joinToString(".") { "`$it`" } + remains
         }
     }
 }
