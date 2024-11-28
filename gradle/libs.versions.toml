@@ -23,7 +23,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version 
 jdbc-h2 = { module = "com.h2database:h2", version = "2.3.232" }
 jdbc-mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version = "3.5.1" }
 jdbc-mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-jdbc-oracle = { module = "com.oracle.database.jdbc:ojdbc11", version = "21.15.0.0" }
+jdbc-oracle = { module = "com.oracle.database.jdbc:ojdbc11", version = "21.16.0.0" }
 jdbc-postgresql = { module = "org.postgresql:postgresql", version = "42.7.4" }
 jdbc-sqlserver = { module = "com.microsoft.sqlserver:mssql-jdbc", version = "12.8.1.jre11" }
 
