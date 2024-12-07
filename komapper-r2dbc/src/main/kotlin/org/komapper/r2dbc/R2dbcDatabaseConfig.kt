@@ -9,6 +9,7 @@ import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.LoggerFacade
 import org.komapper.core.StatementInspector
+import org.komapper.core.Statistics
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.ThreadSafe
 import java.util.UUID
@@ -45,8 +46,9 @@ open class DefaultR2dbcDatabaseConfig(
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ) : R2dbcDatabaseConfig,
-    AbstractDatabaseConfig<R2dbcDialect>(dialect, clockProvider, executionOptions) {
+    AbstractDatabaseConfig<R2dbcDialect>(dialect, clockProvider, executionOptions, enableStatistics) {
     override val session: R2dbcSession by lazy {
         R2dbcSessions.get(connectionFactory, loggerFacade)
     }
@@ -69,4 +71,5 @@ class SimpleR2dbcDatabaseConfig(
     override val session: R2dbcSession,
     override val dataOperator: R2dbcDataOperator,
     override val connectionFactory: ConnectionFactory,
+    override val statistics: Statistics,
 ) : R2dbcDatabaseConfig
