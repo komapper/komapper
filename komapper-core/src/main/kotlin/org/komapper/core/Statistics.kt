@@ -2,6 +2,7 @@ package org.komapper.core
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Statistics.
@@ -50,7 +51,7 @@ interface Statistics {
 class DefaultStatistics : Statistics {
     @Volatile
     private var enabled = false
-    private val sqlStatisticsMap = ConcurrentHashMap<String, MutableSqlStatistics>()
+    private val sqlStatisticsMap = ConcurrentHashMap<String, AtomicReference<SqlStatistics>>()
 
     override fun isEnabled(): Boolean {
         return enabled
@@ -61,18 +62,35 @@ class DefaultStatistics : Statistics {
     }
 
     override fun getSqlStatistics(sql: String): SqlStatistics? {
-        return sqlStatisticsMap[sql]
+        return sqlStatisticsMap[sql]?.get()
     }
 
     override fun getAllSqlStatistics(): Map<String, SqlStatistics> {
-        return sqlStatisticsMap
+        return sqlStatisticsMap.mapValues { it.value.get() }
     }
 
     override fun add(sql: String, startTime: Long, endTime: Long) {
         if (!enabled) return
         val milliseconds = TimeUnit.NANOSECONDS.toMillis(endTime - startTime)
-        val sqlStatistics = sqlStatisticsMap.getOrPut(sql, ::DefaultMutableSqlStatistics)
-        sqlStatistics.add(milliseconds)
+        val sqlStatistics = sqlStatisticsMap.getOrPut(sql) { AtomicReference(SqlStatistics()) }
+        while (true) {
+            val old = sqlStatistics.get()
+            val count = old.executionCount + 1
+            val maxTime = maxOf(old.executionMaxTime, milliseconds)
+            val minTime = minOf(old.executionMinTime, milliseconds)
+            val totalTime = old.executionTotalTime + milliseconds
+            val avgTime = totalTime / count.toDouble()
+            val new = SqlStatistics(
+                executionCount = count,
+                executionMaxTime = maxTime,
+                executionMinTime = minTime,
+                executionTotalTime = totalTime,
+                executionAvgTime = avgTime
+            )
+            if (sqlStatistics.compareAndSet(old, new)) {
+                break
+            }
+        }
     }
 
     override fun clear() {
@@ -91,7 +109,7 @@ internal object EmptyStatistics : Statistics {
     }
 
     override fun getSqlStatistics(sql: String): SqlStatistics {
-        return EmptySqlStatistics
+        return SqlStatistics()
     }
 
     override fun getAllSqlStatistics(): Map<String, SqlStatistics> {

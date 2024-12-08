@@ -1,5 +1,9 @@
 package org.komapper.core
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -73,5 +77,28 @@ class DefaultStatisticsTest {
         assertNotNull(a)
         val b = stats.getSqlStatistics("b")
         assertNull(b)
+    }
+
+    @Test
+    fun add() = runBlocking {
+        val stats = DefaultStatistics()
+        stats.setEnabled(true)
+
+        val jobs = mutableListOf<Job>()
+        for (i in 1..4) {
+            val job = launch(Dispatchers.Default) {
+                stats.add("sql", 0, i * 1_000_000_000L)
+            }
+            jobs.add(job)
+        }
+        jobs.forEach { it.join() }
+
+        val sqlStats = stats.getSqlStatistics("sql")
+        assertNotNull(sqlStats)
+        assertEquals(4, sqlStats.executionCount)
+        assertEquals(4_000, sqlStats.executionMaxTime)
+        assertEquals(1_000, sqlStats.executionMinTime)
+        assertEquals(10_000, sqlStats.executionTotalTime)
+        assertEquals(2_500.0, sqlStats.executionAvgTime)
     }
 }
