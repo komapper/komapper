@@ -138,6 +138,22 @@ module/spring-boot-starter-r2dbc:
 - changed-files:
   - any-glob-to-any-file: 'komapper-spring-boot-starter-r2dbc/**/*'
 
+module/spring-boot-starter-test-jdbc:
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-boot-starter-test-jdbc/**/*'
+
+module/spring-boot-starter-test-r2dbc:
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-boot-starter-test-r2dbc/**/*'
+
+module/spring-boot-test-autoconfigure-jdbc:
+  - changed-files:
+      - any-glob-to-any-file: 'komapper-spring-boot-test-autoconfigure-jdbc/**/*'
+
+module/spring-boot-test-autoconfigure-r2dbc:
+  - changed-files:
+      - any-glob-to-any-file: 'komapper-spring-boot-test-autoconfigure-r2dbc/**/*'
+
 module/spring-jdbc:
 - changed-files:
   - any-glob-to-any-file: 'komapper-spring-jdbc/**/*'
