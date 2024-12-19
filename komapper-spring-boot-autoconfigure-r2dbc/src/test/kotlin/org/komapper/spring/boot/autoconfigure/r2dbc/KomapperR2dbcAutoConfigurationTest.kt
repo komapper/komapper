@@ -8,6 +8,9 @@ import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
 import org.komapper.dialect.h2.r2dbc.H2R2dbcDialect
+import org.komapper.r2dbc.AbstractR2dbcDataType
+import org.komapper.r2dbc.R2dbcDataType
+import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDatabase
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
@@ -19,6 +22,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -41,7 +45,9 @@ class KomapperR2dbcAutoConfigurationTest {
     fun defaultConfiguration() {
         contextRunner
             .run { context ->
-                assertThat(context).hasNotFailed()
+                assertThat(context)
+                    .hasNotFailed()
+                    .doesNotHaveBean(R2dbcDataTypeProvider::class.java)
 
                 val database = context.getBean(R2dbcDatabase::class.java)
                 assertNotNull(database)
@@ -78,6 +84,22 @@ class KomapperR2dbcAutoConfigurationTest {
                 assertNotNull(database)
                 val builder = database.config.templateStatementBuilder
                 assertTrue(builder is MyStatementBuilder)
+            }
+    }
+
+    @Test
+    fun dataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(R2dbcDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(R2dbcDataType::class.java)
+                    .hasSingleBean(R2dbcDataTypeProvider::class.java)
+
+                val dataTypeProvider = context.getBean(R2dbcDataTypeProvider::class.java)
+                val customDataType = context.getBean(R2dbcDataType::class.java)
+                assertThat(dataTypeProvider.get<LongRange>(typeOf<LongRange>())).isEqualTo(customDataType)
             }
     }
 
@@ -119,6 +141,12 @@ class KomapperR2dbcAutoConfigurationTest {
         }
     }
 
+    @Configuration
+    open class R2dbcDataTypeConfigure {
+        @Bean
+        open fun customR2dbcDataType(): R2dbcDataType<LongRange> = CustomR2dbcDataType()
+    }
+
     class MyStatementBuilder : TemplateStatementBuilder {
         override fun build(
             template: CharSequence,
@@ -129,5 +157,9 @@ class KomapperR2dbcAutoConfigurationTest {
         }
 
         override fun clearCache() = Unit
+    }
+
+    private class CustomR2dbcDataType : AbstractR2dbcDataType<LongRange>(typeOf<LongRange>()) {
+        override val name = "custom"
     }
 }

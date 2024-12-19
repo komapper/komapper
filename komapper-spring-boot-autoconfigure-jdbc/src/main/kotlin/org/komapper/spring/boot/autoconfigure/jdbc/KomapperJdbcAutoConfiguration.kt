@@ -16,6 +16,7 @@ import org.komapper.jdbc.DefaultJdbcDataFactory
 import org.komapper.jdbc.DefaultJdbcDataOperator
 import org.komapper.jdbc.JdbcDataFactory
 import org.komapper.jdbc.JdbcDataOperator
+import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDataTypeProviders
 import org.komapper.jdbc.JdbcDatabase
@@ -25,6 +26,7 @@ import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
 import org.komapper.jdbc.SimpleJdbcDatabaseConfig
 import org.komapper.spring.jdbc.SpringJdbcTransactionSession
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -98,6 +100,13 @@ open class KomapperJdbcAutoConfiguration {
     @ConditionalOnMissingBean
     open fun komapperDataFactory(databaseSession: JdbcSession): JdbcDataFactory {
         return DefaultJdbcDataFactory(databaseSession)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(JdbcDataType::class)
+    open fun komapperBeanDataTypeProvider(dataTypes: ObjectProvider<JdbcDataType<*>>): JdbcDataTypeProvider {
+        return JdbcDataTypeProvider(*dataTypes.toList().toTypedArray())
     }
 
     @Bean
