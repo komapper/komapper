@@ -44,7 +44,7 @@ sqlcommenter = { module = "com.google.cloud:sqlcommenter", version = "2.0.1" }
 opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "1.45.0" }
 jts-core = { module = "org.locationtech.jts:jts-core", version = "1.20.0" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.16" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.13" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.14" }
 
 spring-beans = { module = "org.springframework:spring-beans", version.ref = "springframework" }
 spring-core = { module = "org.springframework:spring-core", version.ref = "springframework" }
