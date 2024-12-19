@@ -3,6 +3,7 @@ package org.komapper.spring.boot.autoconfigure.jdbc
 import org.komapper.core.BuilderDialect
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
+import org.komapper.core.DefaultStatistics
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.LoggerFacade
@@ -10,6 +11,7 @@ import org.komapper.core.LoggerFacades
 import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
+import org.komapper.core.Statistics
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
 import org.komapper.jdbc.DefaultJdbcDataFactory
@@ -121,6 +123,12 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    open fun komapperStatistics(): Statistics {
+        return DefaultStatistics()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     open fun komapperDatabaseConfig(
         dialect: JdbcDialect,
         clockProvider: ClockProvider,
@@ -133,6 +141,7 @@ open class KomapperJdbcAutoConfiguration {
         dataOperator: JdbcDataOperator,
         dataSource: DataSource,
         templateStatementBuilder: TemplateStatementBuilder,
+        statistics: Statistics,
     ): JdbcDatabaseConfig {
         return SimpleJdbcDatabaseConfig(
             id = UUID.randomUUID(),
@@ -147,6 +156,7 @@ open class KomapperJdbcAutoConfiguration {
             dataOperator = dataOperator,
             dataSource = dataSource,
             templateStatementBuilder = templateStatementBuilder,
+            statistics = statistics,
         )
     }
 

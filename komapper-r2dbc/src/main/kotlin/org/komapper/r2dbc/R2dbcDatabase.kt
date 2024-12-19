@@ -163,6 +163,7 @@ fun R2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
  * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
+ * @param enableStatistics the flag to enable statistics
  */
 fun R2dbcDatabase(
     connectionFactory: ConnectionFactory,
@@ -170,6 +171,7 @@ fun R2dbcDatabase(
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ): R2dbcDatabase {
     val config = DefaultR2dbcDatabaseConfig(
         connectionFactory = connectionFactory,
@@ -177,6 +179,7 @@ fun R2dbcDatabase(
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
         executionOptions = executionOptions,
+        enableStatistics = enableStatistics,
     )
     return R2dbcDatabase(config)
 }
@@ -189,6 +192,7 @@ fun R2dbcDatabase(
  * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
+ * @param enableStatistics the flag to enable statistics
  */
 fun R2dbcDatabase(
     options: ConnectionFactoryOptions,
@@ -196,6 +200,7 @@ fun R2dbcDatabase(
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ): R2dbcDatabase {
     val connectionFactory = ConnectionFactories.get(options)
     val config = DefaultR2dbcDatabaseConfig(
@@ -204,6 +209,7 @@ fun R2dbcDatabase(
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
         executionOptions = executionOptions,
+        enableStatistics = enableStatistics,
     )
     return R2dbcDatabase(config)
 }
@@ -216,6 +222,7 @@ fun R2dbcDatabase(
  * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
+ * @param enableStatistics the flag to enable statistics
  */
 fun R2dbcDatabase(
     url: String,
@@ -223,6 +230,7 @@ fun R2dbcDatabase(
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ): R2dbcDatabase {
     val connectionFactory = ConnectionFactories.get(url)
     val config = DefaultR2dbcDatabaseConfig(
@@ -231,6 +239,7 @@ fun R2dbcDatabase(
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
         executionOptions = executionOptions,
+        enableStatistics = enableStatistics,
     )
     return R2dbcDatabase(config)
 }
