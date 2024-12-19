@@ -56,6 +56,10 @@ include("komapper-spring-boot-autoconfigure-jdbc")
 include("komapper-spring-boot-autoconfigure-r2dbc")
 include("komapper-spring-boot-starter-jdbc")
 include("komapper-spring-boot-starter-r2dbc")
+include("komapper-spring-boot-starter-test-jdbc")
+include("komapper-spring-boot-starter-test-r2dbc")
+include("komapper-spring-boot-test-autoconfigure-jdbc")
+include("komapper-spring-boot-test-autoconfigure-r2dbc")
 
 // OPTIONAL
 include("komapper-template")

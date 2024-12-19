@@ -51,12 +51,14 @@ spring-core = { module = "org.springframework:spring-core", version.ref = "sprin
 spring-context = { module = "org.springframework:spring-context", version.ref = "springframework" }
 spring-jdbc = { module = "org.springframework:spring-jdbc", version.ref = "springframework" }
 spring-r2dbc = { module = "org.springframework:spring-r2dbc", version.ref = "springframework" }
+spring-test = { module = "org.springframework:spring-test", version.ref = "springframework" }
 spring-tx = { module = "org.springframework:spring-tx", version.ref = "springframework" }
 
 spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
+spring-boot-test-autoconfigure = { module = "org.springframework.boot:spring-boot-test-autoconfigure", version.ref = "spring-boot" }
 
 quarkus-bom = { module = "io.quarkus:quarkus-bom", version.ref = "quarkus" }
 quarkus-core = { module = "io.quarkus:quarkus-core" }
