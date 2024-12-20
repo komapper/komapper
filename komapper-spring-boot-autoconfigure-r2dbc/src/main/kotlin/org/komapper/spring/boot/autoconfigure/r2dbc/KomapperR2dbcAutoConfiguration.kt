@@ -15,6 +15,7 @@ import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
 import org.komapper.r2dbc.DefaultR2dbcDataOperator
 import org.komapper.r2dbc.R2dbcDataOperator
+import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDataTypeProviders
 import org.komapper.r2dbc.R2dbcDatabase
@@ -24,6 +25,7 @@ import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
 import org.komapper.r2dbc.SimpleR2dbcDatabaseConfig
 import org.komapper.spring.r2dbc.SpringR2dbcTransactionSession
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -94,6 +96,13 @@ open class KomapperR2dbcAutoConfiguration {
     @ConditionalOnMissingBean
     open fun komapperStatementInspector(): StatementInspector {
         return StatementInspectors.get()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(R2dbcDataType::class)
+    open fun komapperBeanDataTypeProvider(dataTypes: ObjectProvider<R2dbcDataType<*>>): R2dbcDataTypeProvider {
+        return R2dbcDataTypeProvider(*dataTypes.toList().toTypedArray())
     }
 
     @Bean
