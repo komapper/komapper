@@ -106,6 +106,7 @@ fun JdbcDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
  * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
+ * @param enableStatistics the flag to enable statistics
  */
 fun JdbcDatabase(
     dataSource: DataSource,
@@ -113,6 +114,7 @@ fun JdbcDatabase(
     dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ): JdbcDatabase {
     val config = DefaultJdbcDatabaseConfig(
         dataSource = dataSource,
@@ -120,6 +122,7 @@ fun JdbcDatabase(
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
         executionOptions = executionOptions,
+        enableStatistics = enableStatistics,
     )
     return JdbcDatabase(config)
 }
@@ -134,6 +137,7 @@ fun JdbcDatabase(
  * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
+ * @param enableStatistics the flag to enable statistics
  */
 fun JdbcDatabase(
     url: String,
@@ -143,6 +147,7 @@ fun JdbcDatabase(
     dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ): JdbcDatabase {
     val dataSource = SimpleDataSource(url, user, password)
     val config = DefaultJdbcDatabaseConfig(
@@ -151,6 +156,7 @@ fun JdbcDatabase(
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
         executionOptions = executionOptions,
+        enableStatistics = enableStatistics,
     )
     return JdbcDatabase(config)
 }
