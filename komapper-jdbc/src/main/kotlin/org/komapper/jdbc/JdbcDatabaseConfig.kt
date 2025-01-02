@@ -8,6 +8,7 @@ import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.LoggerFacade
 import org.komapper.core.StatementInspector
+import org.komapper.core.StatisticManager
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.ThreadSafe
 import java.util.UUID
@@ -50,8 +51,9 @@ open class DefaultJdbcDatabaseConfig(
     dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
+    enableStatistics: Boolean = false,
 ) : JdbcDatabaseConfig,
-    AbstractDatabaseConfig<JdbcDialect>(dialect, clockProvider, executionOptions) {
+    AbstractDatabaseConfig<JdbcDialect>(dialect, clockProvider, executionOptions, enableStatistics) {
     override val session: JdbcSession by lazy {
         JdbcSessions.get(dataSource, loggerFacade)
     }
@@ -77,4 +79,5 @@ class SimpleJdbcDatabaseConfig(
     override val dataFactory: JdbcDataFactory,
     override val dataOperator: JdbcDataOperator,
     override val dataSource: DataSource,
+    override val statisticManager: StatisticManager,
 ) : JdbcDatabaseConfig

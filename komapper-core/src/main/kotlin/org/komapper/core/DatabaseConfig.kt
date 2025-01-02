@@ -19,12 +19,14 @@ interface DatabaseConfig {
     val loggerFacade: LoggerFacade
     val statementInspector: StatementInspector
     val templateStatementBuilder: TemplateStatementBuilder
+    val statisticManager: StatisticManager get() = EmptyStatisticManager
 }
 
 abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
     override val dialect: DIALECT,
     override val clockProvider: ClockProvider = DefaultClockProvider(),
     override val executionOptions: ExecutionOptions = ExecutionOptions(),
+    private val enableStatistics: Boolean = false,
 ) : DatabaseConfig {
     override val id: UUID = UUID.randomUUID()
     override val logger: Logger by lazy {
@@ -38,6 +40,9 @@ abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
     }
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
         TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
+    }
+    override val statisticManager: StatisticManager by lazy {
+        StatisticManager(enableStatistics)
     }
 }
 
@@ -60,4 +65,5 @@ object DryRunDatabaseConfig : DatabaseConfig {
         get() = throw UnsupportedOperationException()
     override val templateStatementBuilder: TemplateStatementBuilder
         get() = throw UnsupportedOperationException()
+    override val statisticManager: StatisticManager = EmptyStatisticManager
 }
