@@ -57,7 +57,7 @@ class DefaultJdbcExecutor(
                     setUp(ps)
                     log(statement)
                     bind(ps, statement)
-                    computeExecutionTime(statement) {
+                    executeStatement(statement) {
                         ps.executeQuery().use { rs ->
                             transform(rs)
                         }
@@ -80,7 +80,7 @@ class DefaultJdbcExecutor(
                     setUp(ps)
                     log(statement)
                     bind(ps, statement)
-                    computeExecutionTime(statement) {
+                    executeStatement(statement) {
                         ps.executeQuery().use { rs ->
                             val sequence = sequence {
                                 while (rs.next()) {
@@ -106,7 +106,7 @@ class DefaultJdbcExecutor(
                     setUp(ps)
                     log(statement)
                     bind(ps, statement)
-                    computeExecutionTime(statement) {
+                    executeStatement(statement) {
                         val count = ps.executeUpdate()
                         val keys = if (generatedColumn == null) {
                             emptyList()
@@ -140,7 +140,7 @@ class DefaultJdbcExecutor(
                             bind(ps, statement)
                             ps.addBatch()
                         }
-                        computeExecutionTime(firstStatement) {
+                        executeStatement(firstStatement) {
                             val counts = ps.executeBatch()
                             val pairs = if (generatedColumn == null) {
                                 counts.map { it.toLong() to null }
@@ -169,7 +169,7 @@ class DefaultJdbcExecutor(
                         log(statement)
                         val sql = asSql(statement)
                         try {
-                            computeExecutionTime(statement) {
+                            executeStatement(statement) {
                                 s.execute(sql)
                             }
                         } catch (e: SQLException) {
@@ -201,15 +201,15 @@ class DefaultJdbcExecutor(
         }
     }
 
-    fun <T> computeExecutionTime(statement: Statement, block: () -> T): T {
-        val statistics = config.statistics
-        if (!statistics.isEnabled()) {
+    fun <T> executeStatement(statement: Statement, block: () -> T): T {
+        val statisticsManager = config.statisticManager
+        if (!statisticsManager.isEnabled()) {
             return block()
         }
         val startTime = System.nanoTime()
         val result = block()
         val endTime = System.nanoTime()
-        statistics.add(asSql(statement), startTime, endTime)
+        statisticsManager.recordSqlExecution(asSql(statement), startTime, endTime)
         return result
     }
 

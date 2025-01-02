@@ -8,7 +8,7 @@ import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.LoggerFacade
 import org.komapper.core.StatementInspector
-import org.komapper.core.Statistics
+import org.komapper.core.StatisticManager
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.ThreadSafe
 import java.util.UUID
@@ -79,5 +79,5 @@ class SimpleJdbcDatabaseConfig(
     override val dataFactory: JdbcDataFactory,
     override val dataOperator: JdbcDataOperator,
     override val dataSource: DataSource,
-    override val statistics: Statistics,
+    override val statisticManager: StatisticManager,
 ) : JdbcDatabaseConfig

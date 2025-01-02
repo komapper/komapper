@@ -31,7 +31,7 @@ class OracleJdbcExecutor(
                     executor.log(statement)
                     executor.bind(ps, statement)
                     register(ps, statement)
-                    executor.computeExecutionTime(statement) {
+                    executor.executeStatement(statement) {
                         val count = ps.executeUpdate()
                         if (count > 0) {
                             val ops = ps.unwrap(OraclePreparedStatement::class.java)

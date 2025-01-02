@@ -5,7 +5,7 @@ import io.quarkus.arc.Unremovable;
 import jakarta.inject.Singleton;
 import org.komapper.core.ClockProvider;
 import org.komapper.core.DefaultClockProvider;
-import org.komapper.core.DefaultStatistics;
+import org.komapper.core.DefaultStatisticManager;
 import org.komapper.core.ExecutionOptions;
 import org.komapper.core.Logger;
 import org.komapper.core.LoggerFacade;
@@ -13,7 +13,7 @@ import org.komapper.core.LoggerFacades;
 import org.komapper.core.Loggers;
 import org.komapper.core.StatementInspector;
 import org.komapper.core.StatementInspectors;
-import org.komapper.core.Statistics;
+import org.komapper.core.StatisticManager;
 
 @Singleton
 @Unremovable
@@ -57,7 +57,7 @@ public class KomapperProducer {
   @Singleton
   @DefaultBean
   @Unremovable
-  public Statistics statistics() {
-    return new DefaultStatistics();
+  public StatisticManager statistics() {
+    return new DefaultStatisticManager();
   }
 }

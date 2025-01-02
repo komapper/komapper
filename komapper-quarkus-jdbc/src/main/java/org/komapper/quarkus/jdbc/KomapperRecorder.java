@@ -15,7 +15,7 @@ import org.komapper.core.ExecutionOptions;
 import org.komapper.core.Logger;
 import org.komapper.core.LoggerFacade;
 import org.komapper.core.StatementInspector;
-import org.komapper.core.Statistics;
+import org.komapper.core.StatisticManager;
 import org.komapper.core.TemplateStatementBuilder;
 import org.komapper.core.TemplateStatementBuilders;
 import org.komapper.jdbc.DefaultJdbcDataFactory;
@@ -63,7 +63,7 @@ public class KomapperRecorder {
                   dataSourceDefinition.fetchSize,
                   dataSourceDefinition.queryTimeout,
                   false));
-      var statistics = container.instance(Statistics.class).get();
+      var statistics = container.instance(StatisticManager.class).get();
       return new JdbcDatabaseConfig() {
 
         @Override
@@ -127,7 +127,7 @@ public class KomapperRecorder {
         }
 
         @Override
-        public Statistics getStatistics() {
+        public StatisticManager getStatisticManager() {
           return statistics;
         }
       };

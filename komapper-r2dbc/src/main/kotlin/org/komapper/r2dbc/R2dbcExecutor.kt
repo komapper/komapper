@@ -37,7 +37,7 @@ internal class R2dbcExecutor(
                 setUp(r2dbcStmt)
                 log(statement)
                 bind(r2dbcStmt, statement)
-                computeExecutionTime(statement) {
+                executeStatement(statement) {
                     r2dbcStmt.execute().collect { result ->
                         result.map { row, _ ->
                             val value = transform(config.dataOperator, row)
@@ -63,7 +63,7 @@ internal class R2dbcExecutor(
                 setUp(r2dbcStmt)
                 log(statement)
                 bind(r2dbcStmt, statement)
-                computeExecutionTime(statement) {
+                executeStatement(statement) {
                     r2dbcStmt.execute().collect { result ->
                         if (generatedColumn == null) {
                             result.rowsUpdated.collect { count: Number ->
@@ -102,7 +102,7 @@ internal class R2dbcExecutor(
                             r2dbcStmt.add()
                         }
                     }
-                    computeExecutionTime(firstStatement) {
+                    executeStatement(firstStatement) {
                         r2dbcStmt.execute().collect { result ->
                             if (generatedColumn == null) {
                                 result.rowsUpdated.collect { count: Number ->
@@ -133,7 +133,7 @@ internal class R2dbcExecutor(
                     val sql = asSql(statement)
                     batch.add(sql)
                 }
-                computeExecutionTime(statements.first()) {
+                executeStatement(statements.first()) {
                     batch.execute().collect { result ->
                         result.filter {
                             when (it) {
@@ -169,15 +169,15 @@ internal class R2dbcExecutor(
         }
     }
 
-    private suspend fun <T> computeExecutionTime(statement: Statement, block: suspend () -> T): T {
-        val statistics = config.statistics
-        if (!statistics.isEnabled()) {
+    private suspend fun <T> executeStatement(statement: Statement, block: suspend () -> T): T {
+        val statisticsManager = config.statisticManager
+        if (!statisticsManager.isEnabled()) {
             return block()
         }
         val startTime = System.nanoTime()
         val result = block()
         val endTime = System.nanoTime()
-        statistics.add(asSql(statement), startTime, endTime)
+        statisticsManager.recordSqlExecution(asSql(statement), startTime, endTime)
         return result
     }
 
