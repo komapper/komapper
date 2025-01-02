@@ -89,7 +89,7 @@ internal class DefaultStatisticManager(
         if (endTimeNanos < startTimeNanos) throw IllegalArgumentException("endTimeNanos < startTimeNanos")
         val execTimeMillis = TimeUnit.NANOSECONDS.toMillis(endTimeNanos - startTimeNanos)
         statisticMap.compute(sql) { k, v ->
-            v?.calculate(execTimeMillis) ?: Statistic(sql, execTimeMillis)
+            v?.calculate(execTimeMillis) ?: Statistic.of(k, execTimeMillis)
         }
     }
 
