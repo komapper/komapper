@@ -57,8 +57,10 @@ class DefaultJdbcExecutor(
                     setUp(ps)
                     log(statement)
                     bind(ps, statement)
-                    ps.executeQuery().use { rs ->
-                        transform(rs)
+                    executeStatement(statement) {
+                        ps.executeQuery().use { rs ->
+                            transform(rs)
+                        }
                     }
                 }
             }
@@ -78,14 +80,16 @@ class DefaultJdbcExecutor(
                     setUp(ps)
                     log(statement)
                     bind(ps, statement)
-                    ps.executeQuery().use { rs ->
-                        val sequence = sequence {
-                            while (rs.next()) {
-                                this.yield(transform(config.dataOperator, rs))
+                    executeStatement(statement) {
+                        ps.executeQuery().use { rs ->
+                            val sequence = sequence {
+                                while (rs.next()) {
+                                    this.yield(transform(config.dataOperator, rs))
+                                }
                             }
-                        }
-                        runBlocking {
-                            collect(sequence.asFlow())
+                            runBlocking {
+                                collect(sequence.asFlow())
+                            }
                         }
                     }
                 }
@@ -102,13 +106,15 @@ class DefaultJdbcExecutor(
                     setUp(ps)
                     log(statement)
                     bind(ps, statement)
-                    val count = ps.executeUpdate()
-                    val keys = if (generatedColumn == null) {
-                        emptyList()
-                    } else {
-                        fetchGeneratedKeys(ps)
+                    executeStatement(statement) {
+                        val count = ps.executeUpdate()
+                        val keys = if (generatedColumn == null) {
+                            emptyList()
+                        } else {
+                            fetchGeneratedKeys(ps)
+                        }
+                        count.toLong() to keys
                     }
-                    count.toLong() to keys
                 }
             }
         }
@@ -120,7 +126,8 @@ class DefaultJdbcExecutor(
             @Suppress("NAME_SHADOWING")
             val statements = statements.map { inspect(it) }
             config.session.useConnection { con ->
-                prepare(con, statements.first()).use { ps ->
+                val firstStatement = statements.first()
+                prepare(con, firstStatement).use { ps ->
                     setUp(ps)
                     val countAndKeyList = mutableListOf<Pair<Long, Long?>>()
                     val batchSize = executionOptions.getValidBatchSize()
@@ -133,15 +140,17 @@ class DefaultJdbcExecutor(
                             bind(ps, statement)
                             ps.addBatch()
                         }
-                        val counts = ps.executeBatch()
-                        val pairs = if (generatedColumn == null) {
-                            counts.map { it.toLong() to null }
-                        } else {
-                            val keys = fetchGeneratedKeys(ps)
-                            check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }
-                            counts.zip(keys) { a, b -> a.toLong() to b }
+                        executeStatement(firstStatement) {
+                            val counts = ps.executeBatch()
+                            val pairs = if (generatedColumn == null) {
+                                counts.map { it.toLong() to null }
+                            } else {
+                                val keys = fetchGeneratedKeys(ps)
+                                check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }
+                                counts.zip(keys) { a, b -> a.toLong() to b }
+                            }
+                            countAndKeyList.addAll(pairs)
                         }
-                        countAndKeyList.addAll(pairs)
                     }
                     countAndKeyList
                 }
@@ -160,7 +169,9 @@ class DefaultJdbcExecutor(
                         log(statement)
                         val sql = asSql(statement)
                         try {
-                            s.execute(sql)
+                            executeStatement(statement) {
+                                s.execute(sql)
+                            }
                         } catch (e: SQLException) {
                             handler(e)
                         }
@@ -188,6 +199,18 @@ class DefaultJdbcExecutor(
         } catch (cause: Throwable) {
             throw cause
         }
+    }
+
+    fun <T> executeStatement(statement: Statement, block: () -> T): T {
+        val statisticsManager = config.statisticManager
+        if (!statisticsManager.isEnabled()) {
+            return block()
+        }
+        val startTime = System.nanoTime()
+        val result = block()
+        val endTime = System.nanoTime()
+        statisticsManager.recordSqlExecution(asSql(statement), startTime, endTime)
+        return result
     }
 
     fun inspect(statement: Statement): Statement {

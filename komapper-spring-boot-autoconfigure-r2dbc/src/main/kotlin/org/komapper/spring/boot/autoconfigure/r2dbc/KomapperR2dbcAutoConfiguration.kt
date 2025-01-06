@@ -11,6 +11,7 @@ import org.komapper.core.LoggerFacades
 import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
+import org.komapper.core.StatisticManager
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
 import org.komapper.r2dbc.DefaultR2dbcDataOperator
@@ -126,6 +127,12 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    open fun komapperStatistics(): StatisticManager {
+        return StatisticManager()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     open fun komapperDatabaseConfig(
         dialect: R2dbcDialect,
         clockProvider: ClockProvider,
@@ -137,6 +144,7 @@ open class KomapperR2dbcAutoConfiguration {
         dataOperator: R2dbcDataOperator,
         connectionFactory: ConnectionFactory,
         templateStatementBuilder: TemplateStatementBuilder,
+        statistics: StatisticManager,
     ): R2dbcDatabaseConfig {
         return SimpleR2dbcDatabaseConfig(
             id = UUID.randomUUID(),
@@ -150,6 +158,7 @@ open class KomapperR2dbcAutoConfiguration {
             dataOperator = dataOperator,
             connectionFactory = connectionFactory,
             templateStatementBuilder = templateStatementBuilder,
+            statisticManager = statistics,
         )
     }
 

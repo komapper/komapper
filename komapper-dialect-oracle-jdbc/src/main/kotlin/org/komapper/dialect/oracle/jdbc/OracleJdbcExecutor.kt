@@ -31,22 +31,24 @@ class OracleJdbcExecutor(
                     executor.log(statement)
                     executor.bind(ps, statement)
                     register(ps, statement)
-                    val count = ps.executeUpdate()
-                    if (count > 0) {
-                        val ops = ps.unwrap(OraclePreparedStatement::class.java)
-                        ops.returnResultSet.use { rs ->
-                            val sequence = sequence {
-                                while (rs.next()) {
-                                    this.yield(transform(config.dataOperator, rs))
+                    executor.executeStatement(statement) {
+                        val count = ps.executeUpdate()
+                        if (count > 0) {
+                            val ops = ps.unwrap(OraclePreparedStatement::class.java)
+                            ops.returnResultSet.use { rs ->
+                                val sequence = sequence {
+                                    while (rs.next()) {
+                                        this.yield(transform(config.dataOperator, rs))
+                                    }
+                                }
+                                runBlocking {
+                                    collect(sequence.asFlow())
                                 }
                             }
+                        } else {
                             runBlocking {
-                                collect(sequence.asFlow())
+                                collect(emptyFlow())
                             }
-                        }
-                    } else {
-                        runBlocking {
-                            collect(emptyFlow())
                         }
                     }
                 }

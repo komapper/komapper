@@ -37,13 +37,15 @@ internal class R2dbcExecutor(
                 setUp(r2dbcStmt)
                 log(statement)
                 bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().collect { result ->
-                    result.map { row, _ ->
-                        val value = transform(config.dataOperator, row)
-                        Optional.ofNullable(value)
-                    }.collect {
-                        val value = it.orElse(null)
-                        emit(value)
+                executeStatement(statement) {
+                    r2dbcStmt.execute().collect { result ->
+                        result.map { row, _ ->
+                            val value = transform(config.dataOperator, row)
+                            Optional.ofNullable(value)
+                        }.collect {
+                            val value = it.orElse(null)
+                            emit(value)
+                        }
                     }
                 }
             }
@@ -61,14 +63,16 @@ internal class R2dbcExecutor(
                 setUp(r2dbcStmt)
                 log(statement)
                 bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().collect { result ->
-                    if (generatedColumn == null) {
-                        result.rowsUpdated.collect { count: Number ->
-                            emit(count.toLong() to emptyList())
+                executeStatement(statement) {
+                    r2dbcStmt.execute().collect { result ->
+                        if (generatedColumn == null) {
+                            result.rowsUpdated.collect { count: Number ->
+                                emit(count.toLong() to emptyList())
+                            }
+                        } else {
+                            val keys = fetchGeneratedKeys(result).asFlow().toList()
+                            emit(keys.size.toLong() to keys)
                         }
-                    } else {
-                        val keys = fetchGeneratedKeys(result).asFlow().toList()
-                        emit(keys.size.toLong() to keys)
                     }
                 }
             }
@@ -86,7 +90,8 @@ internal class R2dbcExecutor(
             val batchStatementsList = statements.chunked(batchSize)
             config.session.useConnection { con ->
                 for (batchStatements in batchStatementsList) {
-                    val r2dbcStmt = prepare(con, batchStatements.first())
+                    val firstStatement = batchStatements.first()
+                    val r2dbcStmt = prepare(con, firstStatement)
                     setUp(r2dbcStmt)
                     val iterator = batchStatements.iterator()
                     while (iterator.hasNext()) {
@@ -97,14 +102,16 @@ internal class R2dbcExecutor(
                             r2dbcStmt.add()
                         }
                     }
-                    r2dbcStmt.execute().collect { result ->
-                        if (generatedColumn == null) {
-                            result.rowsUpdated.collect { count: Number ->
-                                emit(count.toLong() to null)
-                            }
-                        } else {
-                            fetchGeneratedKeys(result).collect { key ->
-                                emit(1L to key)
+                    executeStatement(firstStatement) {
+                        r2dbcStmt.execute().collect { result ->
+                            if (generatedColumn == null) {
+                                result.rowsUpdated.collect { count: Number ->
+                                    emit(count.toLong() to null)
+                                }
+                            } else {
+                                fetchGeneratedKeys(result).collect { key ->
+                                    emit(1L to key)
+                                }
                             }
                         }
                     }
@@ -126,14 +133,16 @@ internal class R2dbcExecutor(
                     val sql = asSql(statement)
                     batch.add(sql)
                 }
-                batch.execute().collect { result ->
-                    result.filter {
-                        when (it) {
-                            is Result.Message -> predicate(it)
-                            else -> true
+                executeStatement(statements.first()) {
+                    batch.execute().collect { result ->
+                        result.filter {
+                            when (it) {
+                                is Result.Message -> predicate(it)
+                                else -> true
+                            }
+                        }.rowsUpdated.collect { count: Number ->
+                            emit(count.toLong())
                         }
-                    }.rowsUpdated.collect { count: Number ->
-                        emit(count.toLong())
                     }
                 }
             }
@@ -158,6 +167,18 @@ internal class R2dbcExecutor(
             is Exception -> throw RuntimeException(cause)
             else -> throw cause
         }
+    }
+
+    private suspend fun <T> executeStatement(statement: Statement, block: suspend () -> T): T {
+        val statisticsManager = config.statisticManager
+        if (!statisticsManager.isEnabled()) {
+            return block()
+        }
+        val startTime = System.nanoTime()
+        val result = block()
+        val endTime = System.nanoTime()
+        statisticsManager.recordSqlExecution(asSql(statement), startTime, endTime)
+        return result
     }
 
     private fun inspect(statement: Statement): Statement {
