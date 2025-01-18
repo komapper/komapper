@@ -69,24 +69,48 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
 
     private val dataTypeMap: Map<KType, R2dbcDataType<*>> = DEFAULT_DATA_TYPES.associateBy { it.type }
 
-    private val dataTypeMapByKClass: Map<KClass<*>, R2dbcDataType<*>> = DEFAULT_DATA_TYPES.associateBy { it.type.classifier as KClass<*> }
+    private val dataTypeMapByKClass: Map<KClass<*>, R2dbcDataType<*>> =
+        DEFAULT_DATA_TYPES.associateBy { it.type.classifier as KClass<*> }
 
     override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
-        return if (Array::class.java.isAssignableFrom((type.classifier as KClass<*>).java)) {
-            val componentType = (type.classifier as KClass<*>).java.componentType.kotlin
-            // If the componentType can be converted to KType, the getDataType function should be called
-            val componentDataType = dataTypeMapByKClass[componentType]
-            checkNotNull(componentDataType) { "The dataType is not found for the component type \"${componentType.qualifiedName}\"." }
-            @Suppress("UNCHECKED_CAST")
-            PostgreSqlR2dbcArrayType((type.classifier as KClass<*>), componentDataType) as R2dbcDataType<T>?
-        } else {
-            getDataType(type)
+        @Suppress("UNCHECKED_CAST")
+        val dataType = dataTypeMap[type] as R2dbcDataType<T>?
+        return dataType ?: getArrayDataType(type) ?: next.get(type)
+    }
+
+    /**
+     * Determines the appropriate R2dbcDataType for an array type based on the given KType.
+     *
+     * Note that the classifier of an Array type with primitive boxed elements returns a specialized xxxArray for the corresponding primitive type.
+     *
+     * @param type the KType representing the array data type to be processed
+     * @return the corresponding R2dbcDataType for the array type, or null if no suitable type is found
+     */
+    private fun <T : Any> getArrayDataType(type: KType): R2dbcDataType<T>? {
+        return when (val klass = type.classifier as KClass<*>) {
+            // CharArray and ByteArray are not supported.
+            BooleanArray::class -> createArrayType(Any::class, Boolean::class)
+            DoubleArray::class -> createArrayType(Any::class, Double::class)
+            FloatArray::class -> createArrayType(Any::class, Float::class)
+            IntArray::class -> createArrayType(Any::class, Int::class)
+            LongArray::class -> createArrayType(Any::class, Long::class)
+            ShortArray::class -> createArrayType(Any::class, Short::class)
+            else -> {
+                if (Array::class.java.isAssignableFrom(klass.java)) {
+                    val componentType = klass.java.componentType.kotlin
+                    createArrayType(klass, componentType)
+                } else {
+                    null
+                }
+            }
         }
     }
 
-    private fun <T : Any> getDataType(type: KType): R2dbcDataType<T>? {
+    private fun <T : Any> createArrayType(arrayType: KClass<*>, componentType: KClass<*>): R2dbcDataType<T>? {
+        // If the componentType can be converted to KType, the getDataType function should be called
+        val componentDataType = dataTypeMapByKClass[componentType]
+        checkNotNull(componentDataType) { "The dataType is not found for the component type \"${componentType.qualifiedName}\"." }
         @Suppress("UNCHECKED_CAST")
-        val dataType = dataTypeMap[type] as R2dbcDataType<T>?
-        return dataType ?: next.get(type)
+        return PostgreSqlR2dbcArrayType(arrayType, componentDataType) as R2dbcDataType<T>?
     }
 }

@@ -28,6 +28,12 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
             create table if not exists sequence_strategy(id integer not null primary key, value varchar(10));
 
             create table if not exists array_data(id integer not null primary key, value text[]);
+            create table if not exists array_boolean_data(id integer not null primary key, value boolean[]);
+            create table if not exists array_double_data(id integer not null primary key, value double precision[]);
+            create table if not exists array_float_data(id integer not null primary key, value real[]);
+            create table if not exists array_int_data(id integer not null primary key, value integer[]);
+            create table if not exists array_long_data(id integer not null primary key, value bigint[]);
+            create table if not exists array_short_data(id integer not null primary key, value smallint[]);
             create table if not exists big_decimal_data(id integer not null primary key, value numeric);
             create table if not exists big_integer_data(id integer not null primary key, value numeric);
             create table if not exists blob_data(id integer not null primary key, value bytea);
@@ -35,12 +41,12 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
             create table if not exists byte_data(id integer not null primary key, value int2);
             create table if not exists byte_array_data(id integer not null primary key, value bytea);
             create table if not exists clob_data(id integer not null primary key, value text);
-            create table if not exists double_data(id integer not null primary key, value float8);
+            create table if not exists double_data(id integer not null primary key, value double precision);
             create table if not exists enum_data(id integer not null primary key, value varchar(20));
             create table if not exists enum_ordinal_data(id integer not null primary key, value integer);
             create table if not exists enum_property_data(id integer not null primary key, value integer);
             create table if not exists enum_udt_data(id integer not null primary key, value mood);
-            create table if not exists float_data(id integer not null primary key, value float);
+            create table if not exists float_data(id integer not null primary key, value real);
             create table if not exists instant_data(id integer not null primary key, value timestamp with time zone);
             create table if not exists int_data(id integer not null primary key, value integer);
             create table if not exists local_date_time_data(id integer not null primary key, value timestamp);

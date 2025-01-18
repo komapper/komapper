@@ -174,6 +174,353 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertNull(data2.value)
     }
 
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayBoolean(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayBooleanData
+        val array = arrayOf(true, false)
+        val data = ArrayBooleanData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(2, value.size)
+        assertEquals(true, value[0])
+        assertEquals(false, value[1])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayBoolean_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayBooleanData
+        val data = ArrayBooleanData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayBooleanOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayBooleanOfNullableData
+        val array = arrayOf(true, null, false)
+        val data = ArrayBooleanOfNullableData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(true, value[0])
+        assertNull(value[1])
+        assertEquals(false, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayBooleanOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayBooleanOfNullableData
+        val data = ArrayBooleanOfNullableData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayDouble(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayDoubleData
+        val array = arrayOf(1.0, 2.0, 3.0)
+        val data = ArrayDoubleData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1.0, value[0])
+        assertEquals(2.0, value[1])
+        assertEquals(3.0, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayDouble_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayDoubleData
+        val data = ArrayDoubleData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayDoubleOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayDoubleOfNullableData
+        val array = arrayOf(1.0, null, 3.0)
+        val data = ArrayDoubleOfNullableData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1.0, value[0])
+        assertNull(value[1])
+        assertEquals(3.0, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayDoubleOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayDoubleOfNullableData
+        val data = ArrayDoubleOfNullableData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayFloat(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayFloatData
+        val array = arrayOf(1.0f, 2.0f, 3.0f)
+        val data = ArrayFloatData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1.0f, value[0])
+        assertEquals(2.0f, value[1])
+        assertEquals(3.0f, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayFloat_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayFloatData
+        val data = ArrayFloatData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayFloatOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayFloatOfNullableData
+        val array = arrayOf(1.0f, null, 3.0f)
+        val data = ArrayFloatOfNullableData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1.0f, value[0])
+        assertNull(value[1])
+        assertEquals(3.0f, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayFloatOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayFloatOfNullableData
+        val data = ArrayFloatOfNullableData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayInt(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayIntData
+        val array = arrayOf(1, 2, 3)
+        val data = ArrayIntData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1, value[0])
+        assertEquals(2, value[1])
+        assertEquals(3, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayInt_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayIntData
+        val data = ArrayIntData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayIntOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayIntOfNullableData
+        val array = arrayOf(1, null, 3)
+        val data = ArrayIntOfNullableData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1, value[0])
+        assertNull(value[1])
+        assertEquals(3, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayIntOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayIntOfNullableData
+        val data = ArrayIntOfNullableData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayLong(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayLongData
+        val array = arrayOf(1L, 2L, 3L)
+        val data = ArrayLongData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1L, value[0])
+        assertEquals(2L, value[1])
+        assertEquals(3L, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayLong_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayLongData
+        val data = ArrayLongData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayLongOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayLongOfNullableData
+        val array = arrayOf(1L, null, 3L)
+        val data = ArrayLongOfNullableData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1L, value[0])
+        assertNull(value[1])
+        assertEquals(3L, value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayLongOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayLongOfNullableData
+        val data = ArrayLongOfNullableData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayShort(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayShortData
+        val array = arrayOf(1.toShort(), 2.toShort(), 3.toShort())
+        val data = ArrayShortData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1.toShort(), value[0])
+        assertEquals(2.toShort(), value[1])
+        assertEquals(3.toShort(), value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayShort_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayShortData
+        val data = ArrayShortData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayShortOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayShortOfNullableData
+        val array = arrayOf(1.toShort(), null, 3.toShort())
+        val data = ArrayShortOfNullableData(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals(1.toShort(), value[0])
+        assertNull(value[1])
+        assertEquals(3.toShort(), value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayShortOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayShortOfNullableData
+        val data = ArrayShortOfNullableData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
     @Test
     fun bigDecimal(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.bigDecimalData
@@ -454,10 +801,16 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             }
             Unit
         }
-        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumData\".", ex.message)
+        assertEquals(
+            "Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumData\".",
+            ex.message
+        )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
-        assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
+        assertEquals(
+            "Failed to extract a value from column. The column index is 1. (Column indices start from 0.)",
+            cause.message
+        )
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
         assertEquals(
@@ -509,7 +862,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
-        assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
+        assertEquals(
+            "Failed to extract a value from column. The column index is 1. (Column indices start from 0.)",
+            cause.message
+        )
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
         assertEquals(
@@ -561,7 +917,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         )
         val cause = ex.cause
         assertTrue(cause is ValueExtractingException)
-        assertEquals("Failed to extract a value from column. The column index is 1. (Column indices start from 0.)", cause.message)
+        assertEquals(
+            "Failed to extract a value from column. The column index is 1. (Column indices start from 0.)",
+            cause.message
+        )
         val cause2 = cause.cause
         assertTrue(cause2 is EnumMappingException)
         assertEquals(

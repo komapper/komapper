@@ -30,6 +30,24 @@ data class R2dbcPostgreSqlMapping(
     @KomapperColumn(alwaysQuote = true)
     @Suppress("ArrayInDataClass")
     val array: Array<String>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val arrayBoolean: Array<Boolean>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val arrayDouble: Array<Double>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val arrayFloat: Array<Float>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val arrayInt: Array<Int>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val arrayLong: Array<Long>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val arrayShort: Array<Short>,
     @KomapperColumn(alwaysQuote = true) val bigDecimal: BigDecimal,
     @KomapperColumn(alwaysQuote = true) val bigInteger: BigInteger,
     @KomapperColumn(alwaysQuote = true) val blob: Blob,
