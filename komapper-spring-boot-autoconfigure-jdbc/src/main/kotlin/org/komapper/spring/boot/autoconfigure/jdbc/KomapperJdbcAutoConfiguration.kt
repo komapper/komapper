@@ -11,6 +11,7 @@ import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
 import org.komapper.core.StatisticManager
+import org.komapper.core.StatisticManagers
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
 import org.komapper.jdbc.DefaultJdbcDataFactory
@@ -132,7 +133,7 @@ open class KomapperJdbcAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun komapperStatistics(): StatisticManager {
-        return StatisticManager()
+        return StatisticManagers.get()
     }
 
     @Bean

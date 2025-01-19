@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit
  * retrieving the collected statistics, recording SQL execution details, and
  * clearing the statistics data.
  */
+@ThreadSafe
 interface StatisticManager {
     /**
      * Checks whether the statistics collection is enabled.
@@ -53,20 +54,19 @@ interface StatisticManager {
 }
 
 /**
- * Creates an instance of `StatisticManager`.
+ * Provides a thread-safe implementation for managing the collection and reporting
+ * of SQL execution statistics. This class is responsible for tracking execution
+ * details such as execution time and occurrences, and maintains a record of statistics
+ * for each unique SQL statement.
  *
- * This method constructs a default implementation of the `StatisticManager`
- * interface, allowing users to manage SQL execution statistics, such as enabling
- * or disabling statistics collection, retrieving statistics, and clearing data.
+ * @property enabled Determines whether statistics collection is currently enabled. It is volatile to allow
+ * thread-safe toggling of this feature.
+ * @constructor Initializes the statistics manager with the given state for enabling or disabling statistics collection.
  *
- * @param enabled A boolean that determines whether the statistics collection is
- * initially enabled. Defaults to `false`.
- * @return An instance of the `StatisticManager` interface.
+ * This class uses a concurrent map to ensure thread-safe access and updates to stored statistics.
+ * It verifies input constraints, such as ensuring valid execution time ranges, and updates or creates statistics
+ * accordingly when a new SQL execution is recorded.
  */
-fun StatisticManager(enabled: Boolean = false): StatisticManager {
-    return DefaultStatisticManager(enabled)
-}
-
 internal class DefaultStatisticManager(
     @Volatile private var enabled: Boolean = false,
 ) : StatisticManager {
