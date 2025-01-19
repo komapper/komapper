@@ -23,10 +23,11 @@ import kotlin.reflect.KClass
  * Similarly, component scanning is configured to skip regular components and
  * configuration properties.
  *
- * By default, tests annotated with `@KomapperJdbcTest` use the configured database. If you
- * want to replace any explicit or usually auto-configured DataSource by an embedded
- * in-memory database, the [@AutoConfigureTestDatabase][AutoConfigureTestDatabase]
- * annotation can be used to override these settings.
+ * By default, tests annotated with `@KomapperJdbcTest` are transactional and roll back
+ * at the end of each test. They also use an embedded in-memory database (replacing any
+ * explicit or usually auto-configured `DataSource`). The
+ * [@AutoConfigureTestDatabase][AutoConfigureTestDatabase] annotation can be used to
+ * override these settings.
  *
  * When using JUnit 4, this annotation should be used in combination with `@RunWith(SpringRunner.class)`.
  */
@@ -41,6 +42,7 @@ import kotlin.reflect.KClass
 @Transactional
 @AutoConfigureCache
 @AutoConfigureKomapperJdbc
+@AutoConfigureTestDatabase
 @ImportAutoConfiguration
 annotation class KomapperJdbcTest(
 
