@@ -42,7 +42,7 @@ abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
         TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
     }
     override val statisticManager: StatisticManager by lazy {
-        StatisticManager(enableStatistics)
+        StatisticManagers.get(enableStatistics)
     }
 }
 
