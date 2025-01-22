@@ -25,7 +25,9 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
+import org.komapper.r2dbc.R2dbcUserDefinedDataTypeAdapter
 import org.komapper.r2dbc.SimpleR2dbcDatabaseConfig
+import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import org.komapper.spring.r2dbc.SpringR2dbcTransactionSession
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
@@ -35,6 +37,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Conditional
 import org.springframework.core.env.Environment
 import org.springframework.transaction.ReactiveTransactionManager
 import java.util.Optional
@@ -102,9 +105,14 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(R2dbcDataType::class)
-    open fun komapperBeanDataTypeProvider(dataTypes: ObjectProvider<R2dbcDataType<*>>): R2dbcDataTypeProvider {
-        return R2dbcDataTypeProvider(*dataTypes.toList().toTypedArray())
+    @Conditional(ConditionalOnAnyR2dbcDataTypeBean::class)
+    open fun komapperBeanDataTypeProvider(dataTypes: ObjectProvider<R2dbcDataType<*>>, userDefinedDataTypes: ObjectProvider<R2dbcUserDefinedDataType<*>>): R2dbcDataTypeProvider {
+        val all = dataTypes + userDefinedDataTypes.map { R2dbcUserDefinedDataTypeAdapter(it) }
+        val dupes = all.groupBy { it.type }.filterValues { it.size > 1 }
+        if (dupes.isNotEmpty()) {
+            throw IllegalStateException("Found multiple Beans for one or more DataTypes: ${dupes.keys}")
+        }
+        return R2dbcDataTypeProvider(*all.toTypedArray())
     }
 
     @Bean

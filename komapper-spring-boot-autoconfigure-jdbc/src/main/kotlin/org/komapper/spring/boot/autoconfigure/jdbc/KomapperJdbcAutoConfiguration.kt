@@ -26,7 +26,9 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
+import org.komapper.jdbc.JdbcUserDefinedDataTypeAdapter
 import org.komapper.jdbc.SimpleJdbcDatabaseConfig
+import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import org.komapper.spring.jdbc.SpringJdbcTransactionSession
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
@@ -36,6 +38,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Conditional
 import org.springframework.core.env.Environment
 import org.springframework.transaction.PlatformTransactionManager
 import java.util.Optional
@@ -106,9 +109,14 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(JdbcDataType::class)
-    open fun komapperBeanDataTypeProvider(dataTypes: ObjectProvider<JdbcDataType<*>>): JdbcDataTypeProvider {
-        return JdbcDataTypeProvider(*dataTypes.toList().toTypedArray())
+    @Conditional(ConditionalOnAnyJdbcDataTypeBean::class)
+    open fun komapperBeanDataTypeProvider(dataTypes: ObjectProvider<JdbcDataType<*>>, userDefinedDataTypes: ObjectProvider<JdbcUserDefinedDataType<*>>): JdbcDataTypeProvider {
+        val all = dataTypes + userDefinedDataTypes.map { JdbcUserDefinedDataTypeAdapter(it) }
+        val dupes = all.groupBy { it.type }.filterValues { it.size > 1 }
+        if (dupes.isNotEmpty()) {
+            throw IllegalStateException("Found multiple Beans for one or more DataTypes: ${dupes.keys}")
+        }
+        return JdbcDataTypeProvider(*all.toTypedArray())
     }
 
     @Bean
