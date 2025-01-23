@@ -13,6 +13,8 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcStringType
+import org.komapper.jdbc.JdbcUserDefinedDataTypeAdapter
+import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
@@ -111,6 +113,52 @@ class KomapperJdbcAutoConfigurationTest {
     }
 
     @Test
+    fun userDefinedDataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(JdbcUserDefinedDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(JdbcUserDefinedDataType::class.java)
+                    .hasSingleBean(JdbcDataTypeProvider::class.java)
+
+                val dataTypeProvider = context.getBean(JdbcDataTypeProvider::class.java)
+                assertThat(dataTypeProvider.get<IntRange>(typeOf<IntRange>())).isInstanceOf(
+                    JdbcUserDefinedDataTypeAdapter::class.java
+                )
+            }
+    }
+
+    @Test
+    fun multipleDataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(JdbcDataTypeConfigure::class.java, JdbcUserDefinedDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(JdbcDataType::class.java)
+                    .hasSingleBean(JdbcUserDefinedDataType::class.java)
+                    .hasSingleBean(JdbcDataTypeProvider::class.java)
+
+                val dataTypeProvider = context.getBean(JdbcDataTypeProvider::class.java)
+                val customDataType = context.getBean(JdbcDataType::class.java)
+                assertThat(dataTypeProvider.get<LongRange>(typeOf<LongRange>())).isEqualTo(customDataType)
+                assertThat(dataTypeProvider.get<IntRange>(typeOf<IntRange>())).isInstanceOf(
+                    JdbcUserDefinedDataTypeAdapter::class.java
+                )
+            }
+    }
+
+    @Test
+    fun invalidDataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(JdbcInvalidDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context).hasFailed()
+            }
+    }
+
+    @Test
     fun disabledConfiguration() {
         ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(KomapperJdbcAutoConfiguration::class.java))
@@ -166,6 +214,21 @@ class KomapperJdbcAutoConfigurationTest {
         open fun customJdbcDataType(): JdbcDataType<LongRange> = CustomJdbcDataType()
     }
 
+    @Configuration
+    open class JdbcUserDefinedDataTypeConfigure {
+        @Bean
+        open fun customJdbcUserDefinedDataType(): JdbcUserDefinedDataType<IntRange> = CustomJdbcUserDefinedDataTypeIntRange()
+    }
+
+    @Configuration
+    open class JdbcInvalidDataTypeConfigure {
+        @Bean
+        open fun customJdbcDataType(): JdbcDataType<LongRange> = CustomJdbcDataType()
+
+        @Bean
+        open fun customJdbcUserDefinedDataType(): JdbcUserDefinedDataType<LongRange> = CustomJdbcUserDefinedDataTypeLongRange()
+    }
+
     class MyStatementBuilder : TemplateStatementBuilder {
         override fun build(
             template: CharSequence,
@@ -192,5 +255,41 @@ class KomapperJdbcAutoConfigurationTest {
         override fun doSetValue(ps: PreparedStatement, index: Int, value: LongRange) {
             throw IllegalStateException("Shouldn't be called")
         }
+    }
+
+    private abstract class AbstractJdbcUserDefinedDataType<T : Any> : JdbcUserDefinedDataType<T> {
+        override val name
+            get() = throw IllegalStateException("Shouldn't be called")
+
+        override val jdbcType
+            get() = throw IllegalStateException("Shouldn't be called")
+
+        override fun getValue(rs: ResultSet, index: Int): T? {
+            throw throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun getValue(rs: ResultSet, columnLabel: String): T? {
+            throw throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun setValue(
+            ps: PreparedStatement,
+            index: Int,
+            value: T,
+        ) {
+            throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun toString(value: T): String {
+            throw IllegalStateException("Shouldn't be called")
+        }
+    }
+
+    private class CustomJdbcUserDefinedDataTypeIntRange : AbstractJdbcUserDefinedDataType<IntRange>() {
+        override val type = typeOf<IntRange>()
+    }
+
+    private class CustomJdbcUserDefinedDataTypeLongRange : AbstractJdbcUserDefinedDataType<LongRange>() {
+        override val type = typeOf<LongRange>()
     }
 }

@@ -1,5 +1,6 @@
 package org.komapper.spring.boot.autoconfigure.r2dbc
 
+import io.r2dbc.spi.Row
 import org.assertj.core.api.Assertions.assertThat
 import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
@@ -12,6 +13,8 @@ import org.komapper.r2dbc.AbstractR2dbcDataType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.R2dbcUserDefinedDataTypeAdapter
+import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
@@ -104,6 +107,52 @@ class KomapperR2dbcAutoConfigurationTest {
     }
 
     @Test
+    fun userDefinedDataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(R2dbcUserDefinedDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(R2dbcUserDefinedDataType::class.java)
+                    .hasSingleBean(R2dbcDataTypeProvider::class.java)
+
+                val dataTypeProvider = context.getBean(R2dbcDataTypeProvider::class.java)
+                assertThat(dataTypeProvider.get<IntRange>(typeOf<IntRange>())).isInstanceOf(
+                    R2dbcUserDefinedDataTypeAdapter::class.java
+                )
+            }
+    }
+
+    @Test
+    fun multipleDataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(R2dbcDataTypeConfigure::class.java, R2dbcUserDefinedDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(R2dbcDataType::class.java)
+                    .hasSingleBean(R2dbcUserDefinedDataType::class.java)
+                    .hasSingleBean(R2dbcDataTypeProvider::class.java)
+
+                val dataTypeProvider = context.getBean(R2dbcDataTypeProvider::class.java)
+                val customDataType = context.getBean(R2dbcDataType::class.java)
+                assertThat(dataTypeProvider.get<LongRange>(typeOf<LongRange>())).isEqualTo(customDataType)
+                assertThat(dataTypeProvider.get<IntRange>(typeOf<IntRange>())).isInstanceOf(
+                    R2dbcUserDefinedDataTypeAdapter::class.java
+                )
+            }
+    }
+
+    @Test
+    fun invalidDataTypeBeanConfiguration() {
+        contextRunner
+            .withUserConfiguration(R2dbcInvalidDataTypeConfigure::class.java)
+            .run { context ->
+                assertThat(context).hasFailed()
+            }
+    }
+
+    @Test
     fun disabledConfiguration() {
         ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(KomapperR2dbcAutoConfiguration::class.java))
@@ -147,6 +196,21 @@ class KomapperR2dbcAutoConfigurationTest {
         open fun customR2dbcDataType(): R2dbcDataType<LongRange> = CustomR2dbcDataType()
     }
 
+    @Configuration
+    open class R2dbcUserDefinedDataTypeConfigure {
+        @Bean
+        open fun customR2dbcUserDefinedDataType(): R2dbcUserDefinedDataType<IntRange> = CustomR2dbcUserDefinedDataTypeIntRange()
+    }
+
+    @Configuration
+    open class R2dbcInvalidDataTypeConfigure {
+        @Bean
+        open fun customR2dbcDataType(): R2dbcDataType<LongRange> = CustomR2dbcDataType()
+
+        @Bean
+        open fun customR2dbcUserDefinedDataType(): R2dbcUserDefinedDataType<LongRange> = CustomR2dbcUserDefinedDataTypeLongRange()
+    }
+
     class MyStatementBuilder : TemplateStatementBuilder {
         override fun build(
             template: CharSequence,
@@ -161,5 +225,49 @@ class KomapperR2dbcAutoConfigurationTest {
 
     private class CustomR2dbcDataType : AbstractR2dbcDataType<LongRange>(typeOf<LongRange>()) {
         override val name = "custom"
+    }
+
+    private abstract class AbstractR2dbcUserDefinedDataType<T : Any> : R2dbcUserDefinedDataType<T> {
+        override val name
+            get() = throw IllegalStateException("Shouldn't be called")
+
+        override val r2dbcType: Class<*>
+            get() = throw IllegalStateException("Shouldn't be called")
+
+        override fun getValue(row: Row, index: Int): T? {
+            throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun getValue(row: Row, columnLabel: String): T? {
+            throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun setValue(
+            statement: io.r2dbc.spi.Statement,
+            index: Int,
+            value: T,
+        ) {
+            throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun setValue(
+            statement: io.r2dbc.spi.Statement,
+            name: String,
+            value: T,
+        ) {
+            throw IllegalStateException("Shouldn't be called")
+        }
+
+        override fun toString(value: T): String {
+            throw IllegalStateException("Shouldn't be called")
+        }
+    }
+
+    private class CustomR2dbcUserDefinedDataTypeIntRange : AbstractR2dbcUserDefinedDataType<IntRange>() {
+        override val type = typeOf<IntRange>()
+    }
+
+    private class CustomR2dbcUserDefinedDataTypeLongRange : AbstractR2dbcUserDefinedDataType<LongRange>() {
+        override val type = typeOf<LongRange>()
     }
 }
