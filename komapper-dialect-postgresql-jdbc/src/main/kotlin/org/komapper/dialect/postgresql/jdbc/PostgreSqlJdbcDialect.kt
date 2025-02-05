@@ -10,6 +10,8 @@ interface PostgreSqlJdbcDialect : PostgreSqlDialect, JdbcDialect {
             it.sqlState == PostgreSqlDialect.UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
         }
     }
+
+    override fun supportsReturnGeneratedKeysFlag(): Boolean = false
 }
 
 private object PostgreSqlJdbcDialectImpl : PostgreSqlJdbcDialect
