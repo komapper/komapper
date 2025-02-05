@@ -6,6 +6,7 @@ public interface MySql5Setting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.MYSQL_5
     override val createSql: String
         get() =
+            // language=mysql
             """
             create table if not exists department_archive(department_id integer not null primary key, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer);
             create table if not exists department(department_id integer not null primary key, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer);
@@ -44,6 +45,7 @@ public interface MySql5Setting<DATABASE : Database> : Setting<DATABASE> {
             create table if not exists offset_date_time_data(id integer not null primary key, value timestamp);
             create table if not exists short_data(id integer not null primary key, value smallint);
             create table if not exists string_data(id integer not null primary key, value varchar(20));
+            create table if not exists multi_generated(created_at timestamp default current_timestamp, id integer auto_increment primary key);
 
             insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
             insert into department values(2,20,'RESEARCH','DALLAS',1);
@@ -114,6 +116,7 @@ public interface MySql5Setting<DATABASE : Database> : Setting<DATABASE> {
             """.trimIndent()
     override val resetSql: String
         get() =
+            // language=mysql
             """
             alter table identity_strategy auto_increment = 1
             """.trimIndent()

@@ -6,6 +6,7 @@ public interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.SQLSERVER
     override val createSql: String
         get() =
+            // language=tsql
             """
             create sequence sequence_strategy_id start with 1 increment by 100;
             create sequence person_id_sequence start with 1 increment by 100;
@@ -47,6 +48,7 @@ public interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
             create table offset_date_time_data(id int not null primary key, value datetimeoffset);
             create table short_data(id int not null primary key, value smallint);
             create table string_data(id int not null primary key, value varchar(20));
+            create table multi_generated(created_at datetimeoffset default getdate(), id int identity primary key);
 
             insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
             insert into department values(2,20,'RESEARCH','DALLAS',1);
@@ -117,6 +119,7 @@ public interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
             """.trimIndent()
     override val resetSql: String
         get() =
+            // language=tsql
             """
             truncate table identity_strategy;
             dbcc checkident ('identity_strategy', reseed, 1);

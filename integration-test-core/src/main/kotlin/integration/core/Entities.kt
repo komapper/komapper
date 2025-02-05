@@ -414,3 +414,14 @@ public data class Name(
     val lastName: String?,
     val deletedAt: Instant?,
 )
+
+@KomapperEntity
+@KomapperTable(name = "multi_generated")
+public data class MultiGenerated(
+    @KomapperId
+    @KomapperAutoIncrement
+    val id: Int = 0,
+    @KomapperCreatedAt
+    @KomapperColumn("created_at")
+    val createdAt: Instant = Instant.EPOCH,
+)

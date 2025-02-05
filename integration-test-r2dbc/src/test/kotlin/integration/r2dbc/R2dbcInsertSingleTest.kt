@@ -11,6 +11,7 @@ import integration.core.IdentityStrategy
 import integration.core.Machine
 import integration.core.MachineInfo1
 import integration.core.Man
+import integration.core.MultiGenerated
 import integration.core.Person
 import integration.core.Robot
 import integration.core.RobotInfo1
@@ -24,6 +25,7 @@ import integration.core.human
 import integration.core.identityStrategy
 import integration.core.machine
 import integration.core.man
+import integration.core.multiGenerated
 import integration.core.person
 import integration.core.robot
 import integration.core.sequenceStrategy
@@ -391,5 +393,10 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }
         assertEquals(0, count)
+    }
+
+    @Test
+    fun multipleGeneratedColumns(info: TestInfo) = inTransaction(db, info) {
+        db.runQuery { QueryDsl.insert(Meta.multiGenerated).single(MultiGenerated()) }
     }
 }

@@ -13,6 +13,7 @@ import integration.core.IdentityStrategy
 import integration.core.Machine
 import integration.core.MachineInfo1
 import integration.core.Man
+import integration.core.MultiGenerated
 import integration.core.Name
 import integration.core.Person
 import integration.core.Robot
@@ -29,6 +30,7 @@ import integration.core.human
 import integration.core.identityStrategy
 import integration.core.machine
 import integration.core.man
+import integration.core.multiGenerated
 import integration.core.name
 import integration.core.person
 import integration.core.robot
@@ -570,5 +572,10 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
             Unit
         }
         println(ex)
+    }
+
+    @Test
+    fun multipleGeneratedColumns() {
+        db.runQuery { QueryDsl.insert(Meta.multiGenerated).single(MultiGenerated()) }
     }
 }
