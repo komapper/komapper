@@ -6,6 +6,7 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.POSTGRESQL
     override val createSql: String
         get() =
+            // language=postgresql
             """
             create type mood as enum ('SAD', 'OK', 'HAPPY');
 
@@ -58,6 +59,7 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
             create table if not exists sqlxml_data(id integer not null primary key, value xml);
             create table if not exists string_data(id integer not null primary key, value varchar(20));
             create table if not exists uuid_data(id integer not null primary key, value uuid);
+            create table if not exists multi_generated(created_at timestamp with time zone default now(), id serial primary key);
 
             create table if not exists box_data(id integer not null primary key, value box);
             create table if not exists circle_data(id integer not null primary key, value circle);
@@ -150,6 +152,7 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
             """.trimIndent()
     override val resetSql: String
         get() =
+            // language=postgresql
             """
             alter sequence identity_strategy_id_seq restart with 1;
             alter sequence sequence_strategy_id restart with 1

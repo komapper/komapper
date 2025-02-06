@@ -6,6 +6,7 @@ public interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.ORACLE
     override val createSql: String
         get() =
+            // language=oracle
             """
             create sequence sequence_strategy_id increment by 100 start with 1;
             create sequence person_id increment by 100 start with 1;
@@ -48,6 +49,7 @@ public interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
             create table period_data(id integer not null primary key, "value" interval year to month);
             create table short_data(id integer not null primary key, "value" integer);
             create table string_data(id integer not null primary key, "value" varchar2(20));
+            create table multi_generated(created_at timestamp with time zone default current_timestamp, id integer generated always as identity primary key);
             
             insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
             insert into department values(2,20,'RESEARCH','DALLAS',1);
@@ -117,6 +119,7 @@ public interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
             insert into comp_key_employee values(14,14,7934,'MILLER',7,7,TO_DATE('1982-01-23','YYYY-MM-DD'),1300,1,1,14,14,1);
             """.trimIndent()
     override val resetSql: String get() =
+        // language=oracle
         """
         alter table identity_strategy modify(id generated as identity (start with 1));
         alter sequence sequence_strategy_id restart start with 1;

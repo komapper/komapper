@@ -10,6 +10,8 @@ interface H2JdbcDialect : H2Dialect, JdbcDialect {
             it.errorCode == H2Dialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }
     }
+
+    override fun supportsReturnGeneratedKeysFlag(): Boolean = false
 }
 
 private object H2JdbcDialectImpl : H2JdbcDialect

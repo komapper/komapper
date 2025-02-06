@@ -6,6 +6,7 @@ public interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.MARIADB
     override val createSql: String
         get() =
+            // language=mariadb
             """
             create sequence if not exists sequence_strategy_id start with 1 increment by 100;
             create sequence if not exists person_id_sequence start with 1 increment by 100;
@@ -47,6 +48,7 @@ public interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
             create table if not exists offset_date_time_data(id integer not null primary key, value timestamp);
             create table if not exists short_data(id integer not null primary key, value smallint);
             create table if not exists string_data(id integer not null primary key, value varchar(20));
+            create table if not exists multi_generated(created_at timestamp(6) default now(), id integer auto_increment primary key);
 
             insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
             insert into department values(2,20,'RESEARCH','DALLAS',1);
@@ -117,6 +119,7 @@ public interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
             """.trimIndent()
     override val resetSql: String
         get() =
+            // language=mariadb
             """
             alter table identity_strategy auto_increment = 1;
             alter sequence sequence_strategy_id restart with 1;
