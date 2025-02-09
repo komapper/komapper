@@ -75,11 +75,15 @@ public class KomapperSettingsFactory {
       case "h2":
       case "mysql":
       case "mariadb":
+      case "oracle":
         return dbKind;
       case "postgresql":
       case "pgsql":
       case "pg":
         return "postgresql";
+      case "sqlserver":
+      case "mssql":
+        return "sqlserver";
       default:
         throw new IllegalStateException(
             "Can't infer the driver name from the dbKind \""
