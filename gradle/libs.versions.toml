@@ -43,7 +43,7 @@ hikariCP = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
 sqlcommenter = { module = "com.google.cloud:sqlcommenter", version = "2.0.1" }
 opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "1.47.0" }
 jts-core = { module = "org.locationtech.jts:jts-core", version = "1.20.0" }
-slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.16" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.17" }
 
 spring-beans = { module = "org.springframework:spring-beans", version.ref = "springframework" }
