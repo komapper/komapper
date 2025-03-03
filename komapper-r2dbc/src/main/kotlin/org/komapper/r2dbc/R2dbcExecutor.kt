@@ -42,7 +42,7 @@ internal class R2dbcExecutor(
                         result.map { row, _ ->
                             val value = transform(config.dataOperator, row)
                             Optional.ofNullable(value)
-                        }.collect {
+                        }.asFlow().collect {
                             val value = it.orElse(null)
                             emit(value)
                         }
