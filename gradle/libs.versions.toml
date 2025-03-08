@@ -2,7 +2,7 @@
 kotlin = "2.1.10"
 ksp = "2.1.10-1.0.31"
 kotlinx-coroutines = "1.10.1"
-springframework = "5.3.39"
+springframework = "6.2.3"
 spring-boot = "2.7.18"
 quarkus = "3.19.1"
 
