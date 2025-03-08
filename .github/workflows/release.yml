@@ -18,24 +18,19 @@ jobs:
         if: github.event.inputs.version != null
         run: echo "RELEASE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+      - name: Get latest draft release title
         if: github.event.inputs.version == null
-        id: candidate-version
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          result-encoding: string
-          script: |
-            const list = await github.rest.repos.listReleases({
-              owner: "komapper",
-              repo: "komapper",
-            });
-            console.log(list)
-            let version = list.data[0].name
-            return version.startsWith("v") ? version.substring(1) : version
-
-      - name: Assign candidate version
-        if: github.event.inputs.version == null
-        run: echo "RELEASE_VERSION=${{ steps.candidate-version.outputs.result }}" >> $GITHUB_ENV
+        run: |
+          TITLE=$(gh api repos/${{ github.repository }}/releases \
+            --jq '.[] | select(.draft==true) | .name' | head -n 1)
+          if [[ -z "$TITLE" ]]; then
+            echo "No draft release found."
+            exit 1
+          fi
+          RELEASE_VERSION=${TITLE#v}
+          echo "RELEASE_VERSION=RELEASE_VERSION" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4
