@@ -5,7 +5,6 @@ import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.collect
 import org.komapper.r2dbc.R2dbcSession
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.FlowTransactionOperator
