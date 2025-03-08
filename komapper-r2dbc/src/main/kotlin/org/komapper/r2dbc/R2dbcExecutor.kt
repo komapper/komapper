@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.collect
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -38,7 +37,7 @@ internal class R2dbcExecutor(
                 log(statement)
                 bind(r2dbcStmt, statement)
                 executeStatement(statement) {
-                    r2dbcStmt.execute().collect { result ->
+                    r2dbcStmt.execute().asFlow().collect { result ->
                         result.map { row, _ ->
                             val value = transform(config.dataOperator, row)
                             Optional.ofNullable(value)
@@ -64,9 +63,9 @@ internal class R2dbcExecutor(
                 log(statement)
                 bind(r2dbcStmt, statement)
                 executeStatement(statement) {
-                    r2dbcStmt.execute().collect { result ->
+                    r2dbcStmt.execute().asFlow().collect { result ->
                         if (generatedColumn == null) {
-                            result.rowsUpdated.collect { count: Number ->
+                            result.rowsUpdated.asFlow().collect { count: Number ->
                                 emit(count.toLong() to emptyList())
                             }
                         } else {
@@ -103,13 +102,13 @@ internal class R2dbcExecutor(
                         }
                     }
                     executeStatement(firstStatement) {
-                        r2dbcStmt.execute().collect { result ->
+                        r2dbcStmt.execute().asFlow().collect { result ->
                             if (generatedColumn == null) {
-                                result.rowsUpdated.collect { count: Number ->
+                                result.rowsUpdated.asFlow().collect { count: Number ->
                                     emit(count.toLong() to null)
                                 }
                             } else {
-                                fetchGeneratedKeys(result).collect { key ->
+                                fetchGeneratedKeys(result).asFlow().collect { key ->
                                     emit(1L to key)
                                 }
                             }
@@ -134,13 +133,13 @@ internal class R2dbcExecutor(
                     batch.add(sql)
                 }
                 executeStatement(statements.first()) {
-                    batch.execute().collect { result ->
+                    batch.execute().asFlow().collect { result ->
                         result.filter {
                             when (it) {
                                 is Result.Message -> predicate(it)
                                 else -> true
                             }
-                        }.rowsUpdated.collect { count: Number ->
+                        }.rowsUpdated.asFlow().collect { count: Number ->
                             emit(count.toLong())
                         }
                     }
