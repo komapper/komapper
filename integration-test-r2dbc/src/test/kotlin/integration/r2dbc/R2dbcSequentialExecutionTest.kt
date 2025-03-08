@@ -24,7 +24,7 @@ class R2dbcSequentialExecutionTest(private val db: R2dbcDatabase) {
         for (i in 1..1000) {
             val list: List<Address> = db.runQuery(query)
             assertEquals(3, list.size, "i=$i")
-            assertEquals(listOf(1, 2, 3), list.map { it.addressId }.sorted(), "i=$i")
+            assertEquals(listOf(1, 2, 3), list.map { it.addressId }, "i=$i")
         }
     }
 
