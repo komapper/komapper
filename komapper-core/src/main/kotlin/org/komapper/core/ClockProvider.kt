@@ -1,7 +1,6 @@
 package org.komapper.core
 
 import java.time.Clock
-import java.time.Instant
 import java.time.ZoneId
 
 /**
@@ -20,8 +19,10 @@ fun interface ClockProvider {
 /**
  * The default implementation of [ClockProvider].
  */
-class DefaultClockProvider(private val zoneId: ZoneId = ZoneId.systemDefault()) : ClockProvider {
+class DefaultClockProvider(private val source: Clock = Clock.systemDefaultZone()) : ClockProvider {
+    constructor(zoneId: ZoneId) : this(Clock.system(zoneId))
+
     override fun now(): Clock {
-        return Clock.fixed(Instant.now(), zoneId)
+        return Clock.fixed(source.instant(), source.zone)
     }
 }
