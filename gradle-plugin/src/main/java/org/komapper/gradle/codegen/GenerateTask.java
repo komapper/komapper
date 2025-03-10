@@ -57,6 +57,7 @@ public class GenerateTask extends DefaultTask {
         new CodeGenerator(
             settings.getPackageName().getOrNull(),
             tables,
+            settings.getPackageNameResolver().get(),
             settings.getClassNameResolver().get(),
             settings.getPropertyNameResolver().get());
     var destinationDir = settings.getDestinationDir().get().getAsFile().toPath();
