@@ -9,10 +9,7 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.komapper.codegen.ClassNameResolver;
-import org.komapper.codegen.Enquote;
-import org.komapper.codegen.PropertyNameResolver;
-import org.komapper.codegen.PropertyTypeResolver;
+import org.komapper.codegen.*;
 
 public class Generator {
   private final String name;
@@ -36,6 +33,7 @@ public class Generator {
   private final Property<PropertyTypeResolver> propertyTypeResolver;
   private final Property<Enquote> enquote;
 
+  private final Property<PackageNameResolver> packageNameResolver;
   private final Property<ClassNameResolver> classNameResolver;
   private final Property<PropertyNameResolver> propertyNameResolver;
   private final Property<String> versionPropertyName;
@@ -72,6 +70,8 @@ public class Generator {
         objects.property(PropertyTypeResolver.class).value(PropertyTypeResolver.of());
     this.enquote = objects.property(Enquote.class);
     enquote.set(jdbc.getUrl().map(Enquote::of));
+    this.packageNameResolver =
+        objects.property(PackageNameResolver.class).value(PackageNameResolver.of());
     this.classNameResolver = objects.property(ClassNameResolver.class);
     classNameResolver.set(
         prefix.zip(suffix, Pair::of).zip(singularize, (a, b) -> ClassNameResolver.of(a.a, a.b, b)));
@@ -160,6 +160,10 @@ public class Generator {
 
   public Property<Enquote> getEnquote() {
     return enquote;
+  }
+
+  public Property<PackageNameResolver> getPackageNameResolver() {
+    return packageNameResolver;
   }
 
   public Property<ClassNameResolver> getClassNameResolver() {

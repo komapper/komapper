@@ -17,17 +17,20 @@ public class CodeGenerator {
 
   private final String packageName;
   private final List<Table> tables;
+  private final PackageNameResolver packageNameResolver;
   private final ClassNameResolver classNameResolver;
   private final PropertyNameResolver propertyNameResolver;
 
   public CodeGenerator(
       @Nullable String packageName,
       @NotNull List<Table> tables,
+      @NotNull PackageNameResolver packageNameResolver,
       @NotNull ClassNameResolver classNameResolver,
       @NotNull PropertyNameResolver propertyNameResolver) {
     this.packageName = packageName;
     this.tables = new ArrayList<>(Objects.requireNonNull(tables));
     this.classNameResolver = Objects.requireNonNull(classNameResolver);
+    this.packageNameResolver = Objects.requireNonNull(packageNameResolver);
     this.propertyNameResolver = Objects.requireNonNull(propertyNameResolver);
   }
 
@@ -59,7 +62,7 @@ public class CodeGenerator {
     Objects.requireNonNull(resolver);
     var p = new PrintWriter(writer);
     if (packageName != null) {
-      p.println("package " + packageName);
+      p.println("package " + packageNameResolver.resolve(packageName));
     }
     if (useSelfMapping) {
       p.println();
@@ -111,7 +114,7 @@ public class CodeGenerator {
     Objects.requireNonNull(writer);
     var p = new PrintWriter(writer);
     if (packageName != null) {
-      p.println("package " + packageName);
+      p.println("package " + packageNameResolver.resolve(packageName));
       p.println();
     }
     p.print(

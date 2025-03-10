@@ -3,12 +3,7 @@ package integration.jdbc
 import integration.core.Dbms
 import integration.core.Run
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.codegen.ClassNameResolver
-import org.komapper.codegen.CodeGenerator
-import org.komapper.codegen.MetadataReader
-import org.komapper.codegen.PropertyNameResolver
-import org.komapper.codegen.PropertyTypeResolver
-import org.komapper.codegen.Table
+import org.komapper.codegen.*
 import org.komapper.jdbc.JdbcDatabase
 import java.io.StringWriter
 import kotlin.test.Test
@@ -29,7 +24,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     @Test
     fun dump() {
         val tables = getTables()
-        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", "", false), PropertyNameResolver.of())
+        val generator = CodeGenerator(null, tables, PackageNameResolver.of(), ClassNameResolver.of("", "", false), PropertyNameResolver.of())
         val writer = StringWriter()
         generator.generateEntities(writer, false, false, false, false, false, PropertyTypeResolver.of(), "", "", "")
         println(writer)
@@ -39,7 +34,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     @Test
     fun dump_h2() {
         val tables = getTables("PUBLIC")
-        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", "", false), PropertyNameResolver.of())
+        val generator = CodeGenerator(null, tables, PackageNameResolver.of(), ClassNameResolver.of("", "", false), PropertyNameResolver.of())
         val writer = StringWriter()
         generator.generateEntities(writer, false, false, false, false, false, PropertyTypeResolver.of(), "", "", "")
         println(writer)
