@@ -18,8 +18,9 @@ class CodeGeneratorTest {
     fun generateEntities() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
-            "entity",
+            "entity.class",
             createTables(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
@@ -27,10 +28,10 @@ class CodeGeneratorTest {
             generator.generateEntities(writer, false, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
 
-        val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
+        val file = destinationDir.resolve(Paths.get("entity", "class", "entities.kt"))
         val expected =
             """
-            package entity
+            package entity.`class`
             
             data class Address (
                 val addressId: Int,
@@ -60,18 +61,19 @@ class CodeGeneratorTest {
     fun generateEntities_declareAsNullable() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
-            "entity",
+            "entity.return",
             createTables(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
             generator.generateEntities(writer, true, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
-        val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
+        val file = destinationDir.resolve(Paths.get("entity", "return", "entities.kt"))
         val expected =
             """
-            package entity
+            package entity.`return`
             
             data class Address (
                 val addressId: Int?,
@@ -103,6 +105,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
@@ -156,6 +159,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTablesWithPluralNames(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", true),
             PropertyNameResolver.of()
         )
@@ -196,18 +200,19 @@ class CodeGeneratorTest {
     fun generateEntityDefinition() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
-            "entity",
+            "entity.class",
             createTables(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
             generator.generateDefinitions(writer, false, false, false, "", "", "")
         }
-        val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
+        val file = destinationDir.resolve(Paths.get("entity", "class", "entityDefinitions.kt"))
         val expected =
             """
-            package entity
+            package entity.`class`
             
             import org.komapper.annotation.KomapperAutoIncrement
             import org.komapper.annotation.KomapperColumn
@@ -251,6 +256,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
@@ -307,6 +313,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTablesWithPluralNames(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "", true),
             PropertyNameResolver.of()
         )
@@ -360,6 +367,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
+            PackageNameResolver.of(),
             ClassNameResolver.of("", "Entity", false),
             PropertyNameResolver.of()
         )
