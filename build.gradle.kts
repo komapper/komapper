@@ -72,7 +72,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
     }
 
-    val jvmTargetVersion = 11
+    val jvmTargetVersion = if (project.name.contains("spring")) 17 else 11
 
     tasks {
         withType<Test>().configureEach {
