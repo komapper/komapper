@@ -59,8 +59,8 @@ public class KomapperRecorder {
           executionOptions.plus(
               new ExecutionOptions(
                   dataSourceDefinition.batchSize,
-                  dataSourceDefinition.maxRows,
                   dataSourceDefinition.fetchSize,
+                  dataSourceDefinition.maxRows,
                   dataSourceDefinition.queryTimeout,
                   false));
       var statistics = container.instance(StatisticManager.class).get();
