@@ -110,6 +110,10 @@ module/quarkus-jdbc:
 - changed-files:
   - any-glob-to-any-file: 'komapper-quarkus-jdbc/**/*'
 
+module/quarkus-jdbc-deployment:
+  - changed-files:
+      - any-glob-to-any-file: 'komapper-quarkus-jdbc-deployment/**/*'
+
 module/r2dbc:
 - changed-files:
   - any-glob-to-any-file: 'komapper-r2dbc/**/*'
