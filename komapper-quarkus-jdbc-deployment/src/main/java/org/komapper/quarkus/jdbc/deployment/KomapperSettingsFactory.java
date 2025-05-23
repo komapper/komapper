@@ -37,23 +37,10 @@ public class KomapperSettingsFactory {
     return dataSources.stream()
         .map(
             dataSource -> {
-              var dataSourceConfig = createDataSourceConfig(dataSource);
+              var dataSourceConfig = buildTimeConfig.dataSources().get(dataSource.getName());
               return createDataSourceDefinition(dataSource, dataSourceConfig);
             })
         .collect(toList());
-  }
-
-  private KomapperBuildTimeConfig.DataSourceBuildTimeConfig createDataSourceConfig(
-      JdbcDataSourceBuildItem dataSource) {
-    if (dataSource.isDefault()) {
-      return buildTimeConfig.defaultDataSource;
-    } else {
-      var dataSourceConfig = buildTimeConfig.namedDataSources.get(dataSource.getName());
-      if (dataSourceConfig != null) {
-        return dataSourceConfig;
-      }
-      return new KomapperBuildTimeConfig.DataSourceBuildTimeConfig();
-    }
   }
 
   private DataSourceDefinition createDataSourceDefinition(
@@ -63,10 +50,10 @@ public class KomapperSettingsFactory {
     definition.name = dataSource.getName();
     definition.isDefault = dataSource.isDefault();
     definition.driver = convertToDriverName(dataSource.getDbKind());
-    definition.batchSize = dataSourceConfig.batchSize;
-    definition.fetchSize = dataSourceConfig.fetchSize;
-    definition.maxRows = dataSourceConfig.maxRows;
-    definition.queryTimeout = dataSourceConfig.queryTimeout;
+    definition.batchSize = dataSourceConfig.batchSize();
+    definition.fetchSize = dataSourceConfig.fetchSize();
+    definition.maxRows = dataSourceConfig.maxRows();
+    definition.queryTimeout = dataSourceConfig.queryTimeout();
     return definition;
   }
 

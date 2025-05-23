@@ -1,43 +1,47 @@
 package org.komapper.quarkus.jdbc.deployment;
 
+import io.quarkus.datasource.common.runtime.DataSourceUtil;
 import io.quarkus.runtime.annotations.ConfigDocMapKey;
 import io.quarkus.runtime.annotations.ConfigDocSection;
 import io.quarkus.runtime.annotations.ConfigGroup;
-import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
+import io.smallrye.config.WithDefaults;
+import io.smallrye.config.WithParentName;
+import io.smallrye.config.WithUnnamedKey;
 import java.util.Map;
 
 @ConfigRoot
-public class KomapperBuildTimeConfig {
+@ConfigMapping(prefix = "quarkus.komapper")
+public interface KomapperBuildTimeConfig {
 
-  /** The default datasource. */
-  @ConfigItem(name = ConfigItem.PARENT)
-  public DataSourceBuildTimeConfig defaultDataSource;
-
-  /** Additional named datasources. */
+  /** DataSources. */
   @ConfigDocSection
   @ConfigDocMapKey("datasource-name")
-  @ConfigItem(name = ConfigItem.PARENT)
-  public Map<String, DataSourceBuildTimeConfig> namedDataSources;
+  @WithParentName
+  @WithUnnamedKey(DataSourceUtil.DEFAULT_DATASOURCE_NAME)
+  @WithDefaults
+  Map<String, DataSourceBuildTimeConfig> dataSources();
 
   @SuppressWarnings("CanBeFinal")
   @ConfigGroup
-  public static class DataSourceBuildTimeConfig {
+  interface DataSourceBuildTimeConfig {
 
     /** The batch size. */
-    @ConfigItem(defaultValue = "0")
-    public int batchSize = 0;
+    @WithDefault("0")
+    int batchSize();
 
     /** The fetch size. */
-    @ConfigItem(defaultValue = "0")
-    public int fetchSize = 0;
+    @WithDefault("0")
+    int fetchSize();
 
     /** The max rows. */
-    @ConfigItem(defaultValue = "0")
-    public int maxRows = 0;
+    @WithDefault("0")
+    int maxRows();
 
     /** The query timeout limit in seconds. */
-    @ConfigItem(defaultValue = "0")
-    public int queryTimeout = 0;
+    @WithDefault("0")
+    int queryTimeout();
   }
 }
