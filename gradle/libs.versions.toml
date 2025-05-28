@@ -24,7 +24,7 @@ jdbc-h2 = { module = "com.h2database:h2", version = "2.3.232" }
 jdbc-mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version = "3.5.3" }
 jdbc-mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 jdbc-oracle = { module = "com.oracle.database.jdbc:ojdbc11", version = "23.8.0.25.04" }
-jdbc-postgresql = { module = "org.postgresql:postgresql", version = "42.7.5" }
+jdbc-postgresql = { module = "org.postgresql:postgresql", version = "42.7.6" }
 jdbc-sqlserver = { module = "com.microsoft.sqlserver:mssql-jdbc", version = "12.10.0.jre11" }
 
 r2dbc-h2 = { module = "io.r2dbc:r2dbc-h2", version = "1.0.0.RELEASE" }
