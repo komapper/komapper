@@ -35,6 +35,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Conditional
@@ -54,14 +55,25 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun komapperDialect(environment: Environment): R2dbcDialect {
-        val url = environment.getProperty(R2DBC_URL_PROPERTY)
-            ?: error(
-                "$R2DBC_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the R2dbcDialect bean manually.",
-            )
-        val driver = R2dbcDialects.extractR2dbcDriver(url)
-        return R2dbcDialects.get(driver)
+    open fun komapperDialect(environment: Environment, connectionDetailsProvider: ObjectProvider<R2dbcConnectionDetails>): R2dbcDialect {
+        val dialect = resolveDialectViaConnectionDetails(connectionDetailsProvider)
+            ?: resolveDialectViaEnvironmentProperty(environment)
+        return checkNotNull(dialect) {
+            "Komapper R2dbcDialect was not resolved. To fix this, do one of the following: " +
+                "define a R2dbcConnectionDetails bean, " +
+                "set the $R2DBC_URL_PROPERTY property, " +
+                "or define a R2dbcDialect bean manually."
+        }
+    }
+
+    private fun resolveDialectViaConnectionDetails(connectionDetailsProvider: ObjectProvider<R2dbcConnectionDetails>): R2dbcDialect? {
+        val connectionDetails = connectionDetailsProvider.getIfAvailable() ?: return null
+        return R2dbcDialects.getByOptions(connectionDetails.connectionFactoryOptions)
+    }
+
+    private fun resolveDialectViaEnvironmentProperty(environment: Environment): R2dbcDialect? {
+        val url = environment.getProperty(R2DBC_URL_PROPERTY) ?: return null
+        return R2dbcDialects.getByUrl(url)
     }
 
     @Bean

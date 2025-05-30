@@ -1,5 +1,7 @@
 package org.komapper.spring.boot.autoconfigure.r2dbc
 
+import io.r2dbc.spi.ConnectionFactory
+import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Row
 import org.assertj.core.api.Assertions.assertThat
 import org.komapper.core.ClockProvider
@@ -13,10 +15,13 @@ import org.komapper.r2dbc.AbstractR2dbcDataType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcUserDefinedDataTypeAdapter
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
+import org.mockito.Mockito
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
@@ -164,6 +169,94 @@ class KomapperR2dbcAutoConfigurationTest {
             }
     }
 
+    /**
+     * Test Komapper [R2dbcDialect] resolution when a custom [R2dbcConnectionDetails] bean is defined.
+     */
+    @Test
+    fun customConnectionDetails() {
+        ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    R2dbcAutoConfiguration::class.java,
+                    R2dbcTransactionManagerAutoConfiguration::class.java,
+                    KomapperR2dbcAutoConfiguration::class.java,
+                )
+            )
+            .withBean(R2dbcConnectionDetails::class.java, { CustomR2dbcConnectionDetails("r2dbc:h2:mem:///test") })
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(R2dbcDatabase::class.java)
+                    .getBean(R2dbcDatabase::class.java)
+                    .extracting { it.config.dialect }
+                    .isInstanceOf(H2R2dbcDialect::class.java)
+            }
+    }
+
+    /**
+     * Test Komapper [R2dbcDialect] resolution when [R2dbcConnectionDetails] bean is not defined,
+     * but the `spring.r2dbc.url` property is set.
+     *
+     * It's almost impossible to get this configuration in a real application, as when the property is set,
+     * Spring Boot's [R2dbcAutoConfiguration] will either create a [R2dbcConnectionDetails] bean,
+     * or it won't create any database beans at all, including [ConnectionFactory]
+     * which is required to load the [KomapperR2dbcAutoConfiguration].
+     *
+     * This test artificially creates [ConnectionFactory] without [R2dbcAutoConfiguration]'s help.
+     */
+    @Test
+    fun noConnectionDetails() {
+        ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    R2dbcTransactionManagerAutoConfiguration::class.java,
+                    KomapperR2dbcAutoConfiguration::class.java,
+                )
+            )
+            .withPropertyValues(
+                "spring.r2dbc.url=r2dbc:h2:mem:///test",
+            )
+            .withBean(ConnectionFactory::class.java, { Mockito.mock(ConnectionFactory::class.java) })
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(R2dbcDatabase::class.java)
+                    .getBean(R2dbcDatabase::class.java)
+                    .extracting { it.config.dialect }
+                    .isInstanceOf(H2R2dbcDialect::class.java)
+            }
+    }
+
+    /**
+     * Test Komapper [R2dbcDialect] resolution when no [R2dbcConnectionDetails] bean is present
+     * and the `spring.r2dbc.url` property is not set.
+     *
+     * This should not normally happen, as [R2dbcAutoConfiguration] won't create a [ConnectionFactory] bean.
+     *
+     * This test artificially creates [ConnectionFactory] without [R2dbcAutoConfiguration]'s help.
+     */
+    @Test
+    fun noConnectionDetailsAndNoProperty() {
+        ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    R2dbcTransactionManagerAutoConfiguration::class.java,
+                    KomapperR2dbcAutoConfiguration::class.java,
+                )
+            )
+            .withBean(ConnectionFactory::class.java, { Mockito.mock(ConnectionFactory::class.java) })
+            .run { context ->
+                assertThat(context)
+                    .failure
+                    .hasMessageContaining(
+                        "Komapper R2dbcDialect was not resolved. To fix this, do one of the following: " +
+                            "define a R2dbcConnectionDetails bean, " +
+                            "set the spring.r2dbc.url property, " +
+                            "or define a R2dbcDialect bean manually."
+                    )
+            }
+    }
+
     @Suppress("unused")
     @Configuration
     open class CustomConfigure {
@@ -269,5 +362,11 @@ class KomapperR2dbcAutoConfigurationTest {
 
     private class CustomR2dbcUserDefinedDataTypeLongRange : AbstractR2dbcUserDefinedDataType<LongRange>() {
         override val type = typeOf<LongRange>()
+    }
+
+    private class CustomR2dbcConnectionDetails(private val options: ConnectionFactoryOptions) : R2dbcConnectionDetails {
+        constructor(r2dbcUrl: String) : this(ConnectionFactoryOptions.parse(r2dbcUrl))
+
+        override fun getConnectionFactoryOptions() = options
     }
 }
