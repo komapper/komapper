@@ -37,6 +37,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Conditional
 import org.springframework.core.env.Environment
@@ -56,12 +57,19 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun komapperDialect(environment: Environment): JdbcDialect {
-        val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
-            ?: error(
-                "$DATASOURCE_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the JdbcDialect bean manually.",
-            )
+    open fun komapperDialect(environment: Environment, connectionDetailsProvider: ObjectProvider<JdbcConnectionDetails>): JdbcDialect {
+        val connectionDetails = connectionDetailsProvider.getIfAvailable()
+        val url = if (connectionDetails != null) {
+            connectionDetails.jdbcUrl
+        } else {
+            environment.getProperty(DATASOURCE_URL_PROPERTY)
+        }
+        checkNotNull(url) {
+            "Komapper JdbcDialect was not resolved. To fix this, do one of the following: " +
+                "define a JdbcConnectionDetails bean, " +
+                "set the $DATASOURCE_URL_PROPERTY property, " +
+                "or define a JdbcDialect bean manually."
+        }
         return JdbcDialects.getByUrl(url)
     }
 

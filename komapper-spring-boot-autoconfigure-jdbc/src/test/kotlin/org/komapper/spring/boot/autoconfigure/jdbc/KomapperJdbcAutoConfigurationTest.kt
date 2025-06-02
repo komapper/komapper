@@ -12,15 +12,20 @@ import org.komapper.jdbc.AbstractJdbcDataType
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUserDefinedDataTypeAdapter
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
+import org.mockito.Mockito
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails
+import org.springframework.boot.test.context.FilteredClassLoader
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.transaction.PlatformTransactionManager
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -28,6 +33,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import javax.sql.DataSource
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 import kotlin.test.Test
@@ -170,6 +176,94 @@ class KomapperJdbcAutoConfigurationTest {
             }
     }
 
+    /**
+     * Test Komapper [JdbcDialect] resolution when a custom [JdbcConnectionDetails] bean is defined.
+     */
+    @Test
+    fun customConnectionDetails() {
+        ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    DataSourceAutoConfiguration::class.java,
+                    DataSourceTransactionManagerAutoConfiguration::class.java,
+                    KomapperJdbcAutoConfiguration::class.java,
+                )
+            )
+            .withBean(JdbcConnectionDetails::class.java, { CustomJdbcConnectionDetails("jdbc:h2:mem:example") })
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(JdbcDatabase::class.java)
+                    .getBean(JdbcDatabase::class.java)
+                    .extracting { it.config.dialect }
+                    .isInstanceOf(H2JdbcDialect::class.java)
+            }
+    }
+
+    /**
+     * Test Komapper [JdbcDialect] resolution when [JdbcConnectionDetails] bean is not defined,
+     * but the `spring.datasource.url` property is set.
+     *
+     * It's almost impossible to get this configuration in a real application, as when the property is set,
+     * Spring Boot's [DataSourceAutoConfiguration] will either create a [JdbcConnectionDetails] bean,
+     * or it won't create any database beans at all, including [PlatformTransactionManager] and [DataSource],
+     * which are required to load the [KomapperJdbcAutoConfiguration].
+     *
+     * This test artificially creates [DataSource] without [DataSourceAutoConfiguration]'s help.
+     */
+    @Test
+    fun noConnectionDetails() {
+        ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    DataSourceTransactionManagerAutoConfiguration::class.java,
+                    KomapperJdbcAutoConfiguration::class.java,
+                )
+            )
+            .withPropertyValues(
+                "spring.datasource.url=jdbc:h2:mem:example",
+            )
+            .withBean(DataSource::class.java, { Mockito.mock(DataSource::class.java) })
+            .run { context ->
+                assertThat(context)
+                    .hasNotFailed()
+                    .hasSingleBean(JdbcDatabase::class.java)
+                    .getBean(JdbcDatabase::class.java)
+                    .extracting { it.config.dialect }
+                    .isInstanceOf(H2JdbcDialect::class.java)
+            }
+    }
+
+    /**
+     * Test Komapper [JdbcDialect] resolution when no [JdbcConnectionDetails] bean is present
+     * and the `spring.datasource.url` property is not set.
+     *
+     * This might happen if the application is running in the "embedded datasource" mode.
+     * That can only happen if no JDBC connection pool library (like HikariCP) is present on the classpath.
+     */
+    @Test
+    fun noConnectionDetailsAndNoProperty() {
+        ApplicationContextRunner()
+            .withConfiguration(
+                AutoConfigurations.of(
+                    DataSourceAutoConfiguration::class.java,
+                    DataSourceTransactionManagerAutoConfiguration::class.java,
+                    KomapperJdbcAutoConfiguration::class.java,
+                )
+            )
+            .withClassLoader(FilteredClassLoader("com.zaxxer.hikari"))
+            .run { context ->
+                assertThat(context)
+                    .failure
+                    .hasMessageContaining(
+                        "Komapper JdbcDialect was not resolved. To fix this, do one of the following: " +
+                            "define a JdbcConnectionDetails bean, " +
+                            "set the spring.datasource.url property, " +
+                            "or define a JdbcDialect bean manually."
+                    )
+            }
+    }
+
     @Suppress("unused", "UNCHECKED_CAST")
     @Configuration
     open class CustomConfigure {
@@ -291,5 +385,11 @@ class KomapperJdbcAutoConfigurationTest {
 
     private class CustomJdbcUserDefinedDataTypeLongRange : AbstractJdbcUserDefinedDataType<LongRange>() {
         override val type = typeOf<LongRange>()
+    }
+
+    private class CustomJdbcConnectionDetails(private val jdbcUrl: String) : JdbcConnectionDetails {
+        override fun getUsername() = null
+        override fun getPassword() = null
+        override fun getJdbcUrl() = jdbcUrl
     }
 }
