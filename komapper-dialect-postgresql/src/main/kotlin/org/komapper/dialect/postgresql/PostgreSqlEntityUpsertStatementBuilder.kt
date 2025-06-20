@@ -18,7 +18,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
+import org.komapper.core.dsl.metamodel.getInsertableProperties
 
 class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
@@ -33,7 +33,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
     private val postgreSqlSupport = PostgreSqlStatementBuilderSupport(dialect, context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
-        val properties = target.getNonAutoIncrementProperties()
+        val properties = target.getInsertableProperties()
         buf.append("insert into ")
         table(target)
         buf.append(" (")

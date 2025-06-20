@@ -25,6 +25,7 @@ public interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
                     
             create table identity_strategy(id integer generated always as identity primary key, "value" varchar2(10));
             create table sequence_strategy(id integer not null primary key, "value" varchar2(10));
+            create table insert_test(id integer generated always as identity primary key, name varchar2(20) not null, created_by varchar2(20) default 'system', version integer);
 
             create table big_decimal_data(id integer not null primary key, "value" decimal);
             create table big_integer_data(id integer not null primary key, "value" decimal);

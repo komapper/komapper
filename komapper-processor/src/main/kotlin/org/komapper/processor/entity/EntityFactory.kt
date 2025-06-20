@@ -287,6 +287,7 @@ internal class EntityFactory(
                 alwaysQuote = false,
                 masking = false,
                 updatable = true,
+                insertable = true,
                 alternateType = null,
             )
         } else {

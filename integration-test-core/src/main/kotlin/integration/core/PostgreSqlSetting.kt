@@ -27,6 +27,7 @@ public interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
 
             create table if not exists identity_strategy(id serial primary key, value varchar(10));
             create table if not exists sequence_strategy(id integer not null primary key, value varchar(10));
+            create table if not exists insert_test(id serial primary key, name varchar(20) not null, created_by varchar(20) default 'system', version integer);
 
             create table if not exists array_data(id integer not null primary key, value text[]);
             create table if not exists array_boolean_data(id integer not null primary key, value boolean[]);

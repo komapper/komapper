@@ -23,6 +23,7 @@ public interface MySqlSetting<DATABASE : Database> : Setting<DATABASE> {
 
             create table if not exists identity_strategy(id integer auto_increment primary key, value varchar(10));
             create table if not exists sequence_strategy(id integer not null primary key, value varchar(10));
+            create table if not exists insert_test(id integer auto_increment primary key, name varchar(20) not null, created_by varchar(20) default 'system', version integer);
 
             create table if not exists big_decimal_data(id integer not null primary key, value decimal);
             create table if not exists big_integer_data(id integer not null primary key, value decimal);

@@ -4,6 +4,7 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Department
 import integration.core.IdentityStrategy
+import integration.core.InsertTest
 import integration.core.Man
 import integration.core.Name
 import integration.core.Person
@@ -11,6 +12,7 @@ import integration.core.Run
 import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
+import integration.core.insertTest
 import integration.core.man
 import integration.core.name
 import integration.core.person
@@ -308,5 +310,28 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
             Unit
         }
         println(ex)
+    }
+
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val tests = listOf(
+            InsertTest(name = "test1", createdBy = "user1"),
+            InsertTest(name = "test2", createdBy = "user2"),
+            InsertTest(name = "test3", createdBy = "user3")
+        )
+        val inserted = db.runQuery { QueryDsl.insert(i).batch(tests) }
+
+        // Verify that all rows have IDs
+        assertTrue(inserted.all { it.id != 0 })
+
+        // Verify that the createdBy column was not inserted and has the default value for all rows
+        val results = db.runQuery { QueryDsl.from(i).where { i.id inList inserted.map { it.id } }.orderBy(i.name) }
+        assertEquals(3, results.size)
+        results.forEachIndexed { index, result ->
+            assertEquals("test${index + 1}", result.name)
+            assertEquals("system", result.createdBy) // Should have the default value from the database
+            assertEquals(0, result.version)
+        }
     }
 }
