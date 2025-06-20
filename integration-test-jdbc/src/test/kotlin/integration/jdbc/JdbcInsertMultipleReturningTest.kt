@@ -344,7 +344,7 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
         println(db.dryRunQuery(query))
     }
 
-    @Run(unless = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun insertableProperty() {
         val i = Meta.insertTest

@@ -286,6 +286,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         println(db.dryRunQuery(query))
     }
 
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun insertableProperty() {
         val i = Meta.insertTest

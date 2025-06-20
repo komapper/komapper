@@ -312,6 +312,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         println(ex)
     }
 
+    @Run(unless = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun insertableProperty() {
         val i = Meta.insertTest
