@@ -4,11 +4,13 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Department
 import integration.core.IdentityStrategy
+import integration.core.InsertTest
 import integration.core.Run
 import integration.core.SequenceStrategy
 import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
+import integration.core.insertTest
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dryRunQuery
@@ -340,5 +342,28 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
         )
         val query = QueryDsl.insert(a).multiple(addressList).returning()
         println(db.dryRunQuery(query))
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val tests = listOf(
+            InsertTest(name = "test1", createdBy = "user1"),
+            InsertTest(name = "test2", createdBy = "user2"),
+            InsertTest(name = "test3", createdBy = "user3")
+        )
+        val results = db.runQuery { QueryDsl.insert(i).multiple(tests).returning() }
+
+        // Verify that all rows have IDs
+        assertTrue(results.all { it.id != 0 })
+
+        // Verify that the createdBy column was not inserted and has the default value for all rows
+        assertEquals(3, results.size)
+        results.forEachIndexed { index, result ->
+            assertEquals("test${index + 1}", result.name)
+            assertEquals("system", result.createdBy) // Should have the default value from the database
+            assertEquals(0, result.version)
+        }
     }
 }

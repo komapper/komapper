@@ -7,6 +7,7 @@ import integration.core.Run
 import integration.core.SequenceStrategy
 import integration.core.address
 import integration.core.identityStrategy
+import integration.core.insertTest
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dryRunQuery
@@ -133,5 +134,17 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
             a.version eq 0
         }.returning()
         println(db.dryRunQuery(query))
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val test = db.runQuery {
+            QueryDsl.insert(i).values {
+                i.name eq "aaa"
+            }.returning()
+        }
+        assertEquals("system", test.createdBy)
     }
 }

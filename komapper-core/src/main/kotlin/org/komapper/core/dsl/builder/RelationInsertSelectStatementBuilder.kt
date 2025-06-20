@@ -7,8 +7,7 @@ import org.komapper.core.dsl.context.RelationInsertSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdGenerator
-import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
+import org.komapper.core.dsl.metamodel.getInsertableProperties
 
 class RelationInsertSelectStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
@@ -23,7 +22,7 @@ class RelationInsertSelectStatementBuilder<ENTITY : Any, ID : Any, META : Entity
         buf.append("insert into ")
         table(target)
         buf.append(" (")
-        for (p in target.getNonAutoIncrementProperties()) {
+        for (p in target.getInsertableProperties()) {
             column(p)
             buf.append(", ")
         }
@@ -44,12 +43,11 @@ class RelationInsertSelectStatementBuilder<ENTITY : Any, ID : Any, META : Entity
     }
 
     private fun subquery(expression: SubqueryExpression<*>) {
-        val predicate: (ColumnExpression<*, *>) -> Boolean = when (val idGenerator = context.target.idGenerator()) {
-            is IdGenerator.AutoIncrement -> {
-                { it != idGenerator.property }
-            }
-            else -> {
-                { true }
+        val insertableProperties = context.target.getInsertableProperties()
+        val predicate: (ColumnExpression<*, *>) -> Boolean = { column ->
+            // Check if this column corresponds to one of the insertable properties
+            insertableProperties.any { property ->
+                property.columnName == column.columnName
             }
         }
         val statement = support.buildSubqueryStatement(expression.context, predicate)

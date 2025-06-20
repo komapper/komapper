@@ -7,6 +7,7 @@ import integration.core.Run
 import integration.core.address
 import integration.core.employee
 import integration.core.identityStrategy
+import integration.core.insertTest
 import integration.core.person
 import integration.core.robot
 import integration.core.sequenceStrategy
@@ -15,6 +16,7 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.single
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -269,5 +271,19 @@ class JdbcInsertValuesTest(private val db: JdbcDatabase) {
         val sql = query.dryRun(db.config)
         assertFalse(sql.sql.contains("hiredate"))
         assertTrue(sql.sql.contains("salary"))
+    }
+
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val (count, key) = db.runQuery {
+            QueryDsl.insert(i).values {
+                i.name eq "aaa"
+            }
+        }
+        assertNotNull(key)
+        assertEquals(1, count)
+        val test = db.runQuery { QueryDsl.from(i).where { i.id eq key }.single() }
+        assertEquals("system", test.createdBy)
     }
 }

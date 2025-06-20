@@ -8,7 +8,7 @@ import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
+import org.komapper.core.dsl.metamodel.getInsertableProperties
 
 class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
@@ -40,7 +40,7 @@ class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMe
 
     private fun buildForMultipleEntities(): Statement {
         val target = context.target
-        val properties = target.getNonAutoIncrementProperties()
+        val properties = target.getInsertableProperties()
         return with(StatementBuffer()) {
             append("insert all ")
             for (entity in entities) {

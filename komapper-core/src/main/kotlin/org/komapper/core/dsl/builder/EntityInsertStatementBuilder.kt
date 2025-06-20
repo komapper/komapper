@@ -6,7 +6,7 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
+import org.komapper.core.dsl.metamodel.getInsertableProperties
 
 interface EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     fun build(): Statement
@@ -27,7 +27,7 @@ class DefaultEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
 
     fun buildInsertInto(): Statement {
         val target = context.target
-        val properties = target.getNonAutoIncrementProperties()
+        val properties = target.getInsertableProperties()
         return with(StatementBuffer()) {
             append("insert into ")
             table(target)
@@ -44,7 +44,7 @@ class DefaultEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
 
     fun buildValues(): Statement {
         val target = context.target
-        val properties = target.getNonAutoIncrementProperties()
+        val properties = target.getInsertableProperties()
         return with(StatementBuffer()) {
             append("values ")
             for (entity in entities) {

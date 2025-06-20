@@ -16,7 +16,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
+import org.komapper.core.dsl.metamodel.getInsertableProperties
 
 internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
@@ -49,13 +49,13 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
         }
         buf.cutBack(5)
         buf.append(" when not matched then insert (")
-        for (p in target.getNonAutoIncrementProperties()) {
+        for (p in target.getInsertableProperties()) {
             columnWithoutAlias(p)
             buf.append(", ")
         }
         buf.cutBack(2)
         buf.append(") values (")
-        for (p in excluded.getNonAutoIncrementProperties()) {
+        for (p in excluded.getInsertableProperties()) {
             column(p)
             buf.append(", ")
         }

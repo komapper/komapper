@@ -10,6 +10,7 @@ import integration.core.EmbeddedIdAddress
 import integration.core.GenericEmbeddedIdAddress
 import integration.core.Human
 import integration.core.IdentityStrategy
+import integration.core.InsertTest
 import integration.core.Machine
 import integration.core.MachineInfo1
 import integration.core.Man
@@ -28,6 +29,7 @@ import integration.core.embeddedIdAddress
 import integration.core.genericEmbeddedIdAddress
 import integration.core.human
 import integration.core.identityStrategy
+import integration.core.insertTest
 import integration.core.machine
 import integration.core.man
 import integration.core.multiGenerated
@@ -577,5 +579,19 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     @Test
     fun multipleGeneratedColumns() {
         db.runQuery { QueryDsl.insert(Meta.multiGenerated).single(MultiGenerated()) }
+    }
+
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val test = InsertTest(name = "test", createdBy = "user")
+        val inserted = db.runQuery { QueryDsl.insert(i).single(test) }
+        assertNotEquals(0, inserted.id)
+
+        // Verify that the createdBy column was not inserted and has the default value
+        val result = db.runQuery { QueryDsl.from(i).where { i.id eq inserted.id }.first() }
+        assertEquals("test", result.name)
+        assertEquals("system", result.createdBy) // Should have the default value from the database
+        assertEquals(0, result.version)
     }
 }

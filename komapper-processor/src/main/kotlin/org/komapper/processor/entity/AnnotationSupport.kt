@@ -189,6 +189,8 @@ internal class AnnotationSupport(
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
         val updatable =
             columnAnnotation?.findValue("updatable")?.toString()?.toBooleanStrict() ?: KomapperColumn.UPDATABLE
+        val insertable =
+            columnAnnotation?.findValue("insertable")?.toString()?.toBooleanStrict() ?: KomapperColumn.INSERTABLE
         val alternateType = columnAnnotation?.findValue("alternateType")?.let { type ->
             if (type !is KSType) report("The alternateType is not KSType.", columnAnnotation)
             val classDeclaration = type.declaration as? KSClassDeclaration
@@ -242,7 +244,7 @@ internal class AnnotationSupport(
                 }
             }
         }
-        return Column(name, alwaysQuote, masking, updatable, alternateType)
+        return Column(name, alwaysQuote, masking, updatable, insertable, alternateType)
     }
 
     fun getColumns(parameter: KSValueParameter): List<Triple<String, Column, KSAnnotation>> {

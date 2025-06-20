@@ -201,6 +201,7 @@ internal class EntityMetamodelGenerator(
             val alwaysQuote = "${p.column.alwaysQuote}"
             val masking = "${p.column.masking}"
             val updatable = "${p.column.updatable}"
+            val insertable = "${p.column.insertable}"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
                     fun throwException(value: String, propertyName: String, cause: String) =
@@ -287,7 +288,7 @@ internal class EntityMetamodelGenerator(
             val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $updatable, $getter, $setter, $wrap, $unwrap, $nullable)"
+            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $updatable, $insertable, $getter, $setter, $wrap, $unwrap, $nullable)"
         }
 
         w.println("    private object $EntityDescriptor {")

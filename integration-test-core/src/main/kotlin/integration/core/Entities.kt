@@ -416,6 +416,19 @@ public data class Name(
 )
 
 @KomapperEntity
+@KomapperTable(name = "insert_test")
+public data class InsertTest(
+    @KomapperId
+    @KomapperAutoIncrement
+    val id: Int = 0,
+    val name: String,
+    @KomapperColumn(insertable = false)
+    val createdBy: String = "default-value",
+    @KomapperVersion
+    val version: Int = 0,
+)
+
+@KomapperEntity
 @KomapperTable(name = "multi_generated")
 public data class MultiGenerated(
     @KomapperId

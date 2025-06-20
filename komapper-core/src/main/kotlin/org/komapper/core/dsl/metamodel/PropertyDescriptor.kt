@@ -12,6 +12,7 @@ class PropertyDescriptor<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
     val alwaysQuote: Boolean,
     val masking: Boolean,
     val updatable: Boolean,
+    val insertable: Boolean,
     val getter: (ENTITY) -> EXTERIOR?,
     val setter: (ENTITY, EXTERIOR) -> ENTITY,
     val wrap: (INTERIOR) -> EXTERIOR,

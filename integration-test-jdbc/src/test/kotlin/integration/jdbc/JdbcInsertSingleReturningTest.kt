@@ -4,11 +4,13 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Department
 import integration.core.IdentityStrategy
+import integration.core.InsertTest
 import integration.core.Run
 import integration.core.SequenceStrategy
 import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
+import integration.core.insertTest
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
@@ -22,6 +24,7 @@ import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -281,5 +284,19 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         val address = Address(16, "STREET 16", 0)
         val query = QueryDsl.insert(a).single(address).returning()
         println(db.dryRunQuery(query))
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val test = InsertTest(name = "test", createdBy = "user")
+        val result = db.runQuery { QueryDsl.insert(i).single(test).returning() }
+        assertNotEquals(0, result.id)
+
+        // Verify that the createdBy column was not inserted and has the default value
+        assertEquals("test", result.name)
+        assertEquals("system", result.createdBy) // Should have the default value from the database
+        assertEquals(0, result.version)
     }
 }

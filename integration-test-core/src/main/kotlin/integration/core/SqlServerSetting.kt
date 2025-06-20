@@ -26,6 +26,7 @@ public interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
 
             create table identity_strategy(id int identity primary key, value varchar(10));
             create table sequence_strategy(id int not null primary key, value varchar(10));
+            create table insert_test(id int identity primary key, name varchar(20) not null, created_by varchar(20) default 'system', version int);
 
             create table big_decimal_data(id int not null primary key, value decimal);
             create table big_integer_data(id int not null primary key, value decimal);

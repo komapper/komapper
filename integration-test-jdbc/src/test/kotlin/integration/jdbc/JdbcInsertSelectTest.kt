@@ -4,9 +4,11 @@ import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
 import integration.core.identityStrategy
+import integration.core.insertTest
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -109,5 +111,34 @@ class JdbcInsertSelectTest(private val db: JdbcDatabase) {
         }
         assertEquals(2, count)
         assertTrue(ids.isEmpty())
+    }
+
+    @Run(unless = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun insertableProperty() {
+        val i = Meta.insertTest
+        val results = db.runQuery {
+            val q1 = QueryDsl.insert(i).values {
+                i.name eq "test"
+            }
+            val q2 = QueryDsl.insert(i).values {
+                i.name eq "test2"
+            }
+            val q3 = QueryDsl.update(i).set {
+                i.createdBy eq "aaa"
+            }.options { it.copy(allowMissingWhereClause = true) }
+            val q4 = QueryDsl.from(i)
+            q1.andThen(q2).andThen(q3).andThen(q4)
+        }
+        assertTrue { results.all { it.createdBy == "aaa" } }
+
+        val (_, ids) = db.runQuery {
+            QueryDsl.insert(i).select {
+                QueryDsl.from(i)
+            }
+        }
+        val results2 = db.runQuery { QueryDsl.from(i).where { i.id inList ids } }
+        assertEquals(2, results2.size)
+        assertTrue { results2.all { it.createdBy == "system" } }
     }
 }
