@@ -24,7 +24,7 @@ interface ContextualJdbcDatabase : Database {
      * @param query the query
      * @return the result represented by the query
      */
-    context(JdbcContext)
+    context(jdbcContext: JdbcContext)
     fun <T> runQuery(query: Query<T>): T
 
     /**
@@ -32,7 +32,7 @@ interface ContextualJdbcDatabase : Database {
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    context(JdbcContext)
+    context(jdbcContext: JdbcContext)
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T
 
     /**
@@ -65,7 +65,7 @@ internal class ContextualJdbcDatabaseImpl(
     override val dataFactory: JdbcDataFactory
         get() = database.dataFactory
 
-    context(JdbcContext)
+    context(jdbcContext: JdbcContext)
     override fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : JdbcDatabaseConfig by config {
             override val session: JdbcSession = object : JdbcSession {
@@ -91,7 +91,7 @@ internal class ContextualJdbcDatabaseImpl(
         return runner.run(runtimeConfig)
     }
 
-    context(JdbcContext)
+    context(jdbcContext: JdbcContext)
     override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
