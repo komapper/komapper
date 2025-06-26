@@ -152,14 +152,16 @@ internal class EntityStoreImpl(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<T, S?> {
-        return createOneToOne(first, second).mapKeys { it.key.entity }
+        val oneToOne: Map<out EntityRef<out EntityMetamodel<T, *, *>, T, out Any>, S?> = createOneToOne(first, second)
+        return oneToOne.mapKeys { it.key.entity }
     }
 
     override fun <T : Any, ID : Any, S : Any> oneToOneById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, S?> {
-        return createOneToOne(first, second).mapKeys { it.key.id }
+        val oneToOne: Map<EntityRef<EntityMetamodel<T, ID, *>, T, ID>, S?> = createOneToOne(first, second)
+        return oneToOne.mapKeys { it.key.id }
     }
 
     private fun <META : EntityMetamodel<T, ID, *>, T : Any, ID : Any, S : Any> createOneToOne(
@@ -173,14 +175,17 @@ internal class EntityStoreImpl(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<T, Set<S>> {
-        return createOneToMany(first, second).mapKeys { it.key.entity }
+        val oneToMany: Map<out EntityRef<out EntityMetamodel<T, *, *>, T, out Any>, Set<S>> =
+            createOneToMany(first, second)
+        return oneToMany.mapKeys { it.key.entity }
     }
 
     override fun <T : Any, ID : Any, S : Any> oneToManyById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, Set<S>> {
-        return createOneToMany(first, second).mapKeys { it.key.id }
+        val oneToMany: Map<EntityRef<EntityMetamodel<T, ID, *>, T, ID>, Set<S>> = createOneToMany(first, second)
+        return oneToMany.mapKeys { it.key.id }
     }
 
     private fun <META : EntityMetamodel<T, ID, *>, T : Any, ID : Any, S : Any> createOneToMany(
@@ -212,14 +217,16 @@ internal class EntityStoreImpl(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<T, S?> {
-        return createManyToOne(first, second).mapKeys { it.key.entity }
+        val manyToOne: Map<out EntityRef<out EntityMetamodel<T, *, *>, T, out Any>, S?> = createManyToOne(first, second)
+        return manyToOne.mapKeys { it.key.entity }
     }
 
     override fun <T : Any, ID : Any, S : Any> manyToOneById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, S?> {
-        return createManyToOne(first, second).mapKeys { it.key.id }
+        val manyToOne: Map<EntityRef<EntityMetamodel<T, ID, *>, T, ID>, S?> = createManyToOne(first, second)
+        return manyToOne.mapKeys { it.key.id }
     }
 
     private fun <META : EntityMetamodel<T, ID, *>, T : Any, ID : Any, S : Any> createManyToOne(
@@ -249,8 +256,8 @@ internal class EntityStoreImpl(
         second: EntityMetamodel<S, *, *>,
         entity: T,
     ): S? {
-        val manyToOne = createManyToOne(first, second)
-        val key = EntityRef(first, entity)
+        val manyToOne: Map<EntityRef<EntityMetamodel<T, ID, *>, T, ID>, S?> = createManyToOne(first, second)
+        val key: EntityRef<EntityMetamodel<T, ID, *>, T, ID> = EntityRef(first, entity)
         return manyToOne[key]
     }
 
@@ -259,8 +266,8 @@ internal class EntityStoreImpl(
         second: EntityMetamodel<S, *, *>,
         entity: T,
     ): Set<S> {
-        val oneToMany = createOneToMany(first, second)
-        val key = EntityRef(first, entity)
+        val oneToMany: Map<EntityRef<EntityMetamodel<T, ID, *>, T, ID>, Set<S>> = createOneToMany(first, second)
+        val key: EntityRef<EntityMetamodel<T, ID, *>, T, ID> = EntityRef(first, entity)
         return oneToMany[key] ?: emptySet()
     }
 }

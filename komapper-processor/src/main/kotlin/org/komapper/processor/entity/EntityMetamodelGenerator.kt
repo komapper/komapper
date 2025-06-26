@@ -762,9 +762,14 @@ internal class EntityMetamodelGenerator(
             w.println("}")
             w.println()
             if (context.config.enableEntityStoreContext) {
+                val contextExpression = when (association.kind) {
+                    AssociationKind.ONE_TO_ONE -> "entityStoreContext.store.findOne(source, target, this)"
+                    AssociationKind.MANY_TO_ONE -> "entityStoreContext.store.findOne(source, target, this)"
+                    AssociationKind.ONE_TO_MANY -> "entityStoreContext.store.findMany(source, target, this)"
+                }
                 w.println(
                     """
-                    context($EntityStoreContext)
+                    context(entityStoreContext: $EntityStoreContext)
                     @$KomapperExperimentalAssociation
                     public fun $entityTypeName.`${association.navigator}`(
                         source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
@@ -772,7 +777,7 @@ internal class EntityMetamodelGenerator(
                         ): $returnType {
                     """.trimIndent(),
                 )
-                w.println("    return $expression")
+                w.println("    return $contextExpression")
                 w.println("}")
                 w.println()
             }
@@ -796,14 +801,14 @@ internal class EntityMetamodelGenerator(
         if (context.config.enableEntityStoreContext) {
             w.println(
                 """
-                context($EntityStoreContext)
+                context(entityStoreContext: $EntityStoreContext)
                 @$KomapperExperimentalAssociation
                 public fun `${aggregateRoot.navigator}`(
                     target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
                     ): Set<${targetEntity.typeName}> {
                 """.trimIndent(),
             )
-            w.println("    return store[target]")
+            w.println("    return entityStoreContext.store[target]")
             w.println("}")
             w.println()
         }

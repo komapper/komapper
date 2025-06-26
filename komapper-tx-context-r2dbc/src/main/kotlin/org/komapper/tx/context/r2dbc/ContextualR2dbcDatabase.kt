@@ -29,7 +29,7 @@ interface ContextualR2dbcDatabase : Database {
      * @param query the query
      * @return the result represented by the query
      */
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     suspend fun <T> runQuery(query: Query<T>): T
 
     /**
@@ -38,7 +38,7 @@ interface ContextualR2dbcDatabase : Database {
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T
 
     /**
@@ -47,7 +47,7 @@ interface ContextualR2dbcDatabase : Database {
      * @param query the query
      * @return the flow
      */
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     fun <T> flowQuery(query: FlowQuery<T>): Flow<T>
 
     /**
@@ -56,7 +56,7 @@ interface ContextualR2dbcDatabase : Database {
      * @param block the block that returns a query
      * @return the flow
      */
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T>
 
     /**
@@ -103,7 +103,7 @@ internal class ContextualR2dbcDatabaseImpl(
     override val config: R2dbcDatabaseConfig
         get() = database.config
 
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     @Suppress("UNCHECKED_CAST")
     override suspend fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : R2dbcDatabaseConfig by config {
@@ -132,13 +132,13 @@ internal class ContextualR2dbcDatabaseImpl(
         return runner.run(runtimeConfig)
     }
 
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     override suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
     }
 
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     override fun <T> flowQuery(query: FlowQuery<T>): Flow<T> {
         @Suppress("UNCHECKED_CAST")
         val builder = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
@@ -146,7 +146,7 @@ internal class ContextualR2dbcDatabaseImpl(
         return builder.build(config)
     }
 
-    context(R2dbcContext)
+    context(r2dbcContext: R2dbcContext)
     override fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
         val query = block(QueryScope)
         return flowQuery(query)

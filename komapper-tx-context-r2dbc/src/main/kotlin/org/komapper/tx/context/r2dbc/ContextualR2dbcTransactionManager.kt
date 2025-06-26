@@ -13,43 +13,43 @@ import org.komapper.tx.r2dbc.R2dbcTransactionManagement
  */
 @ThreadSafe
 interface ContextualR2dbcTransactionManager {
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun getConnection(): Connection
 
     /**
      * This function must not throw any exceptions.
      */
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun isActive(): Boolean
 
     /**
      * This function must not throw any exceptions.
      */
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun isRollbackOnly(): Boolean
 
     /**
      * This function must not throw any exceptions.
      */
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun setRollbackOnly()
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty): R2dbcTransactionContext
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun commit()
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun suspend(): R2dbcTransactionContext
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun resume()
 
     /**
      * This function must not throw any exceptions.
      */
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     suspend fun rollback()
 }
 
@@ -60,59 +60,59 @@ internal class ContextualR2dbcTransactionManagerImpl(
     private val management: R2dbcTransactionManagement =
         R2dbcTransactionManagement(connectionFactory, loggerFacade)
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun getConnection(): Connection {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         return management.getConnection(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun isActive(): Boolean {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         return management.isActive(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun isRollbackOnly(): Boolean {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         return management.isRollbackOnly(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun setRollbackOnly() {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         management.setRollbackOnly(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun begin(transactionProperty: TransactionProperty): R2dbcTransactionContext {
-        val currentTx = transaction
+        val currentTx = r2dbcTransactionContext.transaction
         val tx = management.begin(currentTx, transactionProperty)
         return R2dbcTransactionContext(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun commit() {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         management.commit(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun suspend(): R2dbcTransactionContext {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         management.suspend(tx)
         return EmptyR2dbcTransactionContext
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun resume() {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         management.resume(tx)
     }
 
-    context(R2dbcTransactionContext)
+    context(r2dbcTransactionContext: R2dbcTransactionContext)
     override suspend fun rollback() {
-        val tx = transaction
+        val tx = r2dbcTransactionContext.transaction
         management.rollback(tx)
     }
 }
