@@ -15,6 +15,7 @@ import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
 import org.komapper.r2dbc.R2dbcInstantType
 import org.komapper.r2dbc.R2dbcIntType
+import org.komapper.r2dbc.R2dbcKotlinInstantType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
 import org.komapper.r2dbc.R2dbcLocalTimeType
@@ -42,6 +43,7 @@ class H2R2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcFloatType("float"),
             R2dbcInstantType("timestamp with time zone"),
             R2dbcIntType("integer"),
+            R2dbcKotlinInstantType("timestamp with time zone"),
             R2dbcLocalDateTimeType("timestamp"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),

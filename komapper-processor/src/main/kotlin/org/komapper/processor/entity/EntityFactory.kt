@@ -22,6 +22,7 @@ import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Symbols.Instant
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
+import org.komapper.processor.Symbols.KotlinTimeInstant
 import org.komapper.processor.Symbols.LocalDateTime
 import org.komapper.processor.Symbols.OffsetDateTime
 import org.komapper.processor.TypeArgumentResolver
@@ -426,12 +427,12 @@ internal class EntityFactory(
 
     private fun validateTimestampProperty(property: LeafProperty, annotationName: String) {
         when (property.typeName) {
-            Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime -> Unit
+            Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime, KotlinTimeInstant -> Unit
             else -> {
                 when (val kotlinClass = property.kotlinClass) {
                     is ValueClass -> {
                         when (kotlinClass.property.typeName) {
-                            Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime -> Unit
+                            Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime, KotlinTimeInstant -> Unit
                             else -> report(
                                 "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
                                 property.node,

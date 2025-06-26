@@ -15,6 +15,7 @@ internal object Symbols {
     const val KomapperStub = "KomapperStub"
     const val KotlinInstant = "kotlinx.datetime.Instant"
     const val KotlinLocalDateTime = "kotlinx.datetime.LocalDateTime"
+    const val KotlinTimeInstant = "kotlin.time.Instant"
     const val LocalDateTime = "java.time.LocalDateTime"
     const val Meta = "org.komapper.core.dsl.Meta"
     const val OffsetDateTime = "java.time.OffsetDateTime"
@@ -25,6 +26,7 @@ internal object Symbols {
     const val checkMetamodelVersion = "org.komapper.core.dsl.metamodel.checkMetamodelVersion"
     const val toKotlinInstant = "kotlinx.datetime.toKotlinInstant"
     const val toKotlinLocalDateTime = "kotlinx.datetime.toKotlinLocalDateTime"
+    const val toKotlinTimeInstant = "kotlin.time.toKotlinInstant"
 }
 
 internal object BackquotedSymbols {

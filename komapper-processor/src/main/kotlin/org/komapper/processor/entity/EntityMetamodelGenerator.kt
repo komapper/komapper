@@ -40,9 +40,11 @@ import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
+import org.komapper.processor.Symbols.KotlinTimeInstant
 import org.komapper.processor.Symbols.checkMetamodelVersion
 import org.komapper.processor.Symbols.toKotlinInstant
 import org.komapper.processor.Symbols.toKotlinLocalDateTime
+import org.komapper.processor.Symbols.toKotlinTimeInstant
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -58,6 +60,7 @@ internal class EntityMetamodelGenerator(
 ) : Runnable {
     private val usesKotlinInstant: Boolean
     private val usesKotlinLocalDateTime: Boolean
+    private val usersKotlinTimeInstant: Boolean
 
     init {
         fun usesType(property: LeafProperty, typeName: String): Boolean {
@@ -71,6 +74,7 @@ internal class EntityMetamodelGenerator(
         val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
         usesKotlinInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
         usesKotlinLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
+        usersKotlinTimeInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinTimeInstant) }
     }
 
     private val idTypeName: String = if (entity.idProperties.size == 1) {
@@ -108,6 +112,7 @@ internal class EntityMetamodelGenerator(
 
     private fun suppress() {
         w.println("@file:Suppress(\"warnings\")")
+        w.println("@file:OptIn(kotlin.time.ExperimentalTime::class)")
     }
 
     private fun packageDeclaration() {
@@ -118,9 +123,10 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun importStatements() {
-        if (usesKotlinInstant || usesKotlinLocalDateTime) {
+        if (usesKotlinInstant || usesKotlinLocalDateTime || usersKotlinTimeInstant) {
             if (usesKotlinInstant) w.println("import $toKotlinInstant")
             if (usesKotlinLocalDateTime) w.println("import $toKotlinLocalDateTime")
+            if (usersKotlinTimeInstant) w.println("import $toKotlinTimeInstant")
             w.println()
         }
 
@@ -643,6 +649,7 @@ internal class EntityMetamodelGenerator(
                 when (property.kotlinClass.property.typeName) {
                     KotlinInstant -> "${property.typeName}(kotlinInstant(c))"
                     KotlinLocalDateTime -> "${property.typeName}(kotlinDateTime(c))"
+                    KotlinTimeInstant -> "${property.typeName}(c.instant().toKotlinInstant())"
                     else -> "${property.typeName}(${escapePackageName(property.kotlinClass.property.type.declaration)}.now(c))"
                 }
             }
@@ -651,6 +658,7 @@ internal class EntityMetamodelGenerator(
                 when (property.typeName) {
                     KotlinInstant -> "kotlinInstant(c)"
                     KotlinLocalDateTime -> "kotlinDateTime(c)"
+                    KotlinTimeInstant -> "c.instant().toKotlinInstant()"
                     else -> "${escapePackageName(property.kotlinClass.declaration)}.now(c)"
                 }
             }

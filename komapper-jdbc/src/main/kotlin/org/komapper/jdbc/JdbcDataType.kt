@@ -22,6 +22,9 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
+import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
+import kotlin.time.toKotlinInstant
 
 /**
  * Represents a data type for JDBC access.
@@ -383,6 +386,24 @@ class JdbcIntType(override val name: String) : AbstractJdbcDataType<Int>(typeOf<
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Int) {
         ps.setInt(index, value)
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+class JdbcKotlinInstantType(override val name: String) :
+    AbstractJdbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), JDBCType.TIMESTAMP_WITH_TIMEZONE) {
+    val instantType = JdbcInstantType(name)
+
+    override fun doGetValue(rs: ResultSet, index: Int): kotlin.time.Instant? {
+        return instantType.getValue(rs, index)?.toKotlinInstant()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): kotlin.time.Instant? {
+        return instantType.getValue(rs, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: kotlin.time.Instant) {
+        instantType.setValue(ps, index, value.toJavaInstant())
     }
 }
 
