@@ -2,13 +2,10 @@ package org.komapper.datetime.r2dbc
 
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toKotlinInstant
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalDateTime
 import org.komapper.r2dbc.AbstractR2dbcDataType
@@ -21,11 +18,6 @@ import kotlin.reflect.typeOf
 class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataTypeProvider {
     override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
         val dataType: R2dbcDataType<*>? = when (type.classifier as KClass<*>) {
-            Instant::class -> {
-                val dataType = next.get<java.time.Instant>(typeOf<java.time.Instant>())
-                    ?: error("The dataType is not found for java.time.Instant.")
-                JdbcKotlinInstantType(dataType)
-            }
             LocalDate::class -> {
                 val dataType = next.get<java.time.LocalDate>(typeOf<java.time.LocalDate>())
                     ?: error("The dataType is not found for java.time.LocalDate.")
@@ -40,29 +32,6 @@ class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataType
         }
         @Suppress("UNCHECKED_CAST")
         return dataType as R2dbcDataType<T>?
-    }
-}
-
-internal class JdbcKotlinInstantType(private val dataType: R2dbcDataType<java.time.Instant>) :
-    AbstractR2dbcDataType<Instant>(typeOf<Instant>()) {
-    override val name: String = dataType.name
-
-    override fun getValue(row: Row, index: Int): Instant? {
-        val value = dataType.getValue(row, index)
-        return value?.toKotlinInstant()
-    }
-
-    override fun getValue(row: Row, columnLabel: String): Instant? {
-        val value = dataType.getValue(row, columnLabel)
-        return value?.toKotlinInstant()
-    }
-
-    override fun setValue(statement: Statement, index: Int, value: Instant?) {
-        dataType.setValue(statement, index, value?.toJavaInstant())
-    }
-
-    override fun setValue(statement: Statement, name: String, value: Instant?) {
-        dataType.setValue(statement, name, value?.toJavaInstant())
     }
 }
 
