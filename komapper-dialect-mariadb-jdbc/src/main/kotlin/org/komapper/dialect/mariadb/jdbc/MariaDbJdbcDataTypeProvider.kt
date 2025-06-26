@@ -15,6 +15,7 @@ import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
 import org.komapper.jdbc.JdbcInstantAsTimestampType
 import org.komapper.jdbc.JdbcIntType
+import org.komapper.jdbc.JdbcKotlinInstantAsTimestampType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
@@ -42,6 +43,7 @@ class MariaDbJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcData
             JdbcFloatType("real"),
             JdbcInstantAsTimestampType("timestamp"),
             JdbcIntType("integer"),
+            JdbcKotlinInstantAsTimestampType("timestamp"),
             JdbcLocalDateTimeType("datetime(6)"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),

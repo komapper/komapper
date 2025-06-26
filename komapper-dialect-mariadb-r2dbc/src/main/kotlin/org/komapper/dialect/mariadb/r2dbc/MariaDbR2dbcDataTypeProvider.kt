@@ -15,6 +15,7 @@ import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
 import org.komapper.r2dbc.R2dbcInstantAsTimestampType
 import org.komapper.r2dbc.R2dbcIntType
+import org.komapper.r2dbc.R2dbcKotlinInstantAsTimestampType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
 import org.komapper.r2dbc.R2dbcLocalTimeType
@@ -41,6 +42,7 @@ class MariaDbR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcFloatType("real"),
             R2dbcInstantAsTimestampType("timestamp(6)"),
             R2dbcIntType("integer"),
+            R2dbcKotlinInstantAsTimestampType("timestamp(6)"),
             R2dbcLocalDateTimeType("datetime(6)"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),

@@ -17,6 +17,7 @@ import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
 import org.komapper.jdbc.JdbcInstantType
 import org.komapper.jdbc.JdbcIntType
+import org.komapper.jdbc.JdbcKotlinInstantType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
@@ -48,6 +49,7 @@ class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcFloatType("float"),
             JdbcInstantType("timestamp with time zone"),
             JdbcIntType("integer"),
+            JdbcKotlinInstantType("timestamp with time zone"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),

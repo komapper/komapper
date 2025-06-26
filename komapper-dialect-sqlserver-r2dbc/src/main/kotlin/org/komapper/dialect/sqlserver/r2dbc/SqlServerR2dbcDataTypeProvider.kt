@@ -15,6 +15,7 @@ import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
 import org.komapper.r2dbc.R2dbcInstantAsTimestampWithTimezoneType
 import org.komapper.r2dbc.R2dbcIntType
+import org.komapper.r2dbc.R2dbcKotlinInstantAsTimestampWithTimezoneType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
 import org.komapper.r2dbc.R2dbcLocalTimeType
@@ -42,6 +43,7 @@ class SqlServerR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcFloatType("float"),
             R2dbcInstantAsTimestampWithTimezoneType("datetimeoffset"),
             R2dbcIntType("int"),
+            R2dbcKotlinInstantAsTimestampWithTimezoneType("datetimeoffset"),
             R2dbcLocalDateTimeType("datetime2"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),

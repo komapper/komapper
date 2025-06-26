@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalTime::class)
+
 package integration.core
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import org.komapper.annotation.KomapperColumn
@@ -9,6 +10,8 @@ import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @KomapperEntity
 @KomapperTable("instant_data")

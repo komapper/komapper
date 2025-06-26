@@ -14,6 +14,7 @@ import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
 import org.komapper.jdbc.JdbcInstantAsTimestampWithTimezoneType
 import org.komapper.jdbc.JdbcIntType
+import org.komapper.jdbc.JdbcKotlinInstantAsTimestampWithTimezoneType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
@@ -42,6 +43,7 @@ class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcFloatType("real"),
             JdbcInstantAsTimestampWithTimezoneType("datetimeoffset"),
             JdbcIntType("int"),
+            JdbcKotlinInstantAsTimestampWithTimezoneType("datetimeoffset"),
             JdbcLocalDateTimeType("datetime2"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),

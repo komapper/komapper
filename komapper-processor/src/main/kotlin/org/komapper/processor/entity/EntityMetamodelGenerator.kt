@@ -39,10 +39,12 @@ import org.komapper.processor.Context
 import org.komapper.processor.EnumStrategy
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.KotlinInstant
-import org.komapper.processor.Symbols.KotlinLocalDateTime
+import org.komapper.processor.Symbols.KotlinxInstant
+import org.komapper.processor.Symbols.KotlinxLocalDateTime
 import org.komapper.processor.Symbols.checkMetamodelVersion
 import org.komapper.processor.Symbols.toKotlinInstant
-import org.komapper.processor.Symbols.toKotlinLocalDateTime
+import org.komapper.processor.Symbols.toKotlinxInstant
+import org.komapper.processor.Symbols.toKotlinxLocalDateTime
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -56,8 +58,9 @@ internal class EntityMetamodelGenerator(
     private val entityTypeName: String,
     private val w: PrintWriter,
 ) : Runnable {
+    private val usesKotlinxInstant: Boolean
+    private val usesKotlinxLocalDateTime: Boolean
     private val usesKotlinInstant: Boolean
-    private val usesKotlinLocalDateTime: Boolean
 
     init {
         fun usesType(property: LeafProperty, typeName: String): Boolean {
@@ -69,8 +72,9 @@ internal class EntityMetamodelGenerator(
         }
 
         val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
+        usesKotlinxInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinxInstant) }
+        usesKotlinxLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinxLocalDateTime) }
         usesKotlinInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
-        usesKotlinLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
     }
 
     private val idTypeName: String = if (entity.idProperties.size == 1) {
@@ -108,6 +112,7 @@ internal class EntityMetamodelGenerator(
 
     private fun suppress() {
         w.println("@file:Suppress(\"warnings\")")
+        w.println("@file:OptIn(kotlin.time.ExperimentalTime::class)")
     }
 
     private fun packageDeclaration() {
@@ -118,9 +123,10 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun importStatements() {
-        if (usesKotlinInstant || usesKotlinLocalDateTime) {
+        if (usesKotlinxInstant || usesKotlinxLocalDateTime || usesKotlinInstant) {
+            if (usesKotlinxInstant) w.println("import $toKotlinxInstant")
+            if (usesKotlinxLocalDateTime) w.println("import $toKotlinxLocalDateTime")
             if (usesKotlinInstant) w.println("import $toKotlinInstant")
-            if (usesKotlinLocalDateTime) w.println("import $toKotlinLocalDateTime")
             w.println()
         }
 
@@ -641,16 +647,18 @@ internal class EntityMetamodelGenerator(
         return when (property.kotlinClass) {
             is ValueClass -> {
                 when (property.kotlinClass.property.typeName) {
+                    KotlinxInstant -> "${property.typeName}(kotlinxInstant(c))"
+                    KotlinxLocalDateTime -> "${property.typeName}(kotlinxDateTime(c))"
                     KotlinInstant -> "${property.typeName}(kotlinInstant(c))"
-                    KotlinLocalDateTime -> "${property.typeName}(kotlinDateTime(c))"
                     else -> "${property.typeName}(${escapePackageName(property.kotlinClass.property.type.declaration)}.now(c))"
                 }
             }
 
             else -> {
                 when (property.typeName) {
+                    KotlinxInstant -> "kotlinxInstant(c)"
+                    KotlinxLocalDateTime -> "kotlinxDateTime(c)"
                     KotlinInstant -> "kotlinInstant(c)"
-                    KotlinLocalDateTime -> "kotlinDateTime(c)"
                     else -> "${escapePackageName(property.kotlinClass.declaration)}.now(c)"
                 }
             }
@@ -704,11 +712,14 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun helpers() {
-        if (usesKotlinInstant) {
-            w.println("    private fun kotlinInstant(c: java.time.Clock): kotlinx.datetime.Instant = java.time.Instant.now(c).toKotlinInstant()")
+        if (usesKotlinxInstant) {
+            w.println("    private fun kotlinxInstant(c: java.time.Clock): kotlinx.datetime.Instant = java.time.Instant.now(c).toKotlinInstant()")
         }
-        if (usesKotlinLocalDateTime) {
-            w.println("    private fun kotlinDateTime(c: java.time.Clock): kotlinx.datetime.LocalDateTime = java.time.LocalDateTime.now(c).toKotlinLocalDateTime()")
+        if (usesKotlinxLocalDateTime) {
+            w.println("    private fun kotlinxDateTime(c: java.time.Clock): kotlinx.datetime.LocalDateTime = java.time.LocalDateTime.now(c).toKotlinLocalDateTime()")
+        }
+        if (usesKotlinInstant) {
+            w.println("    private fun kotlinInstant(c: java.time.Clock): kotlin.time.Instant = java.time.Instant.now(c).toKotlinInstant()")
         }
     }
 

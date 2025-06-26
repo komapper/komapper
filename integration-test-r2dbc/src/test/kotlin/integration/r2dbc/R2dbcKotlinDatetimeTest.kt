@@ -14,6 +14,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toJavaInstant
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -24,7 +25,10 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinInstant
 
+@OptIn(ExperimentalTime::class)
 @ExtendWith(R2dbcEnv::class)
 class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
     @Test
@@ -32,7 +36,7 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
         val m = Meta.kotlinInstantData
         val datetime = LocalDateTime(2019, 6, 1, 12, 11, 10)
         val instant = datetime.toInstant(TimeZone.UTC)
-        val data = KotlinInstantData(1, instant)
+        val data = KotlinInstantData(1, instant.toJavaInstant().toKotlinInstant())
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

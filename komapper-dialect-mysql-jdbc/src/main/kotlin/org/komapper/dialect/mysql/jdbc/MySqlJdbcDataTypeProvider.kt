@@ -15,6 +15,7 @@ import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
 import org.komapper.jdbc.JdbcInstantAsTimestampType
 import org.komapper.jdbc.JdbcIntType
+import org.komapper.jdbc.JdbcKotlinInstantAsTimestampType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
@@ -43,6 +44,7 @@ class MySqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTy
             JdbcFloatType("real"),
             JdbcInstantAsTimestampType("timestamp(6)"),
             JdbcIntType("integer"),
+            JdbcKotlinInstantAsTimestampType("timestamp(6)"),
             JdbcLocalDateTimeType("datetime(6)"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),

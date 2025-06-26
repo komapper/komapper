@@ -21,6 +21,9 @@ import java.time.ZoneOffset
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
+import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
+import kotlin.time.toKotlinInstant
 
 /**
  * Represents a data type for R2DBC access.
@@ -320,6 +323,59 @@ class R2dbcIntType(override val name: String) :
             is Number -> value.toInt()
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+class R2dbcKotlinInstantType(override val name: String) : AbstractR2dbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>()) {
+    val instantType = R2dbcInstantType(name)
+
+    override fun getValue(row: Row, index: Int): kotlin.time.Instant? {
+        return instantType.getValue(row, index)?.toKotlinInstant()
+    }
+
+    override fun getValue(row: Row, columnLabel: String): kotlin.time.Instant? {
+        return instantType.getValue(row, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun convertBeforeBinding(value: kotlin.time.Instant): Any {
+        return value.toJavaInstant()
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+class R2dbcKotlinInstantAsTimestampType(override val name: String) :
+    AbstractR2dbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), LocalDateTime::class.java) {
+    private val instantAsTimestampType = R2dbcInstantAsTimestampType(name)
+
+    override fun getValue(row: Row, index: Int): kotlin.time.Instant? {
+        return instantAsTimestampType.getValue(row, index)?.toKotlinInstant()
+    }
+
+    override fun getValue(row: Row, columnLabel: String): kotlin.time.Instant? {
+        return instantAsTimestampType.getValue(row, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun convertBeforeBinding(value: kotlin.time.Instant): Any {
+        return LocalDateTime.ofInstant(value.toJavaInstant(), ZoneOffset.UTC)
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+class R2dbcKotlinInstantAsTimestampWithTimezoneType(override val name: String) :
+    AbstractR2dbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), OffsetDateTime::class.java) {
+    private val instantAsTimestampWithTimezoneType = R2dbcInstantAsTimestampWithTimezoneType(name)
+
+    override fun getValue(row: Row, index: Int): kotlin.time.Instant? {
+        return instantAsTimestampWithTimezoneType.getValue(row, index)?.toKotlinInstant()
+    }
+
+    override fun getValue(row: Row, columnLabel: String): kotlin.time.Instant? {
+        return instantAsTimestampWithTimezoneType.getValue(row, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun convertBeforeBinding(value: kotlin.time.Instant): Any {
+        return value.toJavaInstant().atOffset(ZoneOffset.UTC)
     }
 }
 
