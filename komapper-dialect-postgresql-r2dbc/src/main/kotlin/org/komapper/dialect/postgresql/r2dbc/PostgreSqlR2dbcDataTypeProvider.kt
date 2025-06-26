@@ -14,6 +14,7 @@ import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
 import org.komapper.r2dbc.R2dbcInstantAsTimestampWithTimezoneType
 import org.komapper.r2dbc.R2dbcIntType
+import org.komapper.r2dbc.R2dbcKotlinInstantAsTimestampWithTimezoneType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
 import org.komapper.r2dbc.R2dbcLocalTimeType
@@ -43,6 +44,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcFloatType("real"),
             R2dbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             R2dbcIntType("integer"),
+            R2dbcKotlinInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             R2dbcLocalDateTimeType("timestamp"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),

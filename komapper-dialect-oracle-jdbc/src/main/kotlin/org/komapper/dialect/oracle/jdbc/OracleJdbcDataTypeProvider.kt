@@ -14,6 +14,7 @@ import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
 import org.komapper.jdbc.JdbcInstantAsTimestampWithTimezoneType
 import org.komapper.jdbc.JdbcIntType
+import org.komapper.jdbc.JdbcKotlinInstantAsTimestampWithTimezoneType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
@@ -39,6 +40,7 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcFloatType("float"),
             JdbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             JdbcIntType("integer"),
+            JdbcKotlinInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("date"),

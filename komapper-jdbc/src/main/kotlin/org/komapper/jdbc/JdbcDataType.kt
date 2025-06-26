@@ -407,6 +407,42 @@ class JdbcKotlinInstantType(override val name: String) :
     }
 }
 
+@OptIn(ExperimentalTime::class)
+class JdbcKotlinInstantAsTimestampType(override val name: String) :
+    AbstractJdbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), JDBCType.TIMESTAMP) {
+    private val instantAsTimestampType = JdbcInstantAsTimestampType(name)
+
+    override fun doGetValue(rs: ResultSet, index: Int): kotlin.time.Instant? {
+        return instantAsTimestampType.getValue(rs, index)?.toKotlinInstant()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): kotlin.time.Instant? {
+        return instantAsTimestampType.getValue(rs, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: kotlin.time.Instant) {
+        instantAsTimestampType.setValue(ps, index, value.toJavaInstant())
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+class JdbcKotlinInstantAsTimestampWithTimezoneType(override val name: String) :
+    AbstractJdbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), JDBCType.TIMESTAMP_WITH_TIMEZONE) {
+    private val instantAsTimestampWithTimezoneType = JdbcInstantAsTimestampWithTimezoneType(name)
+
+    override fun doGetValue(rs: ResultSet, index: Int): kotlin.time.Instant? {
+        return instantAsTimestampWithTimezoneType.getValue(rs, index)?.toKotlinInstant()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): kotlin.time.Instant? {
+        return instantAsTimestampWithTimezoneType.getValue(rs, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: kotlin.time.Instant) {
+        instantAsTimestampWithTimezoneType.setValue(ps, index, value.toJavaInstant())
+    }
+}
+
 class JdbcLocalDateTimeType(override val name: String) :
     AbstractJdbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), JDBCType.TIMESTAMP) {
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {

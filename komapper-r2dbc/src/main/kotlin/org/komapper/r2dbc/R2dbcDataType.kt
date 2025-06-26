@@ -343,6 +343,42 @@ class R2dbcKotlinInstantType(override val name: String) : AbstractR2dbcDataType<
     }
 }
 
+@OptIn(ExperimentalTime::class)
+class R2dbcKotlinInstantAsTimestampType(override val name: String) :
+    AbstractR2dbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), LocalDateTime::class.java) {
+    private val instantAsTimestampType = R2dbcInstantAsTimestampType(name)
+
+    override fun getValue(row: Row, index: Int): kotlin.time.Instant? {
+        return instantAsTimestampType.getValue(row, index)?.toKotlinInstant()
+    }
+
+    override fun getValue(row: Row, columnLabel: String): kotlin.time.Instant? {
+        return instantAsTimestampType.getValue(row, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun convertBeforeBinding(value: kotlin.time.Instant): Any {
+        return LocalDateTime.ofInstant(value.toJavaInstant(), ZoneOffset.UTC)
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+class R2dbcKotlinInstantAsTimestampWithTimezoneType(override val name: String) :
+    AbstractR2dbcDataType<kotlin.time.Instant>(typeOf<kotlin.time.Instant>(), OffsetDateTime::class.java) {
+    private val instantAsTimestampWithTimezoneType = R2dbcInstantAsTimestampWithTimezoneType(name)
+
+    override fun getValue(row: Row, index: Int): kotlin.time.Instant? {
+        return instantAsTimestampWithTimezoneType.getValue(row, index)?.toKotlinInstant()
+    }
+
+    override fun getValue(row: Row, columnLabel: String): kotlin.time.Instant? {
+        return instantAsTimestampWithTimezoneType.getValue(row, columnLabel)?.toKotlinInstant()
+    }
+
+    override fun convertBeforeBinding(value: kotlin.time.Instant): Any {
+        return value.toJavaInstant().atOffset(ZoneOffset.UTC)
+    }
+}
+
 class R2dbcLocalDateTimeType(override val name: String) :
     AbstractR2dbcDataType<LocalDateTime>(typeOf<LocalDateTime>()) {
     override fun convertBeforeGetting(value: Any): LocalDateTime {
