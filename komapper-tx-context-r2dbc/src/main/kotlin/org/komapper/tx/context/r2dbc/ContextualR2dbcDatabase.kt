@@ -103,8 +103,8 @@ internal class ContextualR2dbcDatabaseImpl(
     override val config: R2dbcDatabaseConfig
         get() = database.config
 
-    context(r2dbcContext: R2dbcContext)
     @Suppress("UNCHECKED_CAST")
+    context(r2dbcContext: R2dbcContext)
     override suspend fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : R2dbcDatabaseConfig by config {
             override val session: R2dbcSession = object : R2dbcSession {
