@@ -50,6 +50,17 @@ public interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
             create table short_data(id int not null primary key, value smallint);
             create table string_data(id int not null primary key, value varchar(20));
             create table multi_generated(created_at datetimeoffset default getdate(), id int identity primary key);
+            
+            create table student (student_id int primary key, student_name varchar(50));
+            create table course (course_id int primary key, course_name varchar(50), student_id int);
+
+            insert into student (student_id, student_name) values (1, 'taro');
+            insert into student (student_id, student_name) values (2, 'hanako');
+            insert into student (student_id, student_name) values (3, 'jiro');
+
+            insert into course (course_id, course_name, student_id) values (101, 'math', 1);
+            insert into course (course_id, course_name, student_id) values (102, 'english', 1);
+            insert into course (course_id, course_name, student_id) values (103, 'science', 4);
 
             insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
             insert into department values(2,20,'RESEARCH','DALLAS',1);
