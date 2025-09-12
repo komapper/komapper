@@ -278,6 +278,11 @@ interface Dialect {
     fun supportsConflictTargetInUpsertStatement(): Boolean = false
 
     /**
+     * Returns whether the FULL OUTER JOIN clause is supported.
+     */
+    fun supportsFullOuterJoin(): Boolean = true
+
+    /**
      * Returns whether the index_predicate is supported in the UPSERT statement.
      */
     fun supportsIndexPredicateInUpsertStatement(): Boolean = false

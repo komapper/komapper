@@ -6,6 +6,7 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.element.FullJoin
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
@@ -134,6 +135,7 @@ class SelectStatementBuilder(
                 when (join) {
                     is InnerJoin -> buf.append(" inner join ")
                     is LeftJoin -> buf.append(" left outer join ")
+                    is FullJoin -> buf.append(" full outer join ")
                 }
                 table(join.target)
                 val criteria = join.getOnCriteria()
@@ -145,6 +147,16 @@ class SelectStatementBuilder(
                     }
                     buf.cutBack(5)
                     buf.append(")")
+                }
+                when (join) {
+                    is FullJoin -> {
+                        if (!dialect.supportsFullOuterJoin()) {
+                            throw UnsupportedOperationException(
+                                "The dialect(driver=${dialect.driver}) does not support FULL OUTER JOIN. sql=$buf"
+                            )
+                        }
+                    }
+                    else -> Unit
                 }
             }
         }

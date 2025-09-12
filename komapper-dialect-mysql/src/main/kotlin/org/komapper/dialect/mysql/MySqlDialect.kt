@@ -61,6 +61,8 @@ interface MySqlDialect : Dialect {
         MySqlVersion.V8 -> true
     }
 
+    override fun supportsFullOuterJoin(): Boolean = false
+
     override fun supportsLockOfTables(): Boolean = when (version) {
         MySqlVersion.V5 -> false
         MySqlVersion.V8 -> true

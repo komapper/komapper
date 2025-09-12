@@ -1,11 +1,16 @@
 package integration.r2dbc
 
+import integration.core.Dbms
+import integration.core.Run
 import integration.core.address
+import integration.core.course
 import integration.core.department
 import integration.core.employee
 import integration.core.manager
 import integration.core.person
+import integration.core.student
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -40,6 +45,39 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
             }
         }
         assertEquals(15, list.size)
+    }
+
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.MYSQL_5, Dbms.MYSQL])
+    @Test
+    fun fullJoin(info: TestInfo) = inTransaction(db, info) {
+        val s = Meta.student
+        val c = Meta.course
+        val set = db.runQuery {
+            QueryDsl.from(s).fullJoin(c) {
+                s.studentId eq c.studentId
+            }.select(s.studentName, c.courseName)
+        }.toSet()
+        assertEquals(5, set.size)
+        assertEquals(
+            setOf("taro" to "math", "taro" to "english", "hanako" to null, "jiro" to null, null to "science"),
+            set
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.MYSQL_5, Dbms.MYSQL])
+    @Test
+    fun fullJoin_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
+        val s = Meta.student
+        val c = Meta.course
+        val ex = assertThrows<UnsupportedOperationException> {
+            db.runQuery {
+                QueryDsl.from(s).fullJoin(c) {
+                    s.studentId eq c.studentId
+                }.select(s.studentName, c.courseName)
+            }
+            Unit
+        }
+        println(ex)
     }
 
     @Test

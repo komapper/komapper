@@ -79,6 +79,8 @@ interface H2Dialect : Dialect {
 
     override fun supportsDeleteReturning(): Boolean = true
 
+    override fun supportsFullOuterJoin(): Boolean = false
+
     override fun supportsInsertMultipleReturning(): Boolean = true
 
     override fun supportsInsertSingleReturning(): Boolean = true
