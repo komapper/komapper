@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.element.FullJoin
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.element.Relationship
@@ -44,6 +45,11 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
 
     override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(relationship: Relationship<ENTITY2, ID2, META2>): RelationSelectQuery<ENTITY> {
         val newContext = support.join(LeftJoin(relationship.metamodel, relationship.on))
+        return copy(context = newContext)
+    }
+
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> fullJoin(relationship: Relationship<ENTITY2, ID2, META2>): RelationSelectQuery<ENTITY> {
+        val newContext = support.join(FullJoin(relationship.metamodel, relationship.on))
         return copy(context = newContext)
     }
 

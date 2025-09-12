@@ -47,6 +47,16 @@ interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): QUERY = leftJoin(Relationship(metamodel, on))
 
     /**
+     * Builds a query with a FULL OUTER JOIN clause.
+     *
+     * @return the query that returns a list of entities
+     */
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> fullJoin(
+        metamodel: META2,
+        on: OnDeclaration,
+    ): QUERY = fullJoin(Relationship(metamodel, on))
+
+    /**
      * Builds a query with an INNER JOIN clause.
      *
      * @return the query that returns a list of entities
@@ -61,6 +71,15 @@ interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
      * @return the query that returns a list of entities
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+        relationship: Relationship<ENTITY2, ID2, META2>,
+    ): QUERY
+
+    /**
+     * Builds a query with a FULL OUTER JOIN clause.
+     *
+     * @return the query that returns a list of entities
+     */
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> fullJoin(
         relationship: Relationship<ENTITY2, ID2, META2>,
     ): QUERY
 

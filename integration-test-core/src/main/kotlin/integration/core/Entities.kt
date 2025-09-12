@@ -438,3 +438,18 @@ public data class MultiGenerated(
     @KomapperColumn("created_at")
     val createdAt: Instant = Instant.EPOCH,
 )
+
+@KomapperEntity
+public data class Student(
+    @KomapperId
+    val studentId: Int,
+    val studentName: String,
+)
+
+@KomapperEntity
+public data class Course(
+    @KomapperId
+    val courseId: Int,
+    val courseName: String,
+    val studentId: Int?,
+)

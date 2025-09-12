@@ -22,3 +22,8 @@ data class LeftJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, M
     override val target: META,
     override val on: OnDeclaration,
 ) : Join<ENTITY, ID, META>
+
+data class FullJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    override val target: META,
+    override val on: OnDeclaration,
+) : Join<ENTITY, ID, META>

@@ -87,6 +87,8 @@ interface MariaDbDialect : Dialect {
 
     override fun supportsDeleteReturning(): Boolean = true
 
+    override fun supportsFullOuterJoin(): Boolean = false
+
     override fun supportsExcludedTable(): Boolean = false
 
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
