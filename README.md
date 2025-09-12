@@ -58,8 +58,8 @@ Add the following code to the Gradle build script (gradle.build.kts).
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "2.1.10"
-    id("com.google.devtools.ksp") version "2.1.10-1.0.31"
+    kotlin("jvm") version "2.2.20"
+    id("com.google.devtools.ksp") version "2.2.20-2.0.3"
 }
 
 val komapperVersion = "5.5.0"
@@ -171,7 +171,8 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 |:-----------------------|:-----------------|---------------|:----------------|--------------------|
 | 1.9.24-1.0.20          | 1.18.1 - 2.x     | No            | 11              | 6.8.3              |
 | 2.0.21-1.0.28          | 2.x - 5.x        | Yes           | 11              | 7.6.4              |
-| 2.1.10-1.0.31          | 5.x              | Yes           | 11              | 7.6.4              |
+| 2.1.21-2.0.2           | 5.x              | Yes           | 11              | 7.6.4              |
+| 2.2.20-2.0.3           | 5.x              | Yes           | 11              | 7.6.4              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
