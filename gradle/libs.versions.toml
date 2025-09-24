@@ -83,7 +83,7 @@ ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version = "1.7.1" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
-spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
+spotless = { id = "com.diffplug.spotless", version = "8.0.0" }
 publish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 release = { id = "net.researchgate.release", version = "3.1.0" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.0.0" }
