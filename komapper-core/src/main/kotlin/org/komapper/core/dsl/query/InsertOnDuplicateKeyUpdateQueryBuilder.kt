@@ -49,7 +49,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted or updated
      * @return the query
      */
-    fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Long>
+    fun multiple(vararg entities: ENTITY): EntityUpsertMultipleQuery<ENTITY>
 
     /**
      * Builds a query to insert or update a list of entities in a batch.
