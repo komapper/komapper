@@ -152,6 +152,29 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
+    fun onDuplicateKeyUpdate_vararg() {
+        val d = Meta.department
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val departments = listOf(
+            department1,
+            department2,
+        )
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(department1, department2,).returning()
+        val departments2 = db.runQuery { query }
+        assertEquals(departments.toSet(), departments2.toSet())
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
     fun onDuplicateKeyUpdateReturningSingleColumn() {
         val d = Meta.department
         val departments = listOf(
@@ -225,6 +248,25 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning()
+        val departments = db.runQuery { query }
+        assertEquals(listOf(department1), departments)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun onDuplicateKeyIgnore_vararg() {
+        val d = Meta.department
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(department1, department2).returning()
         val departments = db.runQuery { query }
         assertEquals(listOf(department1), departments)
         val list = db.runQuery {
