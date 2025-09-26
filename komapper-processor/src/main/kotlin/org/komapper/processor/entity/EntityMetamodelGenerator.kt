@@ -294,7 +294,7 @@ internal class EntityMetamodelGenerator(
             val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $updatable, $insertable, $getter, $setter, $wrap, $unwrap, $nullable)"
+            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $updatable, $insertable, $getter, $setter, $wrap, $unwrap, $nullable, ${p.column.length})"
         }
 
         w.println("    private object $EntityDescriptor {")

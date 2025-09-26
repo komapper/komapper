@@ -2,6 +2,7 @@ package org.komapper.dialect.postgresql.r2dbc
 
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
+import org.komapper.r2dbc.R2dbcBlobByteArrayType
 import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
@@ -35,6 +36,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
             R2dbcBlobType("bytea"),
+            R2dbcBlobByteArrayType("bytea"),
             R2dbcBooleanType("boolean"),
             R2dbcByteType("smallint"),
             R2dbcByteArrayType("bytea"),

@@ -5,6 +5,7 @@ import org.komapper.jdbc.JdbcAnyType
 import org.komapper.jdbc.JdbcArrayType
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
@@ -40,6 +41,7 @@ class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcBigDecimalType("numeric"),
             JdbcBigIntegerType("bigint"),
             JdbcBlobType("blob"),
+            JdbcBlobByteArrayType("blob"),
             JdbcBooleanType("bool"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("binary"),

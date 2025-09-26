@@ -162,6 +162,7 @@ annotation class KomapperColumn(
     val updatable: Boolean = UPDATABLE,
     val insertable: Boolean = INSERTABLE,
     val alternateType: KClass<*> = Void::class,
+    val length: Int = LENGTH,
 ) {
     companion object {
         const val NAME = ""
@@ -169,6 +170,7 @@ annotation class KomapperColumn(
         const val MASKING = false
         const val UPDATABLE = true
         const val INSERTABLE = true
+        const val LENGTH = -1
     }
 }
 

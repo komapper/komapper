@@ -3,6 +3,7 @@ package org.komapper.dialect.sqlserver.jdbc
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
@@ -35,6 +36,7 @@ class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
             JdbcBlobType("varbinary(max)"),
+            JdbcBlobByteArrayType("varbinary(max)"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(1000)"),
             JdbcClobType("text"),

@@ -3,6 +3,7 @@ package org.komapper.dialect.mysql.r2dbc
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
+import org.komapper.r2dbc.R2dbcBlobByteArrayType
 import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
@@ -34,6 +35,7 @@ class MySqlR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
             R2dbcBlobType("blob"),
+            R2dbcBlobByteArrayType("blob"),
             R2dbcBooleanType("bit(1)"),
             R2dbcByteType("tinyint"),
             R2dbcByteArrayType("varbinary(500)"),

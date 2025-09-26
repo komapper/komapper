@@ -1,32 +1,15 @@
 package org.komapper.jdbc.spi
 
+import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
-import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KType
 
 /**
  * Represents a user-defined data type for JDBC access.
  */
 @ThreadSafe
-interface JdbcUserDefinedDataType<T : Any> {
-    /**
-     * The data type name.
-     */
-    val name: String
-
-    /**
-     * The user-defined type.
-     * [KType.isMarkedNullable] must be false.
-     */
-    val type: KType
-
-    /**
-     * The JDBC type defined in the standard library.
-     */
-    val jdbcType: JDBCType
-
+interface JdbcUserDefinedDataType<T : Any> : DataType {
     /**
      * Returns the value.
      *

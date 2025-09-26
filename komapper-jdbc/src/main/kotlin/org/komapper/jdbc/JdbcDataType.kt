@@ -1,7 +1,9 @@
 package org.komapper.jdbc
 
+import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
+import org.komapper.core.type.BlobByteArray
 import org.komapper.core.type.ClobString
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
@@ -30,23 +32,7 @@ import kotlin.time.toKotlinInstant
  * Represents a data type for JDBC access.
  */
 @ThreadSafe
-interface JdbcDataType<T : Any> {
-    /**
-     * The data type name.
-     */
-    val name: String
-
-    /**
-     * The corresponding type.
-     * [KType.isMarkedNullable] must be false.
-     */
-    val type: KType
-
-    /**
-     * The JDBC type defined in the standard library.
-     */
-    val jdbcType: JDBCType
-
+interface JdbcDataType<T : Any> : DataType {
     /**
      * Returns the value.
      *
@@ -128,8 +114,7 @@ abstract class AbstractJdbcDataType<T : Any>(
     }
 }
 
-class JdbcAnyType(override val name: String) :
-    AbstractJdbcDataType<Any>(typeOf<Any>(), JDBCType.OTHER) {
+class JdbcAnyType(override val name: String) : AbstractJdbcDataType<Any>(typeOf<Any>(), JDBCType.OTHER) {
     override fun doGetValue(rs: ResultSet, index: Int): Any? {
         return rs.getObject(index)
     }
@@ -174,7 +159,8 @@ class JdbcBigDecimalType(override val name: String) :
 
 class JdbcBigIntegerType(override val name: String) : JdbcDataType<BigInteger> {
     private val dataType = JdbcBigDecimalType(name)
-    override val type: KType = typeOf<BigInteger>()
+
+    override val type = typeOf<BigInteger>()
     override val jdbcType = dataType.jdbcType
 
     override fun getValue(rs: ResultSet, index: Int): BigInteger? {
@@ -288,6 +274,32 @@ class JdbcClobStringType(override val name: String) : AbstractJdbcDataType<ClobS
 
     override fun doToString(value: ClobString): String {
         return value.value
+    }
+}
+
+class JdbcBlobByteArrayType(override val name: String) : AbstractJdbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BLOB) {
+    override fun doGetValue(rs: ResultSet, index: Int): BlobByteArray? {
+        return rs.getBlob(index)?.toBlobByteArray()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): BlobByteArray? {
+        return rs.getBlob(columnLabel)?.toBlobByteArray()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: BlobByteArray) {
+        ps.setBytes(index, value.value)
+    }
+
+    override fun doToString(value: BlobByteArray): String {
+        return value.toString()
+    }
+
+    private fun Blob.toBlobByteArray(): BlobByteArray {
+        return try {
+            BlobByteArray(getBytes(1, length().toInt()))
+        } finally {
+            free()
+        }
     }
 }
 

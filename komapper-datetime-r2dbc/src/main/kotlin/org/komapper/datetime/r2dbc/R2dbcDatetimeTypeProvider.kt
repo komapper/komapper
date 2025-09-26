@@ -36,7 +36,7 @@ class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataType
 }
 
 internal class JdbcKotlinLocalDateType(private val dataType: R2dbcDataType<java.time.LocalDate>) :
-    AbstractR2dbcDataType<LocalDate>(typeOf<LocalDate>()) {
+    AbstractR2dbcDataType<LocalDate>(typeOf<LocalDate>(), dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): LocalDate? {
@@ -59,7 +59,7 @@ internal class JdbcKotlinLocalDateType(private val dataType: R2dbcDataType<java.
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: R2dbcDataType<java.time.LocalDateTime>) :
-    AbstractR2dbcDataType<LocalDateTime>(typeOf<LocalDateTime>()) {
+    AbstractR2dbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): LocalDateTime? {

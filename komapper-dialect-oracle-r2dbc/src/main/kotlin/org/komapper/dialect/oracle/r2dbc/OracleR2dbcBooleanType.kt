@@ -2,9 +2,10 @@ package org.komapper.dialect.oracle.r2dbc
 
 import io.r2dbc.spi.Statement
 import org.komapper.r2dbc.AbstractR2dbcDataType
+import java.sql.JDBCType
 import kotlin.reflect.typeOf
 
-object OracleR2dbcBooleanType : AbstractR2dbcDataType<Boolean>(typeOf<Boolean>()) {
+object OracleR2dbcBooleanType : AbstractR2dbcDataType<Boolean>(typeOf<Boolean>(), JDBCType.INTEGER) {
     override val name: String = "number(1, 0)"
 
     override fun convertBeforeGetting(value: Any): Boolean {
