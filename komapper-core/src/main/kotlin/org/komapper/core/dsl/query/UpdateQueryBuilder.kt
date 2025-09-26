@@ -5,7 +5,7 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.options.DeleteOptions
+import org.komapper.core.dsl.options.UpdateOptions
 
 /**
  * The builder of update queries.
@@ -44,16 +44,16 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * Builds a query to update a list of entities in a batch.
      *
      * @param entities the entities to be updated
-     * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
+     * @param batchSize the batch size. If it is null, the value of [UpdateOptions.batchSize] will be used.
      * @return the query
      */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
 
     /**
-     * Builds a query to delete an array of entities in a batch.
+     * Builds a query to update an array of entities in a batch.
      *
-     * @param entities the entities to be deleted
-     * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
+     * @param entities the entities to be updated
+     * @param batchSize the batch size. If it is null, the value of [UpdateOptions.batchSize] will be used.
      * @return the query
      */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
