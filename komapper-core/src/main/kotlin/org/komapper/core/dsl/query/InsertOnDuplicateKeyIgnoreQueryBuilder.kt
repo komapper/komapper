@@ -35,7 +35,7 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted
      * @return the query
      */
-    fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Long>
+    fun multiple(vararg entities: ENTITY): EntityUpsertMultipleQuery<ENTITY>
 
     /**
      * Builds a query to insert a list of entities in a batch.
