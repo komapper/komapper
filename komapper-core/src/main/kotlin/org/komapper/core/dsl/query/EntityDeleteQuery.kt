@@ -22,7 +22,7 @@ interface EntityDeleteQuery : Query<Unit> {
 }
 
 /**
- * Represents a query to insert a single entity.
+ * Represents a query to delete a single entity.
  *
  * @param ENTITY the entity type
  */
