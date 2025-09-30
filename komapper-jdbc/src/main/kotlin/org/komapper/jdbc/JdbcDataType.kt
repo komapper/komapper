@@ -1,5 +1,6 @@
 package org.komapper.jdbc
 
+import org.komapper.core.SqlType
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
 import org.komapper.core.type.ClobString
@@ -30,22 +31,12 @@ import kotlin.time.toKotlinInstant
  * Represents a data type for JDBC access.
  */
 @ThreadSafe
-interface JdbcDataType<T : Any> {
-    /**
-     * The data type name.
-     */
-    val name: String
-
-    /**
-     * The corresponding type.
-     * [KType.isMarkedNullable] must be false.
-     */
-    val type: KType
-
+interface JdbcDataType<T : Any> : SqlType {
     /**
      * The JDBC type defined in the standard library.
      */
     val jdbcType: JDBCType
+        get() = sqlType
 
     /**
      * Returns the value.
@@ -93,8 +84,11 @@ interface JdbcDataType<T : Any> {
 
 abstract class AbstractJdbcDataType<T : Any>(
     override val type: KType,
-    override val jdbcType: JDBCType,
+    override val sqlType: JDBCType,
 ) : JdbcDataType<T> {
+    override val jdbcType: JDBCType
+        get() = sqlType
+
     override fun getValue(rs: ResultSet, index: Int): T? {
         val value = doGetValue(rs, index)
         return if (rs.wasNull()) null else value
@@ -111,7 +105,7 @@ abstract class AbstractJdbcDataType<T : Any>(
 
     override fun setValue(ps: PreparedStatement, index: Int, value: T?) {
         if (value == null) {
-            ps.setNull(index, jdbcType.vendorTypeNumber)
+            ps.setNull(index, sqlType.vendorTypeNumber)
         } else {
             doSetValue(ps, index, value)
         }
@@ -128,8 +122,7 @@ abstract class AbstractJdbcDataType<T : Any>(
     }
 }
 
-class JdbcAnyType(override val name: String) :
-    AbstractJdbcDataType<Any>(typeOf<Any>(), JDBCType.OTHER) {
+class JdbcAnyType(override val name: String) : AbstractJdbcDataType<Any>(typeOf<Any>(), JDBCType.OTHER) {
     override fun doGetValue(rs: ResultSet, index: Int): Any? {
         return rs.getObject(index)
     }
@@ -139,7 +132,7 @@ class JdbcAnyType(override val name: String) :
     }
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Any) {
-        ps.setObject(index, value, jdbcType.vendorTypeNumber)
+        ps.setObject(index, value, sqlType.vendorTypeNumber)
     }
 }
 
@@ -174,8 +167,12 @@ class JdbcBigDecimalType(override val name: String) :
 
 class JdbcBigIntegerType(override val name: String) : JdbcDataType<BigInteger> {
     private val dataType = JdbcBigDecimalType(name)
-    override val type: KType = typeOf<BigInteger>()
-    override val jdbcType = dataType.jdbcType
+
+    override val type = typeOf<BigInteger>()
+    override val sqlType = dataType.sqlType
+
+    override val jdbcType: JDBCType
+        get() = sqlType
 
     override fun getValue(rs: ResultSet, index: Int): BigInteger? {
         return dataType.getValue(rs, index)?.toBigInteger()
@@ -653,14 +650,17 @@ class JdbcUShortType(override val name: String) : AbstractJdbcDataType<UShort>(t
 class JdbcUserDefinedDataTypeAdapter<T : Any>(
     private val dataType: JdbcUserDefinedDataType<T>,
 ) : JdbcDataType<T> {
+    override val jdbcType: JDBCType
+        get() = sqlType
+
     override val name: String
         get() = dataType.name
 
     override val type: KType
         get() = dataType.type
 
-    override val jdbcType: JDBCType
-        get() = dataType.jdbcType
+    override val sqlType: JDBCType
+        get() = dataType.sqlType
 
     override fun getValue(rs: ResultSet, index: Int): T? {
         val value = dataType.getValue(rs, index)
@@ -674,7 +674,7 @@ class JdbcUserDefinedDataTypeAdapter<T : Any>(
 
     override fun setValue(ps: PreparedStatement, index: Int, value: T?) {
         if (value == null) {
-            ps.setNull(index, dataType.jdbcType.vendorTypeNumber)
+            ps.setNull(index, dataType.sqlType.vendorTypeNumber)
         } else {
             dataType.setValue(ps, index, value)
         }
@@ -689,11 +689,14 @@ class JdbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
     private val converter: DataTypeConverter<EXTERIOR, INTERIOR>,
     private val dataType: JdbcDataType<INTERIOR>,
 ) : JdbcDataType<EXTERIOR> {
+    override val jdbcType: JDBCType
+        get() = sqlType
+
     override val name: String get() = dataType.name
 
     override val type: KType get() = converter.exteriorType
 
-    override val jdbcType: JDBCType get() = dataType.jdbcType
+    override val sqlType: JDBCType get() = dataType.sqlType
 
     override fun getValue(rs: ResultSet, index: Int): EXTERIOR? {
         val value = dataType.getValue(rs, index)
@@ -707,7 +710,7 @@ class JdbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
 
     override fun setValue(ps: PreparedStatement, index: Int, value: EXTERIOR?) {
         if (value == null) {
-            ps.setNull(index, dataType.jdbcType.vendorTypeNumber)
+            ps.setNull(index, dataType.sqlType.vendorTypeNumber)
         } else {
             dataType.setValue(ps, index, converter.unwrap(value))
         }

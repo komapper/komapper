@@ -7,6 +7,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.isAutoIncrement
+import java.sql.JDBCType
 
 interface SchemaStatementBuilder {
     fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
@@ -66,7 +67,18 @@ abstract class AbstractSchemaStatementBuilder(
     }
 
     protected open fun <INTERIOR : Any> resolveDataTypeName(property: PropertyMetamodel<*, *, INTERIOR>): String {
-        return dialect.getDataTypeName<INTERIOR>(property.interiorType)
+        val base = dialect.getSqlType(property.interiorType)
+        val length = property.length?.takeIf {
+            base.sqlType in setOf(
+                JDBCType.VARCHAR,
+                JDBCType.CHAR,
+                JDBCType.NCHAR,
+                JDBCType.NVARCHAR,
+                JDBCType.BINARY,
+                JDBCType.VARBINARY,
+            )
+        } ?: return base.name
+        return "${base.sqlType.name.lowercase()}($length)"
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {

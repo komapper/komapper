@@ -13,7 +13,7 @@ class MoodType : JdbcUserDefinedDataType<Mood> {
 
     override val type: KType = typeOf<Mood>()
 
-    override val jdbcType: JDBCType = JDBCType.OTHER
+    override val sqlType: JDBCType = JDBCType.OTHER
 
     override fun getValue(rs: ResultSet, index: Int): Mood? {
         return rs.getString(index)?.let { Mood.valueOf(it) }
@@ -24,7 +24,7 @@ class MoodType : JdbcUserDefinedDataType<Mood> {
     }
 
     override fun setValue(ps: PreparedStatement, index: Int, value: Mood) {
-        ps.setObject(index, value.name, jdbcType.vendorTypeNumber)
+        ps.setObject(index, value.name, sqlType.vendorTypeNumber)
     }
 
     override fun toString(value: Mood): String {

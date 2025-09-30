@@ -3,6 +3,7 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.DataOperator
+import org.komapper.core.SqlType
 import kotlin.reflect.KType
 
 interface R2dbcDataOperator : DataOperator {
@@ -93,5 +94,11 @@ class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val da
     override fun <T : Any> getDataTypeName(type: KType): String {
         val dataType = getDataType<T>(type)
         return dataType.name
+    }
+
+    override fun getSqlType(type: KType): SqlType {
+        return dataTypeProvider.get<Any>(type) ?: error(
+            "The dataType is not found for the type \"${type}\".",
+        )
     }
 }

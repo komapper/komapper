@@ -244,7 +244,8 @@ internal class AnnotationSupport(
                 }
             }
         }
-        return Column(name, alwaysQuote, masking, updatable, insertable, alternateType)
+        val length = columnAnnotation?.findValue("length")?.toString()?.toIntOrNull()?.takeIf { it > 0 }
+        return Column(name, alwaysQuote, masking, updatable, insertable, alternateType, length)
     }
 
     fun getColumns(parameter: KSValueParameter): List<Triple<String, Column, KSAnnotation>> {

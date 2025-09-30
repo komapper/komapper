@@ -4,6 +4,7 @@ import integration.core.enumclass.Mood
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
+import java.sql.JDBCType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -13,6 +14,8 @@ class MoodType : R2dbcUserDefinedDataType<Mood> {
     override val type: KType = typeOf<Mood>()
 
     override val r2dbcType: Class<Mood> = Mood::class.javaObjectType
+
+    override val sqlType: JDBCType = JDBCType.OTHER
 
     override fun getValue(row: Row, index: Int): Mood? {
         return row.get(index, r2dbcType)

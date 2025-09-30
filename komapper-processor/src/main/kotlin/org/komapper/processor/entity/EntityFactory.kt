@@ -290,6 +290,7 @@ internal class EntityFactory(
                 updatable = true,
                 insertable = true,
                 alternateType = null,
+                length = null,
             )
         } else {
             column

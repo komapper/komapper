@@ -3,6 +3,7 @@ package integration.r2dbc
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
+import java.sql.JDBCType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -10,6 +11,7 @@ class PairOfStringType : R2dbcUserDefinedDataType<Pair<String, String>> {
     override val name: String = "varchar(500)"
     override val type: KType = typeOf<Pair<String, String>>()
     override val r2dbcType: Class<String> = String::class.javaObjectType
+    override val sqlType: JDBCType = JDBCType.VARCHAR
 
     override fun getValue(row: Row, index: Int): Pair<String, String>? {
         return row.get(index, r2dbcType)?.let {

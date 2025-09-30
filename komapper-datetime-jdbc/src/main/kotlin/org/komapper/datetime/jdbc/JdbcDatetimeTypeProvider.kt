@@ -35,7 +35,7 @@ class JdbcDatetimeTypeProvider(val next: JdbcDataTypeProvider) : JdbcDataTypePro
 }
 
 internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.time.LocalDate>) :
-    AbstractJdbcDataType<LocalDate>(typeOf<LocalDate>(), dataType.jdbcType) {
+    AbstractJdbcDataType<LocalDate>(typeOf<LocalDate>(), dataType.sqlType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDate? {
@@ -54,7 +54,7 @@ internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.t
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: JdbcDataType<java.time.LocalDateTime>) :
-    AbstractJdbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), dataType.jdbcType) {
+    AbstractJdbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), dataType.sqlType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {
