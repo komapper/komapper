@@ -13,7 +13,7 @@ class PostgreSqlJsonType : JdbcDataType<Json> {
     private val stringType = JdbcStringType("")
     override val type: KType = typeOf<Json>()
     override val name: String = "jsonb"
-    override val jdbcType: JDBCType = stringType.jdbcType
+    override val sqlType: JDBCType = stringType.sqlType
 
     override fun getValue(rs: ResultSet, index: Int): Json? {
         val data = stringType.getValue(rs, index)

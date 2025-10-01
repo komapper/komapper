@@ -22,6 +22,14 @@ interface DataOperator {
      * @return the data type name
      */
     fun <T : Any> getDataTypeName(type: KType): String
+
+    /**
+     * Returns the sql type.
+     *
+     * @param type the type corresponding the data type
+     * @return the data type
+     */
+    fun getSqlType(type: KType): SqlType
 }
 
 object DryRunDataOperator : DataOperator {
@@ -39,6 +47,10 @@ object DryRunDataOperator : DataOperator {
     }
 
     override fun <T : Any> getDataTypeName(type: KType): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getSqlType(type: KType): SqlType {
         throw UnsupportedOperationException()
     }
 }

@@ -1,6 +1,7 @@
 package org.komapper.jdbc
 
 import org.komapper.core.DataOperator
+import org.komapper.core.SqlType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import kotlin.reflect.KType
@@ -106,5 +107,11 @@ class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val data
 
     override fun <T : Any> getDataTypeOrNull(type: KType): JdbcDataType<T>? {
         return dataTypeProvider.get(type)
+    }
+
+    override fun getSqlType(type: KType): SqlType {
+        return dataTypeProvider.get<Any>(type) ?: error(
+            "The dataType is not found for the type \"${type}\".",
+        )
     }
 }

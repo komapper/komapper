@@ -2,25 +2,14 @@ package org.komapper.r2dbc.spi
 
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
+import org.komapper.core.SqlType
 import org.komapper.core.ThreadSafe
-import kotlin.reflect.KType
 
 /**
  * Represents a user-defined data type for R2DBC access.
  */
 @ThreadSafe
-interface R2dbcUserDefinedDataType<T : Any> {
-    /**
-     * The data type name.
-     */
-    val name: String
-
-    /**
-     * The user-defined type.
-     * [KType.isMarkedNullable] must be false.
-     */
-    val type: KType
-
+interface R2dbcUserDefinedDataType<T : Any> : SqlType {
     /**
      * The R2DBC codec type.
      * The type must be a nullable type.

@@ -7,6 +7,7 @@ import integration.core.bbb
 import integration.core.belonging
 import integration.core.ccc
 import integration.core.compositeKey
+import integration.core.ddd
 import integration.core.sequenceTable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dryRunQuery
@@ -24,6 +25,7 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
             Meta.aaa,
             Meta.bbb,
             Meta.ccc,
+            Meta.ddd,
             Meta.compositeKey,
             Meta.autoIncrementTable,
             Meta.sequenceTable,
@@ -53,6 +55,7 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
             QueryDsl.from(Meta.aaa)
                 .andThen(QueryDsl.from(Meta.bbb))
                 .andThen(QueryDsl.from(Meta.ccc))
+                .andThen(QueryDsl.from(Meta.ddd))
                 .andThen(QueryDsl.from(Meta.compositeKey))
                 .andThen(QueryDsl.from(Meta.autoIncrementTable))
                 .andThen(QueryDsl.from(Meta.sequenceTable))
@@ -100,5 +103,22 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.drop(Meta.assignment)
         }
+    }
+
+    @Test
+    fun column_length_applied() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        check(result.sql.contains("varchar(1000)"))
+    }
+
+    @Test
+    fun column_length_not_applied() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.ddd)
+        }
+        check(!result.sql.contains("integer(1000)"))
+        check(result.sql.contains("integer"))
     }
 }

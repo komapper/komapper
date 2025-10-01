@@ -352,10 +352,10 @@ class KomapperJdbcAutoConfigurationTest {
     }
 
     private abstract class AbstractJdbcUserDefinedDataType<T : Any> : JdbcUserDefinedDataType<T> {
-        override val name
+        override val sqlType: JDBCType
             get() = throw IllegalStateException("Shouldn't be called")
 
-        override val jdbcType
+        override val name
             get() = throw IllegalStateException("Shouldn't be called")
 
         override fun getValue(rs: ResultSet, index: Int): T? {

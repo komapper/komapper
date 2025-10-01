@@ -13,7 +13,7 @@ class UserDefinedStringType : JdbcUserDefinedDataType<UserDefinedString> {
 
     override val type: KType = typeOf<UserDefinedString>()
 
-    override val jdbcType: JDBCType = JDBCType.VARCHAR
+    override val sqlType: JDBCType = JDBCType.VARCHAR
 
     override fun getValue(rs: ResultSet, index: Int): UserDefinedString? {
         return rs.getString(index)?.let { UserDefinedString(it) }

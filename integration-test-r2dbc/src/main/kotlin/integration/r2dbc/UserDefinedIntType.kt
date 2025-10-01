@@ -4,6 +4,7 @@ import integration.core.UserDefinedInt
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
+import java.sql.JDBCType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -13,6 +14,8 @@ class UserDefinedIntType : R2dbcUserDefinedDataType<UserDefinedInt> {
     override val type: KType = typeOf<UserDefinedInt>()
 
     override val r2dbcType: Class<*> = Int::class.javaObjectType
+
+    override val sqlType: JDBCType = JDBCType.VARCHAR
 
     override fun getValue(row: Row, index: Int): UserDefinedInt? {
         return row.get(index, Int::class.javaObjectType)?.let { UserDefinedInt(it) }
