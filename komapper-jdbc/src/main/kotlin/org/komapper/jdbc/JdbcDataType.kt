@@ -1,6 +1,6 @@
 package org.komapper.jdbc
 
-import org.komapper.core.SqlType
+import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
 import org.komapper.core.type.ClobString
@@ -14,6 +14,7 @@ import java.sql.JDBCType
 import java.sql.NClob
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.SQLType
 import java.sql.SQLXML
 import java.time.Instant
 import java.time.LocalDate
@@ -31,12 +32,17 @@ import kotlin.time.toKotlinInstant
  * Represents a data type for JDBC access.
  */
 @ThreadSafe
-interface JdbcDataType<T : Any> : SqlType {
+interface JdbcDataType<T : Any> : DataType {
+    @Suppress("DEPRECATION")
+    override val sqlType: SQLType
+        get() = jdbcType
+
     /**
      * The JDBC type defined in the standard library.
      */
+    @Deprecated("use sqlType instead")
     val jdbcType: JDBCType
-        get() = sqlType
+        get() = JDBCType.OTHER
 
     /**
      * Returns the value.
@@ -84,11 +90,8 @@ interface JdbcDataType<T : Any> : SqlType {
 
 abstract class AbstractJdbcDataType<T : Any>(
     override val type: KType,
-    override val sqlType: JDBCType,
+    override val sqlType: SQLType,
 ) : JdbcDataType<T> {
-    override val jdbcType: JDBCType
-        get() = sqlType
-
     override fun getValue(rs: ResultSet, index: Int): T? {
         val value = doGetValue(rs, index)
         return if (rs.wasNull()) null else value
@@ -170,9 +173,6 @@ class JdbcBigIntegerType(override val name: String) : JdbcDataType<BigInteger> {
 
     override val type = typeOf<BigInteger>()
     override val sqlType = dataType.sqlType
-
-    override val jdbcType: JDBCType
-        get() = sqlType
 
     override fun getValue(rs: ResultSet, index: Int): BigInteger? {
         return dataType.getValue(rs, index)?.toBigInteger()
@@ -268,7 +268,8 @@ class JdbcClobType(override val name: String) : AbstractJdbcDataType<Clob>(typeO
     }
 }
 
-class JdbcClobStringType(override val name: String) : AbstractJdbcDataType<ClobString>(typeOf<ClobString>(), JDBCType.CLOB) {
+class JdbcClobStringType(override val name: String) :
+    AbstractJdbcDataType<ClobString>(typeOf<ClobString>(), JDBCType.CLOB) {
     override fun doGetValue(rs: ResultSet, index: Int): ClobString? {
         val text = rs.getString(index)
         return if (text == null) null else ClobString(text)
@@ -650,16 +651,13 @@ class JdbcUShortType(override val name: String) : AbstractJdbcDataType<UShort>(t
 class JdbcUserDefinedDataTypeAdapter<T : Any>(
     private val dataType: JdbcUserDefinedDataType<T>,
 ) : JdbcDataType<T> {
-    override val jdbcType: JDBCType
-        get() = sqlType
-
     override val name: String
         get() = dataType.name
 
     override val type: KType
         get() = dataType.type
 
-    override val sqlType: JDBCType
+    override val sqlType: SQLType
         get() = dataType.sqlType
 
     override fun getValue(rs: ResultSet, index: Int): T? {
@@ -689,14 +687,11 @@ class JdbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
     private val converter: DataTypeConverter<EXTERIOR, INTERIOR>,
     private val dataType: JdbcDataType<INTERIOR>,
 ) : JdbcDataType<EXTERIOR> {
-    override val jdbcType: JDBCType
-        get() = sqlType
-
     override val name: String get() = dataType.name
 
     override val type: KType get() = converter.exteriorType
 
-    override val sqlType: JDBCType get() = dataType.sqlType
+    override val sqlType: SQLType get() = dataType.sqlType
 
     override fun getValue(rs: ResultSet, index: Int): EXTERIOR? {
         val value = dataType.getValue(rs, index)

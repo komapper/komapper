@@ -4,13 +4,14 @@ import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.SQLType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class PairOfStringType : JdbcUserDefinedDataType<Pair<String, String>> {
     override val name: String = "varchar(500)"
     override val type: KType = typeOf<Pair<String, String>>()
-    override val sqlType: JDBCType = JDBCType.VARCHAR
+    override val sqlType: SQLType = JDBCType.VARCHAR
 
     override fun getValue(rs: ResultSet, index: Int): Pair<String, String>? {
         return rs.getString(index)?.let {

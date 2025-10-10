@@ -4,7 +4,7 @@ import io.r2dbc.spi.Blob
 import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
-import org.komapper.core.SqlType
+import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
 import org.komapper.core.type.ClobString
@@ -13,6 +13,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.sql.JDBCType
+import java.sql.SQLType
+import java.sql.Types
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -31,7 +33,7 @@ import kotlin.time.toKotlinInstant
  * Represents a data type for R2DBC access.
  */
 @ThreadSafe
-interface R2dbcDataType<T : Any> : SqlType {
+interface R2dbcDataType<T : Any> : DataType {
     /**
      * Returns the value.
      *
@@ -79,7 +81,7 @@ interface R2dbcDataType<T : Any> : SqlType {
 
 abstract class AbstractR2dbcDataType<T : Any>(
     override val type: KType,
-    override val sqlType: JDBCType = JDBCType.OTHER,
+    override val sqlType: SQLType = JDBCType.OTHER,
     val typeOfNull: Class<*> = (type.classifier as KClass<*>).javaObjectType,
 ) : R2dbcDataType<T> {
     override fun getValue(row: Row, index: Int): T? {
@@ -522,7 +524,7 @@ class R2dbcUserDefinedDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDe
 
     override val type: KType get() = dataType.type
 
-    override val sqlType: JDBCType get() = dataType.sqlType
+    override val sqlType: SQLType get() = dataType.sqlType
 
     override fun getValue(row: Row, index: Int): T? {
         return dataType.getValue(row, index)
@@ -561,7 +563,7 @@ class R2dbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
 
     override val type: KType get() = converter.exteriorType
 
-    override val sqlType: JDBCType get() = dataType.sqlType
+    override val sqlType: SQLType get() = dataType.sqlType
 
     override fun getValue(row: Row, index: Int): EXTERIOR? {
         return dataType.getValue(row, index)?.let { converter.wrap(it) }

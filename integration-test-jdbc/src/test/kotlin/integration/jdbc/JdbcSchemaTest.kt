@@ -1,5 +1,7 @@
 package integration.jdbc
 
+import integration.core.Dbms
+import integration.core.Run
 import integration.core.aaa
 import integration.core.assignment
 import integration.core.autoIncrementTable
@@ -17,6 +19,7 @@ import org.komapper.core.dsl.query.andThen
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcSchemaTest(private val db: JdbcDatabase) {
@@ -105,20 +108,22 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
         }
     }
 
+    @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun column_length_applied() {
         val result = db.dryRunQuery {
             QueryDsl.create(Meta.aaa)
         }
-        check(result.sql.contains("varchar(1000)"))
+        assertTrue(result.sql.contains("varchar(1000)"), result.sql)
     }
 
+    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun column_length_not_applied() {
         val result = db.dryRunQuery {
             QueryDsl.create(Meta.ddd)
         }
-        check(!result.sql.contains("integer(1000)"))
-        check(result.sql.contains("integer"))
+        assertFalse(result.sql.contains("integer(1000)"), result.sql)
+        assertTrue(result.sql.contains("integer"), result.sql)
     }
 }

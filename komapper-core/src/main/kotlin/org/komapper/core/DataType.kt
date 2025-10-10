@@ -1,10 +1,11 @@
 package org.komapper.core
 
-import java.sql.JDBCType
+import java.sql.SQLType
+import java.sql.Types
 import kotlin.reflect.KType
 
 @ThreadSafe
-interface SqlType {
+interface DataType {
     /**
      * The data type name.
      */
@@ -17,7 +18,7 @@ interface SqlType {
     val type: KType
 
     /**
-     * The data type defined in the standard library.
+     * The SQL type defined in the [java.sql] package.
      */
-    val sqlType: JDBCType
+    val sqlType: SQLType
 }

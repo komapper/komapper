@@ -3,9 +3,9 @@ package integration.jdbc.postgresql
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcStringType
 import org.postgresql.util.PGobject
-import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.SQLType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -13,7 +13,7 @@ class PostgreSqlJsonType : JdbcDataType<Json> {
     private val stringType = JdbcStringType("")
     override val type: KType = typeOf<Json>()
     override val name: String = "jsonb"
-    override val sqlType: JDBCType = stringType.sqlType
+    override val sqlType: SQLType = stringType.sqlType
 
     override fun getValue(rs: ResultSet, index: Int): Json? {
         val data = stringType.getValue(rs, index)

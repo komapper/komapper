@@ -2,14 +2,19 @@ package org.komapper.r2dbc.spi
 
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
-import org.komapper.core.SqlType
+import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
+import java.sql.JDBCType
+import java.sql.SQLType
 
 /**
  * Represents a user-defined data type for R2DBC access.
  */
 @ThreadSafe
-interface R2dbcUserDefinedDataType<T : Any> : SqlType {
+interface R2dbcUserDefinedDataType<T : Any> : DataType {
+    override val sqlType: SQLType
+        get() = JDBCType.OTHER
+
     /**
      * The R2DBC codec type.
      * The type must be a nullable type.

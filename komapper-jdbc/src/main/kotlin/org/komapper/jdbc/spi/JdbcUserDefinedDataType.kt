@@ -1,22 +1,27 @@
 package org.komapper.jdbc.spi
 
-import org.komapper.core.SqlType
+import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.SQLType
 
 /**
  * Represents a user-defined data type for JDBC access.
  */
 @ThreadSafe
-interface JdbcUserDefinedDataType<T : Any> : SqlType {
+interface JdbcUserDefinedDataType<T : Any> : DataType {
+    @Suppress("DEPRECATION")
+    override val sqlType: SQLType
+        get() = jdbcType
+
     /**
      * The JDBC type defined in the standard library.     *
      */
     @Deprecated("use sqlType instead")
     val jdbcType: JDBCType
-        get() = sqlType
+        get() = JDBCType.OTHER
 
     /**
      * Returns the value.
