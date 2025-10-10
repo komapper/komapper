@@ -108,13 +108,31 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.ORACLE, Dbms.POSTGRESQL])
     @Test
     fun column_length_applied() {
         val result = db.dryRunQuery {
             QueryDsl.create(Meta.aaa)
         }
-        assertTrue(result.sql.contains("varchar(1000)"), result.sql)
+        assertTrue(result.sql.contains("varchar(2000)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE])
+    @Test
+    fun column_length_applied_oracle() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("varchar2(2000)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun column_length_applied_postgresql() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("text"), result.sql)
     }
 
     @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])

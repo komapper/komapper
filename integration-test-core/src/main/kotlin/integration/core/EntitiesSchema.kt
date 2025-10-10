@@ -11,7 +11,7 @@ public data class Aaa(
     @KomapperId
     @KomapperColumn(alwaysQuote = true)
     val id: Int,
-    @KomapperColumn(length = 1000)
+    @KomapperColumn(length = 2000)
     val name: String,
 )
 
