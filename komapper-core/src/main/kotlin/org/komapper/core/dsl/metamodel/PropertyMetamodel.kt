@@ -66,6 +66,11 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
     val insertable: Boolean
 
     /**
+     * The length of the column.
+     */
+    val length: Int?
+
+    /**
      * Converts the given entity to a `Value` object containing the interior type.
      *
      * @param entity the entity to convert
@@ -96,6 +101,7 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.wrap
     override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.unwrap
     override val nullable: Boolean get() = descriptor.nullable
+    override val length: Int? get() = descriptor.length
 }
 
 @Suppress("unused")
@@ -115,6 +121,7 @@ class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     override val wrap: (EXTERIOR) -> EXTERIOR get() = fail()
     override val unwrap: (EXTERIOR) -> EXTERIOR get() = fail()
     override val nullable: Boolean get() = fail()
+    override val length: Int? get() = fail()
 
     private fun fail(): Nothing {
         error("Fix google/ksp compile errors.")

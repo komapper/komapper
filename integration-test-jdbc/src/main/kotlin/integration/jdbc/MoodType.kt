@@ -5,6 +5,7 @@ import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.sql.SQLType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -13,7 +14,7 @@ class MoodType : JdbcUserDefinedDataType<Mood> {
 
     override val type: KType = typeOf<Mood>()
 
-    override val jdbcType: JDBCType = JDBCType.OTHER
+    override val sqlType: SQLType = JDBCType.OTHER
 
     override fun getValue(rs: ResultSet, index: Int): Mood? {
         return rs.getString(index)?.let { Mood.valueOf(it) }
@@ -24,7 +25,7 @@ class MoodType : JdbcUserDefinedDataType<Mood> {
     }
 
     override fun setValue(ps: PreparedStatement, index: Int, value: Mood) {
-        ps.setObject(index, value.name, jdbcType.vendorTypeNumber)
+        ps.setObject(index, value.name, sqlType.vendorTypeNumber)
     }
 
     override fun toString(value: Mood): String {

@@ -19,7 +19,7 @@ open class PostgreSqlSchemaStatementBuilder(dialect: BuilderDialect) :
                 else -> error("The classifier type must not be null.")
             }
         } else {
-            return dialect.getDataTypeName<INTERIOR>(property.interiorType)
+            return super.resolveDataTypeName(property)
         }
     }
 

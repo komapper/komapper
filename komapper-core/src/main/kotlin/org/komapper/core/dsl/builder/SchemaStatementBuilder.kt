@@ -7,6 +7,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.isAutoIncrement
+import java.sql.Types
 
 interface SchemaStatementBuilder {
     fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
@@ -66,7 +67,20 @@ abstract class AbstractSchemaStatementBuilder(
     }
 
     protected open fun <INTERIOR : Any> resolveDataTypeName(property: PropertyMetamodel<*, *, INTERIOR>): String {
-        return dialect.getDataTypeName<INTERIOR>(property.interiorType)
+        val name = dialect.getDataTypeName<INTERIOR>(property.interiorType)
+        val base = dialect.getDataType<Any>(property.interiorType)
+        val length = property.length?.takeIf {
+            base.sqlType.vendorTypeNumber in setOf(
+                Types.VARCHAR,
+                Types.CHAR,
+                Types.NCHAR,
+                Types.NVARCHAR,
+                Types.BINARY,
+                Types.VARBINARY,
+            )
+        } ?: return name
+        val index = name.indexOf("(")
+        return if (index > 0) "${name.take(index)}($length)" else name
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
@@ -82,9 +96,11 @@ abstract class AbstractSchemaStatementBuilder(
                 buf.append("if not exists ")
             }
             buf.append(
-                "${idGenerator.getCanonicalSequenceName(
-                    dialect::enquote
-                )} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy}"
+                "${
+                    idGenerator.getCanonicalSequenceName(
+                        dialect::enquote
+                    )
+                } start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy}"
             )
         }
         return listOf(buf.toStatement())

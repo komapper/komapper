@@ -25,6 +25,6 @@ object PostgreSqlJdbcUUIDType : AbstractJdbcDataType<UUID>(typeOf<UUID>(), JDBCT
     }
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: UUID) {
-        ps.setObject(index, value, jdbcType.vendorTypeNumber)
+        ps.setObject(index, value, sqlType.vendorTypeNumber)
     }
 }
