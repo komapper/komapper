@@ -3,7 +3,6 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.DataOperator
-import org.komapper.core.DataType
 import kotlin.reflect.KType
 
 interface R2dbcDataOperator : DataOperator {

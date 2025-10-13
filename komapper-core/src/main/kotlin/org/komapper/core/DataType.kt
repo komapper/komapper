@@ -1,7 +1,6 @@
 package org.komapper.core
 
 import java.sql.SQLType
-import java.sql.Types
 import kotlin.reflect.KType
 
 @ThreadSafe

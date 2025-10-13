@@ -14,7 +14,6 @@ import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.sql.JDBCType
 import java.sql.SQLType
-import java.sql.Types
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
