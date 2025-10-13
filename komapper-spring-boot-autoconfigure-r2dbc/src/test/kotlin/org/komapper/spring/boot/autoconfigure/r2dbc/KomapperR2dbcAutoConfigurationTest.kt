@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoC
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.sql.JDBCType
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -325,6 +326,9 @@ class KomapperR2dbcAutoConfigurationTest {
             get() = throw IllegalStateException("Shouldn't be called")
 
         override val r2dbcType: Class<*>
+            get() = throw IllegalStateException("Shouldn't be called")
+
+        override val sqlType: JDBCType
             get() = throw IllegalStateException("Shouldn't be called")
 
         override fun getValue(row: Row, index: Int): T? {

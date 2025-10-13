@@ -11,7 +11,7 @@ import kotlin.reflect.typeOf
 class OracleJdbcDataType<T : Any>(private val jdbcDataType: JdbcDataType<T>) : JdbcDataType<T> by jdbcDataType {
     override fun registerReturnParameter(ps: PreparedStatement, index: Int) {
         val ops = ps.unwrap(OraclePreparedStatement::class.java)
-        ops.registerReturnParameter(index, jdbcType.vendorTypeNumber)
+        ops.registerReturnParameter(index, sqlType.vendorTypeNumber)
     }
 }
 

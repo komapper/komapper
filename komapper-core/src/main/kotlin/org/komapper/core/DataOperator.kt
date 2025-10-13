@@ -22,6 +22,22 @@ interface DataOperator {
      * @return the data type name
      */
     fun <T : Any> getDataTypeName(type: KType): String
+
+    /**
+     * Returns the data type.
+     *
+     * @param type the type corresponding the data type
+     * @return the data type
+     */
+    fun <T : Any> getDataType(type: KType): DataType
+
+    /**
+     * Returns the data type or null.
+     *
+     * @param type the type corresponding the data type
+     * @return the data type or null
+     */
+    fun <T : Any> getDataTypeOrNull(type: KType): DataType?
 }
 
 object DryRunDataOperator : DataOperator {
@@ -39,6 +55,14 @@ object DryRunDataOperator : DataOperator {
     }
 
     override fun <T : Any> getDataTypeName(type: KType): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun <T : Any> getDataType(type: KType): DataType {
+        throw UnsupportedOperationException()
+    }
+
+    override fun <T : Any> getDataTypeOrNull(type: KType): DataType? {
         throw UnsupportedOperationException()
     }
 }

@@ -11,6 +11,7 @@ public data class Aaa(
     @KomapperId
     @KomapperColumn(alwaysQuote = true)
     val id: Int,
+    @KomapperColumn(length = 2000)
     val name: String,
 )
 
@@ -18,6 +19,7 @@ public data class Aaa(
 public data class Bbb(
     @KomapperId @KomapperAutoIncrement
     val id: Int,
+    @KomapperColumn(length = 500)
     val name: String?,
 )
 
@@ -27,6 +29,16 @@ public data class Ccc(
     @KomapperSequence("ccc_seq", incrementBy = 50)
     val id: Int,
     val name: String,
+)
+
+@KomapperEntity
+public data class Ddd(
+    @KomapperId
+    val id: Int,
+    @KomapperColumn
+    val name: String,
+    @KomapperColumn(length = 1000)
+    val age: Int,
 )
 
 @KomapperEntity

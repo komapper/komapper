@@ -51,7 +51,7 @@ interface JdbcDataOperator : DataOperator {
      * @param type the value type
      * @return the data type
      */
-    fun <T : Any> getDataType(type: KType): JdbcDataType<*>
+    override fun <T : Any> getDataType(type: KType): JdbcDataType<*>
 
     /**
      * Returns the data type or null.
@@ -59,7 +59,7 @@ interface JdbcDataOperator : DataOperator {
      * @param type the value type
      * @return the data type or null
      */
-    fun <T : Any> getDataTypeOrNull(type: KType): JdbcDataType<T>?
+    override fun <T : Any> getDataTypeOrNull(type: KType): JdbcDataType<T>?
 }
 
 class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val dataTypeProvider: JdbcDataTypeProvider) :

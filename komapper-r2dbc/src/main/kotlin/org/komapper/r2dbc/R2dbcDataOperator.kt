@@ -42,7 +42,7 @@ interface R2dbcDataOperator : DataOperator {
      * @param type the value type
      * @return the data type
      */
-    fun <T : Any> getDataType(type: KType): R2dbcDataType<T>
+    override fun <T : Any> getDataType(type: KType): R2dbcDataType<T>
 
     /**
      * Returns the data type or null.
@@ -50,7 +50,7 @@ interface R2dbcDataOperator : DataOperator {
      * @param type the value type
      * @return the data type or null
      */
-    fun <T : Any> getDataTypeOrNull(type: KType): R2dbcDataType<T>?
+    override fun <T : Any> getDataTypeOrNull(type: KType): R2dbcDataType<T>?
 }
 
 class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val dataTypeProvider: R2dbcDataTypeProvider) :
