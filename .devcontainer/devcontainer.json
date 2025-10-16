@@ -1,6 +1,6 @@
 {
   "name": "Java",
-  "image": "mcr.microsoft.com/devcontainers/java:1-17",
+  "image": "mcr.microsoft.com/devcontainers/java:3-17",
 
   "features": {
     "ghcr.io/devcontainers/features/java:1.6.3": {
