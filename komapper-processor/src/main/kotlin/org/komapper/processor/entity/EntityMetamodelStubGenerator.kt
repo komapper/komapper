@@ -2,6 +2,7 @@ package org.komapper.processor.entity
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelImplementor
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelInstance
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelStub
 import org.komapper.processor.BackquotedSymbols.PropertyMetamodel
 import org.komapper.processor.BackquotedSymbols.PropertyMetamodelStub
@@ -58,6 +59,7 @@ internal class EntityMetamodelStubGenerator(
         w.println("}")
         w.println("")
         for (alias in aliases) {
+            w.println("@get:$EntityMetamodelInstance($entityTypeName::class)")
             w.println("val $unitTypeName.`$alias`: $simpleName get() = $simpleName.`$alias`")
         }
     }

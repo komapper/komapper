@@ -14,6 +14,7 @@ import org.komapper.processor.BackquotedSymbols.EntityMetamodelDeclaration
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelFactory
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelFactorySpi
 import org.komapper.processor.BackquotedSymbols.EntityMetamodelImplementor
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelInstance
 import org.komapper.processor.BackquotedSymbols.EntityStore
 import org.komapper.processor.BackquotedSymbols.EntityStoreContext
 import org.komapper.processor.BackquotedSymbols.EnumMappingException
@@ -741,6 +742,7 @@ internal class EntityMetamodelGenerator(
 
     private fun metamodels() {
         for (alias in aliases) {
+            w.println("@get:$EntityMetamodelInstance($entityTypeName::class)")
             w.println("public val $unitTypeName.`$alias`: $simpleName get() = $simpleName.`$alias`")
         }
         w.println()
