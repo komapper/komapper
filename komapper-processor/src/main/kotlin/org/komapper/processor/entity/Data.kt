@@ -273,6 +273,8 @@ internal data class Column(
     val insertable: Boolean,
     val alternateType: ValueClass?,
     val length: Int?,
+    val precision: Int?,
+    val scale: Int?,
 )
 
 internal data class Link(
