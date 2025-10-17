@@ -5,6 +5,7 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperSequence
+import java.math.BigDecimal
 
 @KomapperEntity
 public data class Aaa(
@@ -13,6 +14,12 @@ public data class Aaa(
     val id: Int,
     @KomapperColumn(length = 2000)
     val name: String,
+    @KomapperColumn(precision = 3)
+    val age: BigDecimal,
+    @KomapperColumn(precision = 5, scale = 2)
+    val weight: BigDecimal,
+    @KomapperColumn(scale = 2)
+    val taxRatio: BigDecimal,
 )
 
 @KomapperEntity

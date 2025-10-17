@@ -69,8 +69,8 @@ abstract class AbstractSchemaStatementBuilder(
     protected open fun <INTERIOR : Any> resolveDataTypeName(property: PropertyMetamodel<*, *, INTERIOR>): String {
         val name = dialect.getDataTypeName<INTERIOR>(property.interiorType)
         val base = dialect.getDataType<Any>(property.interiorType)
-        val length = property.length?.takeIf {
-            base.sqlType.vendorTypeNumber in setOf(
+
+        if (base.sqlType.vendorTypeNumber in setOf(
                 Types.VARCHAR,
                 Types.CHAR,
                 Types.NCHAR,
@@ -78,9 +78,37 @@ abstract class AbstractSchemaStatementBuilder(
                 Types.BINARY,
                 Types.VARBINARY,
             )
-        } ?: return name
-        val index = name.indexOf("(")
-        return if (index > 0) "${name.take(index)}($length)" else name
+        ) {
+            val length = property.length
+            val index = name.indexOf("(")
+            return if (length != null && index > 0) {
+                "${name.take(index)}($length)"
+            } else {
+                name
+            }
+        }
+
+        if (base.sqlType.vendorTypeNumber in setOf(Types.DECIMAL, Types.NUMERIC)) {
+            val precision = property.precision
+            val scale = property.scale
+            val index = name.indexOf("(")
+            val prefix = if (index > 0) name.take(index) else name
+            return if (precision != null) {
+                if (scale != null) {
+                    "$prefix($precision, $scale)"
+                } else {
+                    "$prefix($precision)"
+                }
+            } else {
+                if (scale != null) {
+                    "$prefix($scale, $scale)"
+                } else {
+                    name
+                }
+            }
+        }
+
+        return name
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {

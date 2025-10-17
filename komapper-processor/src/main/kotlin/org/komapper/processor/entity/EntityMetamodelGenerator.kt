@@ -292,9 +292,12 @@ internal class EntityMetamodelGenerator(
                 }
             }
             val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
+            val length = p.column.length
+            val precision = p.column.precision
+            val scale = p.column.scale
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $updatable, $insertable, $getter, $setter, $wrap, $unwrap, $nullable, ${p.column.length})"
+            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $updatable, $insertable, $getter, $setter, $wrap, $unwrap, $nullable, $length, $precision, $scale)"
         }
 
         w.println("    private object $EntityDescriptor {")

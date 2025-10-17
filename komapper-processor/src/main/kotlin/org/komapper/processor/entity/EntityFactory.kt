@@ -291,6 +291,8 @@ internal class EntityFactory(
                 insertable = true,
                 alternateType = null,
                 length = null,
+                precision = null,
+                scale = null,
             )
         } else {
             column

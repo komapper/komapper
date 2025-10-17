@@ -144,4 +144,59 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
         assertFalse(result.sql.contains("integer(1000)"), result.sql)
         assertTrue(result.sql.contains("integer"), result.sql)
     }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Test
+    fun column_precision_applied_for_numeric() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("age numeric(3)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun column_precision_applied_for_decimal() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("age decimal(3)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Test
+    fun column_scale_applied_for_numeric() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        println(result.sql)
+        assertTrue(result.sql.contains("tax_ratio numeric(2, 2)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun column_scale_applied_for_decimal() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("tax_ratio decimal(2, 2)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Test
+    fun column_precision_scale_applied_for_numeric() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("weight numeric(5, 2)"), result.sql)
+    }
+
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Test
+    fun column_precision_scale_applied_for_decimal() {
+        val result = db.dryRunQuery {
+            QueryDsl.create(Meta.aaa)
+        }
+        assertTrue(result.sql.contains("weight decimal(5, 2)"), result.sql)
+    }
 }

@@ -19,4 +19,6 @@ class PropertyDescriptor<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
     val unwrap: (EXTERIOR) -> INTERIOR,
     val nullable: Boolean,
     val length: Int?,
+    val precision: Int?,
+    val scale: Int?,
 )

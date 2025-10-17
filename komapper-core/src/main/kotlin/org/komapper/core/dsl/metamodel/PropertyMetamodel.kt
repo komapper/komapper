@@ -71,6 +71,16 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
     val length: Int?
 
     /**
+     * The precision of the column.
+     */
+    val precision: Int?
+
+    /**
+     * The scale of the column.
+     */
+    val scale: Int?
+
+    /**
      * Converts the given entity to a `Value` object containing the interior type.
      *
      * @param entity the entity to convert
@@ -102,6 +112,8 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.unwrap
     override val nullable: Boolean get() = descriptor.nullable
     override val length: Int? get() = descriptor.length
+    override val precision: Int? get() = descriptor.precision
+    override val scale: Int? get() = descriptor.scale
 }
 
 @Suppress("unused")
@@ -122,6 +134,8 @@ class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     override val unwrap: (EXTERIOR) -> EXTERIOR get() = fail()
     override val nullable: Boolean get() = fail()
     override val length: Int? get() = fail()
+    override val precision: Int? get() = fail()
+    override val scale: Int? get() = fail()
 
     private fun fail(): Nothing {
         error("Fix google/ksp compile errors.")
