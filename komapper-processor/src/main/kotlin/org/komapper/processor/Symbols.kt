@@ -43,6 +43,7 @@ internal object BackquotedSymbols {
     const val EntityMetamodelFactory = "`org`.`komapper`.`core`.`dsl`.`metamodel`.EntityMetamodelFactory"
     const val EntityMetamodelFactorySpi = "`org`.`komapper`.`core`.`spi`.EntityMetamodelFactory"
     const val EntityMetamodelImplementor = "`org`.`komapper`.`core`.`dsl`.`metamodel`.EntityMetamodelImplementor"
+    const val EntityMetamodelInstance = "`org`.`komapper`.`core`.`dsl`.`metamodel`.EntityMetamodelInstance"
     const val EntityMetamodelStub = "`org`.`komapper`.`core`.`dsl`.`metamodel`.EntityMetamodelStub"
     const val EntityStore = "`org`.`komapper`.`core`.`dsl`.`query`.EntityStore"
     const val EntityStoreContext = "`org`.`komapper`.`core`.`dsl`.`query`.EntityStoreContext"
