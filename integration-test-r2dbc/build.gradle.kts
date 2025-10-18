@@ -14,7 +14,7 @@ dependencies {
     api(libs.r2dbc.pool)
     api(platform(libs.testcontainers.bom))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
-    api("org.testcontainers:r2dbc")
+    api("org.testcontainers:testcontainers-r2dbc")
 }
 
 ksp {
