@@ -69,12 +69,12 @@ quarkus-arc-deployment = { module = "io.quarkus:quarkus-arc-deployment", version
 quarkus-agroal-deployment = { module = "io.quarkus:quarkus-agroal-deployment", version.ref = "quarkus" }
 quarkus-datasource-deployment = { module = "io.quarkus:quarkus-datasource-deployment", version.ref = "quarkus" }
 
-testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "1.21.3" }
-testcontainers-mariadb = { module = "org.testcontainers:mariadb" }
-testcontainers-mysql = { module = "org.testcontainers:mysql" }
-testcontainers-oracle = { module = "org.testcontainers:oracle-xe" }
-testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
-testcontainers-sqlserver = { module = "org.testcontainers:mssqlserver" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "2.0.1" }
+testcontainers-mariadb = { module = "org.testcontainers:testcontainers-mariadb" }
+testcontainers-mysql = { module = "org.testcontainers:testcontainers-mysql" }
+testcontainers-oracle = { module = "org.testcontainers:testcontainers-oracle-xe" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
+testcontainers-sqlserver = { module = "org.testcontainers:testcontainers-mssqlserver" }
 
 google-java-format = { module = "com.google.googlejavaformat:google-java-format", version = "1.28.0" }
 ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version = "1.7.1" }
