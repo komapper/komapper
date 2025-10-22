@@ -8,6 +8,7 @@ quarkus = "3.28.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
 ksp-symbol-processing = { module = "com.google.devtools.ksp:symbol-processing", version.ref = "ksp" }
@@ -45,6 +46,7 @@ opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "
 jts-core = { module = "org.locationtech.jts:jts-core", version = "1.20.0" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.20" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
 
 spring-beans = { module = "org.springframework:spring-beans", version.ref = "springframework" }
 spring-core = { module = "org.springframework:spring-core", version.ref = "springframework" }
@@ -58,6 +60,8 @@ spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-aut
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "spring-boot" }
 spring-boot-test-autoconfigure = { module = "org.springframework.boot:spring-boot-test-autoconfigure", version.ref = "spring-boot" }
 
 quarkus-bom = { module = "io.quarkus:quarkus-bom", version.ref = "quarkus" }
@@ -70,6 +74,7 @@ quarkus-agroal-deployment = { module = "io.quarkus:quarkus-agroal-deployment", v
 quarkus-datasource-deployment = { module = "io.quarkus:quarkus-datasource-deployment", version.ref = "quarkus" }
 
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "2.0.1" }
+testcontainers-r2dbc = { module = "org.testcontainers:testcontainers-r2dbc" }
 testcontainers-mariadb = { module = "org.testcontainers:testcontainers-mariadb" }
 testcontainers-mysql = { module = "org.testcontainers:testcontainers-mysql" }
 testcontainers-oracle = { module = "org.testcontainers:testcontainers-oracle-xe" }

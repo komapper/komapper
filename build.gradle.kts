@@ -30,13 +30,9 @@ val kotlinProjects = subprojects - platformProject - javaProjects.toSet()
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 
-// Retain a reference to rootProject.libs to make the version catalog accessible within allprojects and subprojects.
-// See https://github.com/gradle/gradle/issues/16708
-val catalog = libs
-
 allprojects {
     apply(plugin = "base")
-    apply(plugin = catalog.plugins.spotless.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.spotless.get().pluginId)
 
     repositories {
         mavenCentral()
@@ -46,7 +42,7 @@ allprojects {
     spotless {
         lineEndings = com.diffplug.spotless.LineEnding.UNIX
         kotlinGradle {
-            ktlint(catalog.ktlint.get().version)
+            ktlint(rootProject.libs.ktlint.get().version)
         }
     }
 
@@ -59,7 +55,7 @@ allprojects {
 
 configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
     apply(plugin = "java")
-    apply(plugin = catalog.plugins.kotlin.jvm.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.kotlin.jvm.get().pluginId)
 
     dependencies {
         testImplementation(rootProject.libs.kotlin.test)
@@ -109,7 +105,7 @@ configure(libraryProjects + gradlePluginProject) {
 configure(kotlinProjects) {
     spotless {
         kotlin {
-            ktlint(catalog.ktlint.get().version)
+            ktlint(rootProject.libs.ktlint.get().version)
             targetExclude("build/**")
         }
     }
@@ -118,10 +114,10 @@ configure(kotlinProjects) {
 configure(javaProjects) {
     spotless {
         java {
-            googleJavaFormat(catalog.google.java.format.get().version)
+            googleJavaFormat(rootProject.libs.google.java.format.get().version)
         }
         kotlin {
-            ktlint(catalog.ktlint.get().version)
+            ktlint(rootProject.libs.ktlint.get().version)
             targetExclude("build/**")
         }
     }
