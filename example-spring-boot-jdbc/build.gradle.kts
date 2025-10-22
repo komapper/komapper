@@ -4,15 +4,14 @@ plugins {
     alias(libs.plugins.kotlin.plugin.spring)
 }
 
-apply(plugin = "io.spring.dependency-management")
-
 dependencies {
     ksp(project(":komapper-processor"))
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.jackson.module.kotlin)
     implementation(project(":komapper-spring-boot-starter-jdbc"))
     runtimeOnly(project(":komapper-dialect-h2-jdbc"))
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.spring.boot.starter.test)
 }
 
 ksp {
