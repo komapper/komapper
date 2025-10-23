@@ -80,6 +80,11 @@ class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val da
         }
     }
 
+    override fun <T : Any> formatValueToLiteral(value: T?, type: KType): String {
+        val dataType = getDataTypeOrNull<T>(type)
+        return dataType?.toLiteral(value) ?: formatValue(value, type, masking = false)
+    }
+
     override fun <T : Any> getDataType(type: KType): R2dbcDataType<T> {
         return getDataTypeOrNull(type) ?: error(
             "The dataType is not found for the type \"${type}\".",

@@ -1,5 +1,7 @@
 package org.komapper.dialect.postgresql.jdbc
 
+import org.komapper.dialect.postgresql.PostgreSqlLiteral.toDoubleLiteral
+import org.komapper.dialect.postgresql.PostgreSqlLiteral.toOffsetDateTimeLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcArrayType
 import org.komapper.jdbc.JdbcBigDecimalType
@@ -26,10 +28,12 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import kotlin.time.ExperimentalTime
 
 class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
     AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcArrayType("text[]"),
             JdbcBigDecimalType("numeric"),
@@ -38,7 +42,7 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcByteType("smallint"),
             JdbcByteArrayType("bytea"),
             JdbcClobStringType("text"),
-            JdbcDoubleType("double precision"),
+            JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcFloatType("real"),
             JdbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             JdbcIntType("integer"),
@@ -47,7 +51,7 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
-            JdbcOffsetDateTimeType("timestamp with time zone"),
+            JdbcOffsetDateTimeType("timestamp with time zone") { toOffsetDateTimeLiteral(it) },
             JdbcShortType("smallint"),
             JdbcSQLXMLType("xml"),
             JdbcStringType("text"),

@@ -1,5 +1,6 @@
 integration.r2dbc.MoodType
 integration.r2dbc.PairOfIntType
 integration.r2dbc.PairOfStringType
+integration.r2dbc.UserDefinedDoubleType
 integration.r2dbc.UserDefinedIntType
 integration.r2dbc.UserDefinedStringType

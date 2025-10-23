@@ -30,10 +30,12 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import kotlin.time.ExperimentalTime
 
 class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
     AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         private val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcAnyType("java_object"),
             JdbcArrayType("varchar(100) array"),

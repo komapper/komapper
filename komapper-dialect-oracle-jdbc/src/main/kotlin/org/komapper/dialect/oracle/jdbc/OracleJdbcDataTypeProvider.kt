@@ -1,5 +1,7 @@
 package org.komapper.dialect.oracle.jdbc
 
+import org.komapper.dialect.oracle.OracleLiteral.toDoubleLiteral
+import org.komapper.dialect.oracle.OracleLiteral.toOffsetDateTimeLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
@@ -25,9 +27,11 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import kotlin.time.ExperimentalTime
 
 class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -36,7 +40,7 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcByteArrayType("raw(500)"),
             JdbcClobType("clob"),
             JdbcClobStringType("clob"),
-            JdbcDoubleType("float"),
+            JdbcDoubleType("float") { toDoubleLiteral(it) },
             JdbcFloatType("float"),
             JdbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             JdbcIntType("integer"),
@@ -45,7 +49,7 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("date"),
             JdbcLongType("integer"),
-            JdbcOffsetDateTimeType("timestamp with time zone"),
+            JdbcOffsetDateTimeType("timestamp with time zone") { toOffsetDateTimeLiteral(it) },
             JdbcShortType("integer"),
             JdbcStringType("varchar2(1000)"),
             JdbcUByteType("integer"),

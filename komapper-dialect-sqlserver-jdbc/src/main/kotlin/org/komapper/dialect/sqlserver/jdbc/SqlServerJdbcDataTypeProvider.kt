@@ -1,5 +1,7 @@
 package org.komapper.dialect.sqlserver.jdbc
 
+import org.komapper.dialect.sqlserver.SqlServerLiteral.toDoubleLiteral
+import org.komapper.dialect.sqlserver.SqlServerLiteral.toOffsetDateTimeLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
@@ -27,10 +29,12 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import kotlin.time.ExperimentalTime
 
 class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
     AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -39,7 +43,7 @@ class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcByteArrayType("varbinary(1000)"),
             JdbcClobType("text"),
             JdbcClobStringType("text"),
-            JdbcDoubleType("float"),
+            JdbcDoubleType("float") { toDoubleLiteral(it) },
             JdbcFloatType("real"),
             JdbcInstantAsTimestampWithTimezoneType("datetimeoffset"),
             JdbcIntType("int"),
@@ -49,7 +53,7 @@ class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
             JdbcNClobType("ntext"),
-            JdbcOffsetDateTimeType("datetimeoffset"),
+            JdbcOffsetDateTimeType("datetimeoffset") { toOffsetDateTimeLiteral(it) },
             JdbcShortType("smallint"),
             JdbcSQLXMLType("xml"),
             JdbcStringType("varchar(1000)"),

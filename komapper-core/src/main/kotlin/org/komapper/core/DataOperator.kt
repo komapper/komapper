@@ -6,7 +6,7 @@ import kotlin.reflect.KType
 @ThreadSafe
 interface DataOperator {
     /**
-     * Formats the value.
+     * Formats the value for logging.
      *
      * @param value the value
      * @param type the type of the value
@@ -14,6 +14,17 @@ interface DataOperator {
      * @return the formatted value
      */
     fun <T : Any> formatValue(value: T?, type: KType, masking: Boolean): String
+
+    /**
+     * Formats the given value into its literal representation based on its type.
+     *
+     * @param value the value to be formatted
+     * @param type the type of the value
+     * @return the literal string representation of the value
+     */
+    fun <T : Any> formatValueToLiteral(value: T?, type: KType): String {
+        return formatValue(value, type, masking = false)
+    }
 
     /**
      * Returns the data type name.

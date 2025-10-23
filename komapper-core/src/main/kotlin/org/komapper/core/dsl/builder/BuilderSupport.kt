@@ -24,10 +24,10 @@ import org.komapper.core.dsl.expression.LastValue
 import org.komapper.core.dsl.expression.Lead
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
-import org.komapper.core.dsl.expression.NonNullLiteralExpression
 import org.komapper.core.dsl.expression.NthValue
 import org.komapper.core.dsl.expression.Ntile
 import org.komapper.core.dsl.expression.NullLiteralExpression
+import org.komapper.core.dsl.expression.NullableLiteralExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
@@ -259,7 +259,7 @@ class BuilderSupport(
     private fun visitLiteralExpression(expression: LiteralExpression<*, *>) {
         val literal = when (expression) {
             is NullLiteralExpression -> "null"
-            is NonNullLiteralExpression -> dialect.formatValue(expression.value, expression.interiorType, false)
+            is NullableLiteralExpression -> dialect.formatValueToLiteral(expression.value, expression.interiorType)
         }
         buf.append(literal)
     }

@@ -55,4 +55,14 @@ interface JdbcUserDefinedDataType<T : Any> : DataType {
      * @return the string presentation of the value
      */
     fun toString(value: T): String
+
+    /**
+     * Converts the given value to its literal string representation.
+     *
+     * @param value the value to be converted
+     * @return the literal string representation of the value
+     */
+    fun toLiteral(value: T?): String {
+        return if (value == null) "null" else toString(value)
+    }
 }

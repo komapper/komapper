@@ -314,6 +314,15 @@ public data class UnsignedSequenceStrategy(
 )
 
 @KomapperEntity
+@KomapperTable("double_data")
+public data class UserDefinedDoubleData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: UserDefinedDouble?,
+)
+
+public data class UserDefinedDouble(val value: Double)
+
+@KomapperEntity
 @KomapperTable("int_data")
 public data class UserDefinedIntData(
     @KomapperId val id: Int,

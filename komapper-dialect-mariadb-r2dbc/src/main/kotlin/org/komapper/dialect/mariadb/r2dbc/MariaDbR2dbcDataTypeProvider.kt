@@ -1,5 +1,6 @@
 package org.komapper.dialect.mariadb.r2dbc
 
+import org.komapper.dialect.mariadb.MariaDbLiteral.toDoubleLiteral
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
@@ -25,10 +26,12 @@ import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
 import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
+import kotlin.time.ExperimentalTime
 
 class MariaDbR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
     AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
@@ -38,7 +41,7 @@ class MariaDbR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteArrayType("varbinary(500)"),
             R2dbcClobType("text"),
             R2dbcClobStringType("text"),
-            R2dbcDoubleType("double precision"),
+            R2dbcDoubleType("double precision") { toDoubleLiteral(it) },
             R2dbcFloatType("real"),
             R2dbcInstantAsTimestampType("timestamp(6)"),
             R2dbcIntType("integer"),
