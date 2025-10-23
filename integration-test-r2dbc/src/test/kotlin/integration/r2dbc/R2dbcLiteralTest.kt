@@ -169,7 +169,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
         assertTrue(value2.isEqual(result.second))
     }
 
-    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_literal_offsetDateTime_unsupportedException(info: TestInfo) = inTransaction(db, info) {
         val value = OffsetDateTime.parse("2025-10-23T12:34:56+09:00")

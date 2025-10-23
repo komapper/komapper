@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 
 object MySqlLiteral {
     fun DataType.toDoubleLiteral(value: Double?): String {
-        return "cast($value as double precision)"
+        return value.toString()
     }
 
     fun DataType.toOffsetDateTimeLiteral(value: OffsetDateTime?): String {

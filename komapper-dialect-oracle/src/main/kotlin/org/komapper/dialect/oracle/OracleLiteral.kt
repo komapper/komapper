@@ -10,6 +10,6 @@ object OracleLiteral {
 
     fun DataType.toOffsetDateTimeLiteral(value: OffsetDateTime?): String {
         val v = if (value == null) "null" else "'$value'"
-        return "to_timestamp_tz($v, 'YYYY-MM-DD HH24:MI:SS TZH:TZM')"
+        return "to_timestamp_tz($v, 'YYYY-MM-DD\"T\"HH24:MI:SSTZH:TZM')"
     }
 }

@@ -168,7 +168,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         assertTrue(value2.isEqual(result.second))
     }
 
-    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_literal_offsetDateTime_unsupportedException() {
         val value = OffsetDateTime.parse("2025-10-23T12:34:56+09:00")
