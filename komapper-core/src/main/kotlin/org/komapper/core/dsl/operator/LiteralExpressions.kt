@@ -70,10 +70,22 @@ fun literal(value: OffsetDateTime?): ColumnExpression<OffsetDateTime, OffsetDate
  * @exception IllegalArgumentException if the value contains the single quotation.
  */
 fun literal(value: String?): ColumnExpression<String, String> {
-    if (value != null) {
-        require("'" !in value) { "The value must not contain the single quotation." }
+    if (value != null && containsSingleQuote(value)) {
+        throw IllegalArgumentException("The value must not contain the single quote.")
     }
     return createSimpleNullableLiteralExpression(value, typeOf<String>())
+}
+
+internal fun containsSingleQuote(value: String): Boolean {
+    var quote = false
+    for (c in value) {
+        if (c == '\'') {
+            quote = !quote
+        } else if (quote) {
+            return true
+        }
+    }
+    return quote
 }
 
 fun <EXTERNAL : Any, INTERNAL : Any> literal(

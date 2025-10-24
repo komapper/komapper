@@ -253,7 +253,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         val ex = assertFailsWith<IllegalArgumentException> {
             literal("I don't like it.")
         }
-        assertEquals("The value must not contain the single quotation.", ex.message)
+        assertEquals("The value must not contain the single quote.", ex.message)
     }
 
     @Test
