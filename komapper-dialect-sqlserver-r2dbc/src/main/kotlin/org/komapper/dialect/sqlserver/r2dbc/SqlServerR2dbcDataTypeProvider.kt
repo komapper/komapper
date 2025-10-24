@@ -1,5 +1,7 @@
 package org.komapper.dialect.sqlserver.r2dbc
 
+import org.komapper.dialect.sqlserver.SqlServerLiteral.toDoubleLiteral
+import org.komapper.dialect.sqlserver.SqlServerLiteral.toOffsetDateTimeLiteral
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
@@ -26,10 +28,12 @@ import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
 import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
+import kotlin.time.ExperimentalTime
 
 class SqlServerR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
     AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
@@ -39,7 +43,7 @@ class SqlServerR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteArrayType("varbinary(1000)"),
             R2dbcClobType("text"),
             R2dbcClobStringType("text"),
-            R2dbcDoubleType("real"),
+            R2dbcDoubleType("real") { toDoubleLiteral(it) },
             R2dbcFloatType("float"),
             R2dbcInstantAsTimestampWithTimezoneType("datetimeoffset"),
             R2dbcIntType("int"),
@@ -48,7 +52,7 @@ class SqlServerR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),
             R2dbcLongType("bigint"),
-            R2dbcOffsetDateTimeType("datetimeoffset"),
+            R2dbcOffsetDateTimeType("datetimeoffset") { toOffsetDateTimeLiteral(it) },
             R2dbcShortType("smallint"),
             R2dbcStringType("varchar(1000)"),
             R2dbcUByteType("smallint"),

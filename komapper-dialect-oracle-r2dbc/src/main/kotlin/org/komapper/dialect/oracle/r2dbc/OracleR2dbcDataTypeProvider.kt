@@ -1,5 +1,7 @@
 package org.komapper.dialect.oracle.r2dbc
 
+import org.komapper.dialect.oracle.OracleLiteral.toDoubleLiteral
+import org.komapper.dialect.oracle.OracleLiteral.toOffsetDateTimeLiteral
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
@@ -25,10 +27,12 @@ import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
 import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
+import kotlin.time.ExperimentalTime
 
 class OracleR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
     AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
@@ -37,7 +41,7 @@ class OracleR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteArrayType("raw(500)"),
             R2dbcClobType("clob"),
             R2dbcClobStringType("clob"),
-            R2dbcDoubleType("float"),
+            R2dbcDoubleType("float") { toDoubleLiteral(it) },
             R2dbcFloatType("float"),
             R2dbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             R2dbcIntType("integer"),
@@ -46,7 +50,7 @@ class OracleR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("date"),
             R2dbcLongType("integer"),
-            R2dbcOffsetDateTimeType("timestamp with time zone"),
+            R2dbcOffsetDateTimeType("timestamp with time zone") { toOffsetDateTimeLiteral(it) },
             R2dbcShortType("integer"),
             R2dbcStringType("varchar2(1000)"),
             R2dbcUByteType("integer"),

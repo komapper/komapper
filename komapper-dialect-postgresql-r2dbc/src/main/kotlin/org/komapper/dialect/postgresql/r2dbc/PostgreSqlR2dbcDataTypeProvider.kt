@@ -1,5 +1,7 @@
 package org.komapper.dialect.postgresql.r2dbc
 
+import org.komapper.dialect.postgresql.PostgreSqlLiteral.toDoubleLiteral
+import org.komapper.dialect.postgresql.PostgreSqlLiteral.toOffsetDateTimeLiteral
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
 import org.komapper.r2dbc.R2dbcBlobType
@@ -27,10 +29,12 @@ import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.time.ExperimentalTime
 
 class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
     R2dbcDataTypeProvider {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
@@ -40,7 +44,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcByteArrayType("bytea"),
             R2dbcClobType("text"),
             R2dbcClobStringType("text"),
-            R2dbcDoubleType("double precision"),
+            R2dbcDoubleType("double precision") { toDoubleLiteral(it) },
             R2dbcFloatType("real"),
             R2dbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             R2dbcIntType("integer"),
@@ -49,7 +53,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),
             R2dbcLongType("bigint"),
-            R2dbcOffsetDateTimeType("timestamp with time zone"),
+            R2dbcOffsetDateTimeType("timestamp with time zone") { toOffsetDateTimeLiteral(it) },
             R2dbcShortType("smallint"),
             R2dbcStringType("varchar(500)"),
             R2dbcUByteType("smallint"),

@@ -21,18 +21,21 @@ data class NullLiteralExpression<EXTERNAL : Any, INTERNAL : Any>(
     override val masking: Boolean get() = false
 }
 
-internal data class NonNullLiteralExpression<T : Any>(
-    val value: T,
-    private val type: KType,
-) : LiteralExpression<T, T> {
+internal data class NullableLiteralExpression<EXTERNAL : Any, INTERNAL : Any>(
+    val value: INTERNAL?,
+    override val exteriorType: KType,
+    override val interiorType: KType,
+    override val wrap: (INTERNAL) -> EXTERNAL,
+    override val unwrap: (EXTERNAL) -> INTERNAL,
+) : LiteralExpression<EXTERNAL, INTERNAL> {
     override val owner: TableExpression<*>
         get() = throw UnsupportedOperationException()
-    override val exteriorType: KType = type
-    override val interiorType: KType = type
-    override val wrap: (T) -> T get() = { it }
-    override val unwrap: (T) -> T get() = { it }
     override val columnName: String
         get() = throw UnsupportedOperationException()
     override val alwaysQuote: Boolean get() = false
     override val masking: Boolean get() = false
+}
+
+fun <T : Any> createSimpleNullableLiteralExpression(value: T?, type: KType): ColumnExpression<T, T> {
+    return NullableLiteralExpression(value, type, type, { it }, { it })
 }

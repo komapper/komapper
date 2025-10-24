@@ -26,10 +26,12 @@ import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
 import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
+import kotlin.time.ExperimentalTime
 
 class H2R2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
     AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("numeric"),
             R2dbcBigIntegerType("bigint"),

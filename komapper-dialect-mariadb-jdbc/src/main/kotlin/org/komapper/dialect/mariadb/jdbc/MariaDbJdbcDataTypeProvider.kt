@@ -1,5 +1,6 @@
 package org.komapper.dialect.mariadb.jdbc
 
+import org.komapper.dialect.mariadb.MariaDbLiteral.toDoubleLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
@@ -27,9 +28,11 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import kotlin.time.ExperimentalTime
 
 class MariaDbJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -37,7 +40,7 @@ class MariaDbJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcData
             JdbcBooleanType("bit(1)"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(500)"),
-            JdbcDoubleType("double precision"),
+            JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcClobType("text"),
             JdbcClobStringType("text"),
             JdbcFloatType("real"),

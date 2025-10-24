@@ -1,5 +1,7 @@
 package org.komapper.dialect.mysql.jdbc
 
+import org.komapper.dialect.mysql.MySqlLiteral.toDoubleLiteral
+import org.komapper.dialect.mysql.MySqlLiteral.toOffsetDateTimeLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
@@ -28,9 +30,11 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import kotlin.time.ExperimentalTime
 
 class MySqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
     companion object {
+        @OptIn(ExperimentalTime::class)
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -38,7 +42,7 @@ class MySqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTy
             JdbcBooleanType("bit(1)"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(500)"),
-            JdbcDoubleType("double precision"),
+            JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcClobType("text"),
             JdbcClobStringType("text"),
             JdbcFloatType("real"),
@@ -50,7 +54,7 @@ class MySqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTy
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
             JdbcNClobType("text"),
-            JdbcOffsetDateTimeType("timestamp(6)"),
+            JdbcOffsetDateTimeType("timestamp(6)") { toOffsetDateTimeLiteral(it) },
             JdbcShortType("smallint"),
             JdbcStringType("varchar(500)"),
             JdbcSQLXMLType("text"),
