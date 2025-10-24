@@ -7,6 +7,9 @@ import integration.core.UserDefinedInt
 import integration.core.booleanData
 import integration.core.doubleData
 import integration.core.enumData
+import integration.core.enumOrdinalData
+import integration.core.enumPropertyData
+import integration.core.enumclass.Color
 import integration.core.enumclass.Direction
 import integration.core.intData
 import integration.core.longData
@@ -274,6 +277,66 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
     @Test
     fun test_literal_enum_null() {
         val m = Meta.enumData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null, m.value)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null, m.value)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_enum_ordinal() {
+        val m = Meta.enumOrdinalData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(Direction.EAST, m.value)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(Direction.WEST, m.value)).first()
+        }
+        assertEquals(Direction.EAST to Direction.WEST, result)
+    }
+
+    @Test
+    fun test_literal_enum_ordinal_null() {
+        val m = Meta.enumOrdinalData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null, m.value)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null, m.value)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_enum_property() {
+        val m = Meta.enumPropertyData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(Color.RED, m.value)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(Color.BLUE, m.value)).first()
+        }
+        assertEquals(Color.RED to Color.BLUE, result)
+    }
+
+    @Test
+    fun test_literal_enum_property_null() {
+        val m = Meta.enumPropertyData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1

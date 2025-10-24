@@ -88,6 +88,14 @@ internal fun containsSingleQuote(value: String): Boolean {
     return quote
 }
 
+/**
+ * Creates a column expression representing a literal value. This function allows you to handle
+ * Enum types or user-defined types.
+ *
+ * @param value the value of the literal
+ * @param expression the column expression defining the type mappings and conversion functions
+ * @return a column expression that represents the literal value
+ */
 fun <EXTERNAL : Any, INTERNAL : Any> literal(
     value: EXTERNAL?,
     expression: ColumnExpression<EXTERNAL, INTERNAL>,
