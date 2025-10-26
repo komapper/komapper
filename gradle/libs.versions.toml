@@ -5,6 +5,7 @@ kotlinx-coroutines = "1.10.2"
 springframework = "6.2.12"
 spring-boot = "3.5.7"
 quarkus = "3.29.0"
+exposed = "1.0.0-rc-2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -72,6 +73,10 @@ quarkus-core-deployment = { module = "io.quarkus:quarkus-core-deployment", versi
 quarkus-arc-deployment = { module = "io.quarkus:quarkus-arc-deployment", version.ref = "quarkus" }
 quarkus-agroal-deployment = { module = "io.quarkus:quarkus-agroal-deployment", version.ref = "quarkus" }
 quarkus-datasource-deployment = { module = "io.quarkus:quarkus-datasource-deployment", version.ref = "quarkus" }
+
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "2.0.1" }
 testcontainers-r2dbc = { module = "org.testcontainers:testcontainers-r2dbc" }

@@ -304,7 +304,7 @@ internal class TwoWayTemplateStatementBuilder(
                     property.get(any)
                 }
             }
-            Value(v, property.returnType, value.masking)
+            Value(v, property.returnType, value.masking, value.hint)
         } else {
             value
         }
