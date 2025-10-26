@@ -71,7 +71,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val id = bind(EntityID(1, Tasks), Tasks.id)
+            val id by bind(EntityID(1, Tasks), Tasks.id)
             build(
                 """
                 select title from tasks where id = /* $id */0                
@@ -94,7 +94,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val title = bind("Read The Hobbit", Tasks.title)
+            val title by bind("Read The Hobbit", Tasks.title)
             build(
                 """
                 select id from tasks where title = /* $title */''                
@@ -117,7 +117,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val title = bind("Read The Hobbit", VarCharColumnType())
+            val title by bind("Read The Hobbit", VarCharColumnType())
             build(
                 """
                 select id from tasks where title = /* $title */''                
@@ -140,7 +140,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val title = bind("Read The Hobbit", VarCharColumnType(), "taskTitle")
+            val title by bind("Read The Hobbit", VarCharColumnType())
             build(
                 """
                 select id from tasks where title = /* $title */''                
@@ -163,7 +163,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val title = bind("Hobbit", Tasks.title)
+            val title by bind("Hobbit", Tasks.title)
             build(
                 """
                 select id from tasks where title like /* $title.asSuffix() */''                
@@ -186,7 +186,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val statusName = bind(Status.NEW, Tasks.statusName)
+            val statusName by bind(Status.NEW, Tasks.statusName)
             build(
                 """
                 select title from tasks where status_name = /* $statusName */''
@@ -209,7 +209,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val statusOrdinal = bind(Status.NEW, Tasks.statusOrdinal)
+            val statusOrdinal by bind(Status.NEW, Tasks.statusOrdinal)
             build(
                 """
                 select title from tasks where status_ordinal = /* $statusOrdinal */''
@@ -232,8 +232,8 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val statusName = bind(Status.NEW, Tasks.statusName)
-            val title = bind("Learn Exposed DAO", Tasks.title)
+            val statusName by bind(Status.NEW, Tasks.statusName)
+            val title by bind("Learn Exposed DAO", Tasks.title)
             build(
                 """
                 select
@@ -263,8 +263,8 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val statusName = bind(Status.NEW, EnumerationNameColumnType<Status>(Status::class, 10))
-            val title = bind("Learn Exposed DAO", VarCharColumnType())
+            val statusName by bind(Status.NEW, EnumerationNameColumnType<Status>(Status::class, 10))
+            val title by bind("Learn Exposed DAO", VarCharColumnType())
             build(
                 """
                 select
@@ -294,7 +294,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val id = bind(EntityID(1, Tasks), Tasks.id)
+            val id by bind(EntityID(1, Tasks), Tasks.id)
             build(
                 """
                 select title from tasks where 
@@ -319,7 +319,7 @@ class JdbcTemplateTest {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
-            val title = bind(null, Tasks.title)
+            val title by bind(null, Tasks.title)
             build(
                 """
                 select title from tasks where 

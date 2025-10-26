@@ -7,7 +7,6 @@ import org.jetbrains.exposed.v1.core.BooleanColumnType
 import org.jetbrains.exposed.v1.core.ByteColumnType
 import org.jetbrains.exposed.v1.core.CharacterColumnType
 import org.jetbrains.exposed.v1.core.Column
-import org.jetbrains.exposed.v1.core.ColumnType
 import org.jetbrains.exposed.v1.core.DoubleColumnType
 import org.jetbrains.exposed.v1.core.FloatColumnType
 import org.jetbrains.exposed.v1.core.IColumnType
@@ -33,6 +32,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.template.TwoWayTemplateStatementBuilderFactory
 import java.sql.ResultSet
 import java.util.UUID
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -60,9 +60,6 @@ class JdbcTemplateBuilder() {
 
     @PublishedApi
     internal var template: String? = null
-
-    @PublishedApi
-    internal var counter = 0
 }
 
 fun buildJdbcTemplate(block: JdbcTemplateBuilder.() -> Unit): JdbcTemplate {
@@ -72,22 +69,25 @@ fun buildJdbcTemplate(block: JdbcTemplateBuilder.() -> Unit): JdbcTemplate {
     return JdbcTemplate(sql, builder.nameToValueMap.toMap())
 }
 
-inline fun <reified T : Any> JdbcTemplateBuilder.bind(value: T?, column: Column<T>): BoundValue<T> {
-    val name = column.name
-    val type = typeOf<T>()
+inline fun <reified T : Any> JdbcTemplateBuilder.bind(value: T?, column: Column<T>): ReadOnlyProperty<Nothing?, BoundValue<T>> {
     // Create a new instance to ensure that the original nullable property remains unchanged when calling `TransactionManager.current().exec()`.
     val columnType = object : IColumnType<T> by column.columnType {
         override var nullable: Boolean = true
     }
-    nameToValueMap[name] = Value(value, type, hint = columnType)
-    return BoundValue(name, value, type, columnType)
+    return bindInternal(value, typeOf<T>(), columnType)
 }
 
-inline fun <reified T : Any> JdbcTemplateBuilder.bind(value: T?, columnType: ColumnType<T>, name: String? = null): BoundValue<T> {
-    val name = name ?: "_komapper_anonymous_value_${counter++}"
-    val type = typeOf<T>()
-    nameToValueMap[name] = Value(value, type, hint = columnType)
-    return BoundValue(name, value, type, columnType)
+inline fun <reified T : Any> JdbcTemplateBuilder.bind(value: T?, columnType: IColumnType<T>): ReadOnlyProperty<Nothing?, BoundValue<T>> {
+    return bindInternal(value, typeOf<T>(), columnType)
+}
+
+@PublishedApi
+internal fun <T : Any> JdbcTemplateBuilder.bindInternal(value: T?, type: KType, columnType: IColumnType<T>): ReadOnlyProperty<Nothing?, BoundValue<T>> {
+    return ReadOnlyProperty<Nothing?, BoundValue<T>> { _, property ->
+        val name = property.name
+        nameToValueMap[name] = Value(value, type, hint = columnType)
+        BoundValue(name, value, type, columnType)
+    }
 }
 
 data class BoundValue<T>(
