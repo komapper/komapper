@@ -185,7 +185,7 @@ internal class TwoWayTemplateStatementBuilder(
 
         is SqlNode.LiteralValueDirective -> {
             val (obj, type) = eval(node.location, node.expression, state.asExprContext())
-            val literal = dialect.formatValue(obj, type, false)
+            val literal = dialect.formatValueToLiteral(obj, type)
             state.append(literal)
             node.nodeList.fold(state, ::visit)
         }
