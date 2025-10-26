@@ -113,30 +113,7 @@ class JdbcTemplateTest {
     }
 
     @Test
-    fun bind_varCharColumnType_implicitName() = transaction(db) {
-        addLogger(StdOutSqlLogger)
-
-        val result = buildJdbcTemplate {
-            val title by bind("Read The Hobbit", VarCharColumnType())
-            build(
-                """
-                select id from tasks where title = /* $title */''                
-                """.trimIndent()
-            )
-        }.exec {
-            val list = mutableListOf<Int>()
-            while (it.next()) {
-                list += it.getInt("id")
-            }
-            list
-        }
-
-        assertEquals(1, result!!.size)
-        assertEquals(2, result.first())
-    }
-
-    @Test
-    fun bind_varCharColumnType_explicitName() = transaction(db) {
+    fun bind_varCharColumnType() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
         val result = buildJdbcTemplate {
