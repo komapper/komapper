@@ -3,6 +3,7 @@ package integration.jdbc
 import integration.core.Address
 import integration.core.AddressDto
 import integration.core.Dbms
+import integration.core.DoubleData
 import integration.core.Run
 import integration.core.address
 import integration.core.selectAsAddress
@@ -146,6 +147,33 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
                 .select(asAddress)
         }
         assertEquals(15, list.size)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun literal() {
+        db.runQuery {
+            val sql = "insert into double_data values(/*id*/0, /*value*/0.0)"
+            QueryDsl.executeTemplate(sql)
+                .bind("id", 1)
+                .bind("value", 10.0)
+        }
+        val list = db.runQuery {
+            val sql = "select * from double_data where value = /*^value*/0.0"
+            QueryDsl.fromTemplate(sql)
+                .bind("value", 10.0)
+                .select {
+                    DoubleData(it.getNotNull("id"), it.getNotNull("value"))
+                }
+        }
+        assertEquals(1, list.size)
+        assertEquals(
+            DoubleData(
+                1,
+                10.0,
+            ),
+            list[0],
+        )
     }
 
     @Test
