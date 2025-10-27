@@ -37,60 +37,60 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 interface JdbcTemplate {
-    fun <T> exec(transform: (ResultSet) -> T?): T?
+    fun <T> execute(transform: (ResultSet) -> T?): T?
 }
 
 fun JdbcTemplate(
     @Language("sql") sql: String,
     nameToValueMap: Map<String, Value<*>> = emptyMap(),
 ): JdbcTemplate {
-    val context = JdbcTemplateContext(sql, nameToValueMap)
+    val context = SqlTemplateContext(sql, nameToValueMap)
     return JdbcTemplateImpl(context)
 }
 
-class JdbcTemplateBuilder() {
+class SqlTemplateBuilder() {
     fun build(
-        @Language("sql") template: String,
+        @Language("sql") rawTemplate: String,
     ) {
-        this.template = template
+        this.rawTemplate = rawTemplate
     }
 
     @PublishedApi
     internal val nameToValueMap: MutableMap<String, Value<*>> = mutableMapOf()
 
     @PublishedApi
-    internal var template: String? = null
+    internal var rawTemplate: String? = null
 }
 
-fun buildJdbcTemplate(block: JdbcTemplateBuilder.() -> Unit): JdbcTemplate {
-    val builder = JdbcTemplateBuilder()
+fun jdbcTemplate(block: SqlTemplateBuilder.() -> Unit): JdbcTemplate {
+    val builder = SqlTemplateBuilder()
     builder.block()
-    val sql = builder.template ?: error("The invocation of the build method is missing.")
-    return JdbcTemplate(sql, builder.nameToValueMap.toMap())
+    val rawTemplate = builder.rawTemplate ?: error("The invocation of the build method is missing.")
+    return JdbcTemplate(rawTemplate, builder.nameToValueMap.toMap())
 }
 
-inline fun <reified T : Any> JdbcTemplateBuilder.bind(value: T?, column: Column<T>): ReadOnlyProperty<Nothing?, BoundValue<T>> {
+inline fun <reified T : Any> SqlTemplateBuilder.arg(value: T?, column: Column<T>): ReadOnlyProperty<Nothing?, Argument<T>> {
     // Create a new instance to ensure that the original nullable property remains unchanged when calling `TransactionManager.current().exec()`.
     val columnType = object : IColumnType<T> by column.columnType {
         override var nullable: Boolean = true
     }
-    return bindInternal(value, typeOf<T>(), columnType)
+    return bind(value, typeOf<T>(), columnType)
 }
 
-inline fun <reified T : Any> JdbcTemplateBuilder.bind(value: T?, columnType: IColumnType<T>): ReadOnlyProperty<Nothing?, BoundValue<T>> {
-    return bindInternal(value, typeOf<T>(), columnType)
+inline fun <reified T : Any> SqlTemplateBuilder.arg(value: T?, columnType: IColumnType<T>): ReadOnlyProperty<Nothing?, Argument<T>> {
+    return bind(value, typeOf<T>(), columnType)
 }
 
 @PublishedApi
-internal fun <T : Any> JdbcTemplateBuilder.bindInternal(value: T?, type: KType, columnType: IColumnType<T>): ReadOnlyProperty<Nothing?, BoundValue<T>> {
-    return ReadOnlyProperty<Nothing?, BoundValue<T>> { _, property ->
+internal fun <T : Any> SqlTemplateBuilder.bind(value: T?, type: KType, columnType: IColumnType<T>): ReadOnlyProperty<Nothing?, Argument<T>> {
+    return ReadOnlyProperty<Nothing?, Argument<T>> { _, property ->
         val name = property.name
         nameToValueMap[name] = Value(value, type, hint = columnType)
-        BoundValue(name, value, type, columnType)
+        Argument(name, value, type, columnType)
     }
 }
 
-data class BoundValue<T>(
+data class Argument<T>(
     val name: String,
     val value: T?,
     val type: KType,
@@ -102,14 +102,14 @@ data class BoundValue<T>(
     override fun toString(): String = name
 }
 
-internal data class JdbcTemplateContext(
+internal data class SqlTemplateContext(
     val sql: String,
     val nameToValueMap: Map<String, Value<*>>,
 )
 
-internal class JdbcTemplateImpl(private val context: JdbcTemplateContext) : JdbcTemplate {
-    override fun <T> exec(transform: (ResultSet) -> T?): T? {
-        val dialect = JdbcBuilderDialect()
+internal class JdbcTemplateImpl(private val context: SqlTemplateContext) : JdbcTemplate {
+    override fun <T> execute(transform: (ResultSet) -> T?): T? {
+        val dialect = SqlTemplateDialect()
         val builder = TwoWayTemplateStatementBuilderFactory().create(dialect)
         val extensions = TemplateBuiltinExtensions { dialect.escape(it) }
         val statement = builder.build(context.sql, context.nameToValueMap, extensions)
@@ -146,8 +146,8 @@ internal class JdbcTemplateImpl(private val context: JdbcTemplateContext) : Jdbc
     }
 }
 
-internal class JdbcBuilderDialect() : BuilderDialect {
-    override val driver: String = "komapper-exposed-jdbc"
+internal class SqlTemplateDialect() : BuilderDialect {
+    override val driver: String = "komapper-exposed"
 
     override fun getSequenceSql(sequenceName: String): String {
         throw UnsupportedOperationException()

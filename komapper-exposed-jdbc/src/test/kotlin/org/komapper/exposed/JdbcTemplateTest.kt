@@ -70,14 +70,14 @@ class JdbcTemplateTest {
     fun bind_entityID() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val id by bind(EntityID(1, Tasks), Tasks.id)
+        val result = jdbcTemplate {
+            val id by arg(EntityID(1, Tasks), Tasks.id)
             build(
                 """
                 select title from tasks where id = /* $id */0                
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
@@ -93,14 +93,14 @@ class JdbcTemplateTest {
     fun bind_string() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val title by bind("Read The Hobbit", Tasks.title)
+        val result = jdbcTemplate {
+            val title by arg("Read The Hobbit", Tasks.title)
             build(
                 """
                 select id from tasks where title = /* $title */''                
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<Int>()
             while (it.next()) {
                 list += it.getInt("id")
@@ -116,14 +116,14 @@ class JdbcTemplateTest {
     fun bind_varCharColumnType() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val title by bind("Read The Hobbit", VarCharColumnType())
+        val result = jdbcTemplate {
+            val title by arg("Read The Hobbit", VarCharColumnType())
             build(
                 """
                 select id from tasks where title = /* $title */''                
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<Int>()
             while (it.next()) {
                 list += it.getInt("id")
@@ -139,14 +139,14 @@ class JdbcTemplateTest {
     fun bind_expression() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val title by bind("Hobbit", Tasks.title)
+        val result = jdbcTemplate {
+            val title by arg("Hobbit", Tasks.title)
             build(
                 """
                 select id from tasks where title like /* $title.asSuffix() */''                
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<Int>()
             while (it.next()) {
                 list += it.getInt("id")
@@ -162,14 +162,14 @@ class JdbcTemplateTest {
     fun bind_enum_name() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val statusName by bind(Status.NEW, Tasks.statusName)
+        val result = jdbcTemplate {
+            val statusName by arg(Status.NEW, Tasks.statusName)
             build(
                 """
                 select title from tasks where status_name = /* $statusName */''
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
@@ -185,14 +185,14 @@ class JdbcTemplateTest {
     fun bind_enum_ordinal() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val statusOrdinal by bind(Status.NEW, Tasks.statusOrdinal)
+        val result = jdbcTemplate {
+            val statusOrdinal by arg(Status.NEW, Tasks.statusOrdinal)
             build(
                 """
                 select title from tasks where status_ordinal = /* $statusOrdinal */''
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
@@ -208,9 +208,9 @@ class JdbcTemplateTest {
     fun bind_multiple_columns() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val statusName by bind(Status.NEW, Tasks.statusName)
-            val title by bind("Learn Exposed DAO", Tasks.title)
+        val result = jdbcTemplate {
+            val statusName by arg(Status.NEW, Tasks.statusName)
+            val title by arg("Learn Exposed DAO", Tasks.title)
             build(
                 """
                 select
@@ -223,7 +223,7 @@ class JdbcTemplateTest {
                     status_name = /* $statusName */''              
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
@@ -239,9 +239,9 @@ class JdbcTemplateTest {
     fun bind_multiple_columnTypes() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val statusName by bind(Status.NEW, EnumerationNameColumnType<Status>(Status::class, 10))
-            val title by bind("Learn Exposed DAO", VarCharColumnType())
+        val result = jdbcTemplate {
+            val statusName by arg(Status.NEW, EnumerationNameColumnType<Status>(Status::class, 10))
+            val title by arg("Learn Exposed DAO", VarCharColumnType())
             build(
                 """
                 select
@@ -252,9 +252,9 @@ class JdbcTemplateTest {
                     title = /* $title */''
                     and
                     status_name = /* $statusName */''              
-                """.trimIndent()
+                """
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
@@ -270,8 +270,8 @@ class JdbcTemplateTest {
     fun if_directive_true() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val id by bind(EntityID(1, Tasks), Tasks.id)
+        val result = jdbcTemplate {
+            val id by arg(EntityID(1, Tasks), Tasks.id)
             build(
                 """
                 select title from tasks where 
@@ -279,7 +279,7 @@ class JdbcTemplateTest {
                 order by id                
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
@@ -295,8 +295,8 @@ class JdbcTemplateTest {
     fun if_directive_false() = transaction(db) {
         addLogger(StdOutSqlLogger)
 
-        val result = buildJdbcTemplate {
-            val title by bind(null, Tasks.title)
+        val result = jdbcTemplate {
+            val title by arg(null, Tasks.title)
             build(
                 """
                 select title from tasks where 
@@ -304,7 +304,7 @@ class JdbcTemplateTest {
                 order by id                
                 """.trimIndent()
             )
-        }.exec {
+        }.execute {
             val list = mutableListOf<String>()
             while (it.next()) {
                 list += it.getString("title")
