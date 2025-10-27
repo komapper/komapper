@@ -93,3 +93,5 @@ include("example-starter-r2dbc")
 include("integration-test-core")
 include("integration-test-jdbc")
 include("integration-test-r2dbc")
+
+include("komapper-exposed-r2dbc")

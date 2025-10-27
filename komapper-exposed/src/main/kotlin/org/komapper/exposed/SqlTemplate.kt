@@ -18,12 +18,6 @@ import org.jetbrains.exposed.v1.core.UShortColumnType
 import org.jetbrains.exposed.v1.core.UUIDColumnType
 import org.jetbrains.exposed.v1.core.VarCharColumnType
 import org.jetbrains.exposed.v1.core.statements.api.ExposedBlob
-import org.komapper.core.BuilderDialect
-import org.komapper.core.DataType
-import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
-import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.UUID
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -60,45 +54,5 @@ fun resolveColumnType(type: KType): IColumnType<*> {
         typeOf<UUID>() -> UUIDColumnType()
 
         else -> throw UnsupportedOperationException("Unsupported type: $type")
-    }
-}
-
-class SqlTemplateDialect() : BuilderDialect {
-    override val driver: String = "komapper-exposed"
-
-    override fun getSequenceSql(sequenceName: String): String {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
-        throw UnsupportedOperationException()
-    }
-
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
-        dialect: BuilderDialect,
-        context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>,
-    ): EntityUpsertStatementBuilder<ENTITY> {
-        throw UnsupportedOperationException()
-    }
-
-    override fun <T : Any> formatValue(
-        value: T?,
-        type: KType,
-        masking: Boolean,
-    ): String {
-        return value.toString()
-    }
-
-    override fun <T : Any> getDataTypeName(type: KType): String {
-        throw UnsupportedOperationException()
-    }
-
-    override fun <T : Any> getDataType(type: KType): DataType {
-        throw UnsupportedOperationException()
-    }
-
-    override fun <T : Any> getDataTypeOrNull(type: KType): DataType {
-        throw UnsupportedOperationException()
     }
 }
