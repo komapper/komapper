@@ -1,4 +1,4 @@
-package org.komapper.exposed
+package org.komapper.exposed.jdbc
 
 import org.jetbrains.exposed.v1.core.EnumerationNameColumnType
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
