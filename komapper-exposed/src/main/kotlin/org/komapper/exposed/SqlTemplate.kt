@@ -22,6 +22,18 @@ import java.util.UUID
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
+/**
+ * Represents a SQL template argument that binds a value to a named parameter.
+ *
+ * This class implements [CharSequence] to allow seamless integration with SQL template strings,
+ * where the argument name is used as the parameter placeholder.
+ *
+ * @param T the type of the value
+ * @param name the parameter name used in the SQL template
+ * @param value the actual value to bind (nullable)
+ * @param type the Kotlin type information
+ * @param columnType the Exposed column type for proper JDBC/R2DBC binding
+ */
 data class Argument<T>(
     val name: String,
     val value: T?,
@@ -34,6 +46,22 @@ data class Argument<T>(
     override fun toString(): String = name
 }
 
+/**
+ * Resolves the appropriate Exposed column type for a given Kotlin type.
+ *
+ * This function maps Kotlin types to their corresponding Exposed [IColumnType] implementations,
+ * which are used for proper JDBC/R2DBC binding and database operations.
+ *
+ * Supported types:
+ * - Primitive types: String, Byte, Short, Int, Long, Boolean, Char, Float, Double
+ * - Unsigned types: UByte, UShort, UInt, ULong
+ * - Binary types: ByteArray, ExposedBlob
+ * - UUID
+ *
+ * @param type the Kotlin type to resolve
+ * @return the corresponding Exposed column type
+ * @throws UnsupportedOperationException if the type is not supported
+ */
 fun resolveColumnType(type: KType): IColumnType<*> {
     return when (type) {
         typeOf<String>() -> VarCharColumnType()
