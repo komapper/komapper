@@ -1,6 +1,8 @@
 package integration.r2dbc
 
 import integration.core.Address
+import integration.core.Dbms
+import integration.core.Run
 import integration.core.address
 import integration.core.employee
 import kotlinx.coroutines.flow.Flow
@@ -251,6 +253,53 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         assertEquals(Address(15, "TOKYO", 2), address)
     }
 
+    /*
+    # Description
+
+    When running on SQL Server, the following error occurs, and subsequent tests may also start failing.
+    Since the issue doesn’t reproduce consistently, it appears to be related to multithreading. From the error message,
+    it seems that a parameterized query—one that is not issued by the application itself—is being generated
+    unintentionally due to some internal defect, and executed without the required parameter (`@p2`) being supplied.
+
+    ## Stacktrace
+
+    The parameterized query '(@p1 int,@p2 int)select t0_.address_id, t0_.street, t0_.version ' expects the parameter '@p2', which was not supplied.
+io.r2dbc.mssql.ExceptionFactory$MssqlNonTransientException: [8178] [S0001] The parameterized query '(@p1 int,@p2 int)select t0_.address_id, t0_.street, t0_.version ' expects the parameter '@p2', which was not supplied.
+	at io.r2dbc.mssql.ExceptionFactory.createException(ExceptionFactory.java:154)
+	at io.r2dbc.mssql.DefaultMssqlResult.lambda$doMap$3(DefaultMssqlResult.java:229)
+	at reactor.core.publisher.FluxHandleFuseable$HandleFuseableSubscriber.onNext(FluxHandleFuseable.java:179)
+	at reactor.core.publisher.FluxWindowPredicate$WindowFlux.drainRegular(FluxWindowPredicate.java:670)
+	at reactor.core.publisher.FluxWindowPredicate$WindowFlux.drain(FluxWindowPredicate.java:748)
+	at reactor.core.publisher.FluxWindowPredicate$WindowFlux.subscribe(FluxWindowPredicate.java:823)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8773)
+	at kotlinx.coroutines.reactive.PublisherAsFlow.collectImpl(ReactiveFlow.kt:90)
+	at kotlinx.coroutines.reactive.PublisherAsFlow.collect(ReactiveFlow.kt:75)
+	at org.komapper.r2dbc.R2dbcExecutor$executeQuery$1$1$1$1.emit(R2dbcExecutor.kt:44)
+	at org.komapper.r2dbc.R2dbcExecutor$executeQuery$1$1$1$1.emit(R2dbcExecutor.kt:40)
+	at kotlinx.coroutines.reactive.PublisherAsFlow.collectImpl(ReactiveFlow.kt:96)
+	at kotlinx.coroutines.reactive.PublisherAsFlow.access$collectImpl(ReactiveFlow.kt:44)
+	at kotlinx.coroutines.reactive.PublisherAsFlow$collectImpl$1.invokeSuspend(ReactiveFlow.kt)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at integration.r2dbc.R2dbcTestUtilityKt.runBlockingWithTimeout(R2dbcTestUtility.kt:22)
+	at integration.r2dbc.R2dbcTestUtilityKt.runBlockingWithTimeout$default(R2dbcTestUtility.kt:21)
+	at integration.r2dbc.R2dbcTestUtilityKt.inTransaction(R2dbcTestUtility.kt:11)
+	at integration.r2dbc.R2dbcFlowTest.flowTransaction_setRollbackOnly(R2dbcFlowTest.kt:255)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+    ## Workaround
+
+    Skip execution on SQL Server.
+     */
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun flowTransaction_setRollbackOnly(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
