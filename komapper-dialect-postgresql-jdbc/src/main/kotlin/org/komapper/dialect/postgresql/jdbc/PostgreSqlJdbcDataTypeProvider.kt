@@ -70,8 +70,8 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
     }
 }
 
-object PostgreSqlJdbcBlobByteArrayType
-    : AbstractJdbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BINARY) {
+object PostgreSqlJdbcBlobByteArrayType :
+    AbstractJdbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BINARY) {
     override val name: String = "bytea"
     override fun doGetValue(rs: ResultSet, index: Int): BlobByteArray? {
         return rs.getBytes(index)?.let { BlobByteArray(it) }
@@ -83,4 +83,3 @@ object PostgreSqlJdbcBlobByteArrayType
         ps.setBytes(index, value.value)
     }
 }
-
