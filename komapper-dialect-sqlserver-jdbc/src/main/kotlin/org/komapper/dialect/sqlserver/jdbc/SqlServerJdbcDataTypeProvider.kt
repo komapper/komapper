@@ -5,6 +5,7 @@ import org.komapper.dialect.sqlserver.SqlServerLiteral.toOffsetDateTimeLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
@@ -41,6 +42,7 @@ class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcBlobType("varbinary(max)"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(1000)"),
+            JdbcBlobByteArrayType("varbinary(max)"),
             JdbcClobType("text"),
             JdbcClobStringType("text"),
             JdbcDoubleType("float") { toDoubleLiteral(it) },

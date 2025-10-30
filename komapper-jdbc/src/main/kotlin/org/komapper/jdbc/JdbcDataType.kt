@@ -3,6 +3,7 @@ package org.komapper.jdbc
 import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
+import org.komapper.core.type.BlobByteArray
 import org.komapper.core.type.ClobString
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
@@ -228,6 +229,37 @@ class JdbcBlobType(override val name: String, toLiteral: (DataType.(Blob?) -> St
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Blob) {
         ps.setBlob(index, value)
+    }
+}
+
+class JdbcBlobByteArrayType(override val name: String, toLiteral: (DataType.(BlobByteArray?) -> String)? = null) :
+    AbstractJdbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BLOB, toLiteral) {
+    override fun doGetValue(rs: ResultSet, index: Int): BlobByteArray? {
+        return rs.getBlob(index)?.toBlobByteArray()
+    }
+    override fun doGetValue(rs: ResultSet, columnLabel: String): BlobByteArray? {
+        return rs.getBlob(columnLabel)?.toBlobByteArray()
+    }
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: BlobByteArray) {
+        ps.setBytes(index, value.value)
+    }
+
+    private fun Blob?.toBlobByteArray(): BlobByteArray? {
+        return try {
+            this?.binaryStream?.use { input ->
+                val output = mutableListOf<Byte>()
+                val buffer = ByteArray(4096)
+                var bytesRead: Int
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    for (i in 0 until bytesRead) {
+                        output.add(buffer[i])
+                    }
+                }
+                BlobByteArray(output.toByteArray())
+            }
+        } finally {
+            runCatching { this?.free() }
+        }
     }
 }
 
