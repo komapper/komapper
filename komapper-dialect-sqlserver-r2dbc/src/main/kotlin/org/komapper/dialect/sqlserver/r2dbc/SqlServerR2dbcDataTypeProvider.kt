@@ -3,6 +3,7 @@ package org.komapper.dialect.sqlserver.r2dbc
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
+import org.komapper.r2dbc.R2dbcBlobByteArrayType
 import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
@@ -37,6 +38,7 @@ class SqlServerR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBooleanType("bit"),
             R2dbcByteType("smallint"),
             R2dbcByteArrayType("varbinary(1000)"),
+            R2dbcBlobByteArrayType("varbinary(max)"),
             R2dbcClobType("text"),
             R2dbcClobStringType("text"),
             R2dbcDoubleType("real"),

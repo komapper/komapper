@@ -4,6 +4,7 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
+import org.komapper.core.type.BlobByteArray
 import org.komapper.core.type.ClobString
 import java.sql.Array
 import java.sql.Blob
@@ -44,4 +45,12 @@ data class ClobStringData(
 data class SqlXmlData(
     @KomapperId val id: Int,
     @KomapperColumn(alwaysQuote = true) val value: SQLXML?,
+)
+
+@KomapperEntity
+@KomapperTable("blob_data")
+data class BlobByteArrayData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true, alternateType = BlobByteArray::class)
+    val value: ByteArray?,
 )

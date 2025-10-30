@@ -4,6 +4,7 @@ import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcArrayType
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
@@ -37,6 +38,7 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcBooleanType("boolean"),
             JdbcByteType("smallint"),
             JdbcByteArrayType("bytea"),
+            JdbcBlobByteArrayType("bytea"),
             JdbcClobStringType("text"),
             JdbcDoubleType("double precision"),
             JdbcFloatType("real"),

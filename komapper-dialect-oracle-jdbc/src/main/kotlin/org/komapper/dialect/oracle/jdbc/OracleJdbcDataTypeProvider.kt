@@ -3,6 +3,7 @@ package org.komapper.dialect.oracle.jdbc
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
@@ -34,6 +35,7 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcBlobType("blob"),
             JdbcByteType("integer"),
             JdbcByteArrayType("raw(500)"),
+            JdbcBlobByteArrayType("blob"),
             JdbcClobType("clob"),
             JdbcClobStringType("clob"),
             JdbcDoubleType("float"),

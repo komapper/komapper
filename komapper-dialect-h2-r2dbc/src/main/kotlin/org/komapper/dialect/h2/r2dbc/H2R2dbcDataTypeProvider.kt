@@ -3,6 +3,7 @@ package org.komapper.dialect.h2.r2dbc
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
+import org.komapper.r2dbc.R2dbcBlobByteArrayType
 import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
@@ -37,6 +38,7 @@ class H2R2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBooleanType("bool"),
             R2dbcByteType("tinyint"),
             R2dbcByteArrayType("binary"),
+            R2dbcBlobByteArrayType("blob"),
             R2dbcClobType("clob"),
             R2dbcClobStringType("clob"),
             R2dbcDoubleType("double"),
