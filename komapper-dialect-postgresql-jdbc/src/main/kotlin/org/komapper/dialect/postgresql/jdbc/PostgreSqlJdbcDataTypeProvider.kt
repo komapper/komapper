@@ -1,12 +1,13 @@
 package org.komapper.dialect.postgresql.jdbc
 
+import org.komapper.core.type.BlobByteArray
 import org.komapper.dialect.postgresql.PostgreSqlLiteral.toDoubleLiteral
 import org.komapper.dialect.postgresql.PostgreSqlLiteral.toOffsetDateTimeLiteral
+import org.komapper.jdbc.AbstractJdbcDataType
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcArrayType
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
-import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
@@ -29,6 +30,10 @@ import org.komapper.jdbc.JdbcStringType
 import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
+import java.sql.JDBCType
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import kotlin.reflect.typeOf
 import kotlin.time.ExperimentalTime
 
 class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
@@ -42,7 +47,7 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcBooleanType("boolean"),
             JdbcByteType("smallint"),
             JdbcByteArrayType("bytea"),
-            JdbcBlobByteArrayType("bytea"),
+            PostgreSqlJdbcBlobByteArrayType,
             JdbcClobStringType("text"),
             JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcFloatType("real"),
@@ -64,3 +69,18 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
         )
     }
 }
+
+object PostgreSqlJdbcBlobByteArrayType
+    : AbstractJdbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BINARY) {
+    override val name: String = "bytea"
+    override fun doGetValue(rs: ResultSet, index: Int): BlobByteArray? {
+        return rs.getBytes(index)?.let { BlobByteArray(it) }
+    }
+    override fun doGetValue(rs: ResultSet, columnLabel: String): BlobByteArray? {
+        return rs.getBytes(columnLabel)?.let { BlobByteArray(it) }
+    }
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: BlobByteArray) {
+        ps.setBytes(index, value.value)
+    }
+}
+
