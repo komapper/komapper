@@ -212,7 +212,7 @@ class R2dbcBlobType(override val name: String, toLiteral: (DataType.(Blob?) -> S
 }
 
 class R2dbcBlobByteArrayType(override val name: String, toLiteral: (DataType.(BlobByteArray?) -> String)? = null) :
-    AbstractR2dbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BLOB, toLiteral = toLiteral) {
+    AbstractR2dbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BLOB, Blob::class.javaObjectType, toLiteral = toLiteral) {
     override fun convertBeforeGetting(value: Any): BlobByteArray {
         return when (value) {
             is Blob -> runBlocking(Dispatchers.IO) { BlobByteArray(value.toByteArray()) }
