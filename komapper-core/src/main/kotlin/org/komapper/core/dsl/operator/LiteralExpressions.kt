@@ -5,6 +5,9 @@ import org.komapper.core.dsl.expression.NullLiteralExpression
 import org.komapper.core.dsl.expression.NullableLiteralExpression
 import org.komapper.core.dsl.expression.createSimpleNullableLiteralExpression
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.reflect.typeOf
 
@@ -34,6 +37,27 @@ fun literal(value: Boolean?): ColumnExpression<Boolean, Boolean> {
  */
 fun literal(value: Int?): ColumnExpression<Int, Int> {
     return createSimpleNullableLiteralExpression(value, typeOf<Int>())
+}
+
+/**
+ * Builds a [LocalDate] literal.
+ */
+fun literal(value: LocalDate?): ColumnExpression<LocalDate, LocalDate> {
+    return createSimpleNullableLiteralExpression(value, typeOf<LocalDate>())
+}
+
+/**
+ * Builds a [LocalDateTime] literal.
+ */
+fun literal(value: LocalDateTime?): ColumnExpression<LocalDateTime, LocalDateTime> {
+    return createSimpleNullableLiteralExpression(value, typeOf<LocalDateTime>())
+}
+
+/**
+ * Builds a [LocalTime] literal.
+ */
+fun literal(value: LocalTime?): ColumnExpression<LocalTime, LocalTime> {
+    return createSimpleNullableLiteralExpression(value, typeOf<LocalTime>())
 }
 
 /**
