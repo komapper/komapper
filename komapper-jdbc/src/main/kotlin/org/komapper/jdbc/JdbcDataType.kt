@@ -23,6 +23,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 import kotlin.time.ExperimentalTime
@@ -519,7 +520,10 @@ class JdbcKotlinInstantAsTimestampWithTimezoneType(
     }
 }
 
-class JdbcLocalDateTimeType(override val name: String, toLiteral: (DataType.(LocalDateTime?) -> String)? = null) :
+class JdbcLocalDateTimeType(
+    override val name: String,
+    toLiteral: (DataType.(LocalDateTime?) -> String)? = DataType::toLocalDateTimeLiteral,
+) :
     AbstractJdbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), JDBCType.TIMESTAMP, toLiteral) {
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {
         return rs.getObject(index, LocalDateTime::class.java)
@@ -538,7 +542,16 @@ class JdbcLocalDateTimeType(override val name: String, toLiteral: (DataType.(Loc
     }
 }
 
-class JdbcLocalDateType(override val name: String, toLiteral: (DataType.(LocalDate?) -> String)? = null) :
+private fun DataType.toLocalDateTimeLiteral(value: LocalDateTime?): String {
+    if (value == null) return "null"
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    return "{ts '${value.format(formatter)}'}"
+}
+
+class JdbcLocalDateType(
+    override val name: String,
+    toLiteral: (DataType.(LocalDate?) -> String)? = DataType::toLocalDateLiteral,
+) :
     AbstractJdbcDataType<LocalDate>(typeOf<LocalDate>(), JDBCType.DATE, toLiteral) {
     override fun doGetValue(rs: ResultSet, index: Int): LocalDate? {
         return rs.getObject(index, LocalDate::class.java)
@@ -557,7 +570,16 @@ class JdbcLocalDateType(override val name: String, toLiteral: (DataType.(LocalDa
     }
 }
 
-class JdbcLocalTimeType(override val name: String, toLiteral: (DataType.(LocalTime?) -> String)? = null) :
+private fun DataType.toLocalDateLiteral(value: LocalDate?): String {
+    if (value == null) return "null"
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    return "{d '${value.format(formatter)}'}"
+}
+
+class JdbcLocalTimeType(
+    override val name: String,
+    toLiteral: (DataType.(LocalTime?) -> String)? = DataType::toLocalTimeLiteral,
+) :
     AbstractJdbcDataType<LocalTime>(typeOf<LocalTime>(), JDBCType.TIME, toLiteral) {
     override fun doGetValue(rs: ResultSet, index: Int): LocalTime? {
         return rs.getObject(index, LocalTime::class.java)
@@ -574,6 +596,12 @@ class JdbcLocalTimeType(override val name: String, toLiteral: (DataType.(LocalTi
     override fun doToString(value: LocalTime): String {
         return "'$value'"
     }
+}
+
+private fun DataType.toLocalTimeLiteral(value: LocalTime?): String {
+    if (value == null) return "null"
+    val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+    return "{t '${value.format(formatter)}'}"
 }
 
 class JdbcLongType(override val name: String, toLiteral: (DataType.(Long?) -> String)? = null) :

@@ -51,6 +51,10 @@ internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.t
     override fun doSetValue(ps: PreparedStatement, index: Int, value: LocalDate) {
         dataType.setValue(ps, index, value.toJavaLocalDate())
     }
+
+    override fun toLiteral(value: LocalDate?): String {
+        return if (value == null) "null" else dataType.toLiteral(value.toJavaLocalDate())
+    }
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: JdbcDataType<java.time.LocalDateTime>) :
@@ -69,5 +73,9 @@ internal class JdbcKotlinLocalDateTimeType(private val dataType: JdbcDataType<ja
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: LocalDateTime) {
         dataType.setValue(ps, index, value.toJavaLocalDateTime())
+    }
+
+    override fun toLiteral(value: LocalDateTime?): String {
+        return if (value == null) "null" else dataType.toLiteral(value.toJavaLocalDateTime())
     }
 }

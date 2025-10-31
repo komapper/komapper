@@ -12,18 +12,29 @@ import integration.core.enumPropertyData
 import integration.core.enumclass.Color
 import integration.core.enumclass.Direction
 import integration.core.intData
+import integration.core.kotlinLocalDateData
+import integration.core.kotlinLocalDateTimeData
+import integration.core.localDateData
+import integration.core.localDateTimeData
+import integration.core.localTimeData
 import integration.core.longData
 import integration.core.offsetDateTimeData
 import integration.core.stringData
 import integration.core.userDefinedDoubleData
 import integration.core.userDefinedIntData
+import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinLocalDateTime
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.nullLiteral
 import org.komapper.core.dsl.query.first
+import org.komapper.datetime.jdbc.literal
 import org.komapper.jdbc.JdbcDatabase
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -118,6 +129,160 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         }
         val result = db.runQuery {
             QueryDsl.from(m).select(m.value, literal(null as Int?)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_kotlinLocalDate() {
+        val m = Meta.kotlinLocalDateData
+        val date1 = LocalDate.of(2020, 12, 31).toKotlinLocalDate()
+        val date2 = LocalDate.of(2021, 6, 15).toKotlinLocalDate()
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(date1)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(date2)).first()
+        }
+        assertEquals(date1 to date2, result)
+    }
+
+    @Test
+    fun test_literal_kotlinLocalDate_null() {
+        val m = Meta.kotlinLocalDateData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null as kotlinx.datetime.LocalDate?)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null as kotlinx.datetime.LocalDate?)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_kotlinLocalDateTime() {
+        val m = Meta.kotlinLocalDateTimeData
+        val date1 = LocalDateTime.of(2020, 12, 31, 13, 30, 20).toKotlinLocalDateTime()
+        val date2 = LocalDateTime.of(2021, 6, 15, 1, 2, 3).toKotlinLocalDateTime()
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(date1)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(date2)).first()
+        }
+        assertEquals(date1 to date2, result)
+    }
+
+    @Test
+    fun test_literal_kotlinLocalDateTime_null() {
+        val m = Meta.kotlinLocalDateTimeData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null as kotlinx.datetime.LocalDateTime?)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null as kotlinx.datetime.LocalDateTime?)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_localDate() {
+        val m = Meta.localDateData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(LocalDate.of(2020, 12, 31))
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(LocalDate.of(2021, 6, 15))).first()
+        }
+        assertEquals(LocalDate.of(2020, 12, 31) to LocalDate.of(2021, 6, 15), result)
+    }
+
+    @Test
+    fun test_literal_localDate_null() {
+        val m = Meta.localDateData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null as LocalDate?)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null as LocalDate?)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_localDateTime() {
+        val m = Meta.localDateTimeData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(LocalDateTime.of(2020, 12, 31, 14, 30, 20))
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(LocalDateTime.of(2021, 6, 15, 1, 2, 3))).first()
+        }
+        assertEquals(LocalDateTime.of(2020, 12, 31, 14, 30, 20) to LocalDateTime.of(2021, 6, 15, 1, 2, 3), result)
+    }
+
+    @Test
+    fun test_literal_localDateTime_null() {
+        val m = Meta.localDateTimeData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null as LocalDateTime?)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null as LocalDateTime?)).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_literal_localTime() {
+        val m = Meta.localTimeData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(LocalTime.of(14, 30, 20))
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(LocalTime.of(1, 2, 3))).first()
+        }
+        assertEquals(LocalTime.of(14, 30, 20) to LocalTime.of(1, 2, 3), result)
+    }
+
+    @Test
+    fun test_literal_localTime_null() {
+        val m = Meta.localTimeData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq literal(null as LocalTime?)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, literal(null as LocalTime?)).first()
         }
         assertEquals(null to null, result)
     }
