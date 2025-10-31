@@ -41,6 +41,7 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcBooleanType("boolean"),
             JdbcByteType("smallint"),
             JdbcByteArrayType("bytea"),
+            PostgreSqlJdbcBlobByteArrayType(),
             JdbcClobStringType("text"),
             JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcFloatType("real"),

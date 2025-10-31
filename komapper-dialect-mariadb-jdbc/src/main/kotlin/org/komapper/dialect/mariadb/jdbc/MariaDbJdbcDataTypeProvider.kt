@@ -4,6 +4,7 @@ import org.komapper.dialect.mariadb.MariaDbLiteral.toDoubleLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
@@ -40,6 +41,7 @@ class MariaDbJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcData
             JdbcBooleanType("bit(1)"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(500)"),
+            JdbcBlobByteArrayType("blob"),
             JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcClobType("text"),
             JdbcClobStringType("text"),

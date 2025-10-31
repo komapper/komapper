@@ -738,6 +738,36 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    // jasync-r2dbc-mysql does not support blob type
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
+    @Test
+    fun blobByteArray(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.blobByteArrayData
+        val testBytes = byteArrayOf(-119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8, 6, 0, 0, 0, 31, -13, -1, 97, 0, 0, 1, 69, 73, 68, 65, 84, 120, -38, -107, -109, 75, 106, -125, 80, 20, -86, 45, 37, -84, -114, 66, -23, 34, 58, -24, -72, 3, -41, -40, 117, -108, -84, 34, -120, 66, 10, -50, -36, -127, 115, -33, -58, -73, 38, -98, -98, 95, -18, 9, 87, 47, 41, 116, -16, -93, 81, -65, -17, 60, 52, 22, 17, 61, 89, -106, -11, -58, -7, -8, 71, -34, 57, -5, -123, 85, 2, 59, 78, 18, -118, -30, -104, -110, 52, -91, 52, -53, 40, -53, 115, -54, -117, -126, -118, -78, -92, -14, 114, -95, -117, -92, -86, -88, -82, 107, 98, -26, 117, 37, -120, 98, 37, 96, -111, 8, 10, 22, -108, 44, 16, -80, 82, -87, -101, -58, 20, 0, 66, 117, -87, -68, -128, 0, -72, 26, -128, 6, 105, 91, 106, 57, 93, -39, -99, -126, -100, 65, -87, -118, -118, 0, 1, 9, -48, -9, -3, 61, -61, 48, -104, 2, -52, 90, -88, 118, 49, 99, -93, -127, 0, -58, 113, 92, -59, 16, -56, -110, 0, -93, -22, 22, -100, -90, -23, -98, -21, -11, 106, 10, 42, 53, -17, 22, -42, 33, -55, -19, 118, 51, 5, -78, 40, -76, -83, -61, 2, 72, -26, 121, 94, 98, 8, 100, -61, -113, 96, -100, -29, -70, -36, 55, 4, -82, 109, 60, -80, -123, -15, 27, -9, -15, -122, 50, 126, -35, 56, 50, 115, 88, 9, 100, -29, -37, -22, 56, 98, -76, 48, 12, -23, 124, -2, -95, 32, 8, -56, 113, -100, 47, 102, -98, 13, -127, -34, -66, 84, -57, 53, 124, 35, -98, -25, 45, -107, 79, -89, -45, -111, -97, -33, -127, 91, 9, -74, -101, 23, 1, 90, -113, -94, -120, 124, -33, 39, -41, 117, -65, 109, -37, 126, 17, 88, 23, 124, -10, 15, -106, -121, -50, -16, -1, 80, 109, -17, 116, 88, 23, -20, -79, -43, 63, 114, -112, -99, -73, -7, 5, -60, -23, -13, 112, 76, -55, -91, 117, 0, 0, 0, 0, 73, 69, 78, 68, -82, 66, 96, -126)
+        val data = BlobByteArrayData(1, testBytes)
+        db.runQuery {
+            QueryDsl.insert(m).single(data)
+        }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data.id, data2.id)
+        assertContentEquals(data.value, data2.value)
+    }
+
+    @Test
+    fun blobByteArray_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.blobByteArrayData
+        val data = BlobByteArrayData(1, null)
+        db.runQuery {
+            QueryDsl.insert(m).single(data)
+        }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
     @Test
     fun double(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.doubleData

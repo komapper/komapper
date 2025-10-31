@@ -5,6 +5,7 @@ import org.komapper.dialect.mysql.MySqlLiteral.toOffsetDateTimeLiteral
 import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
+import org.komapper.jdbc.JdbcBlobByteArrayType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
@@ -42,6 +43,7 @@ class MySqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTy
             JdbcBooleanType("bit(1)"),
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(500)"),
+            JdbcBlobByteArrayType("blob"),
             JdbcDoubleType("double precision") { toDoubleLiteral(it) },
             JdbcClobType("text"),
             JdbcClobStringType("text"),

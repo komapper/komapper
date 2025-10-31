@@ -5,6 +5,7 @@ import org.komapper.dialect.oracle.OracleLiteral.toOffsetDateTimeLiteral
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
+import org.komapper.r2dbc.R2dbcBlobByteArrayType
 import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcByteArrayType
 import org.komapper.r2dbc.R2dbcByteType
@@ -39,6 +40,7 @@ class OracleR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBlobType("blob"),
             R2dbcByteType("integer"),
             R2dbcByteArrayType("raw(500)"),
+            R2dbcBlobByteArrayType("blob"),
             R2dbcClobType("clob"),
             R2dbcClobStringType("clob"),
             R2dbcDoubleType("float") { toDoubleLiteral(it) },

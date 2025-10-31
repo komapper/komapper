@@ -4,9 +4,13 @@ import io.r2dbc.spi.Blob
 import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.runBlocking
 import org.komapper.core.DataType
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
+import org.komapper.core.type.BlobByteArray
 import org.komapper.core.type.ClobString
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.math.BigDecimal
@@ -204,6 +208,35 @@ class R2dbcBlobType(override val name: String, toLiteral: (DataType.(Blob?) -> S
 
     override fun getValue(row: Row, columnLabel: String): Blob? {
         return row.get(columnLabel, Blob::class.java)
+    }
+}
+
+class R2dbcBlobByteArrayType(override val name: String, toLiteral: (DataType.(BlobByteArray?) -> String)? = null) :
+    AbstractR2dbcDataType<BlobByteArray>(typeOf<BlobByteArray>(), JDBCType.BLOB, Blob::class.javaObjectType, toLiteral = toLiteral) {
+    override fun convertBeforeGetting(value: Any): BlobByteArray {
+        return when (value) {
+            is Blob -> runBlocking(Dispatchers.IO) { BlobByteArray(value.toByteArray()) }
+            is ByteArray -> BlobByteArray(value)
+            is ByteBuffer -> BlobByteArray(value.array())
+            else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
+        }
+    }
+    override fun convertBeforeBinding(value: BlobByteArray): Any {
+        return value.value
+    }
+
+    private suspend fun Blob.toByteArray(): ByteArray {
+        return try {
+            val output = mutableListOf<Byte>()
+            this.stream().collect { buffer ->
+                for (byte in buffer.array()) {
+                    output.add(byte)
+                }
+            }
+            output.toByteArray()
+        } finally {
+            runCatching { discard() }
+        }
     }
 }
 

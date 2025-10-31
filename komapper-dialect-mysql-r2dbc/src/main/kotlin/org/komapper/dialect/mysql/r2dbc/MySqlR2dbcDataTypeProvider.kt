@@ -5,6 +5,7 @@ import org.komapper.dialect.mysql.MySqlLiteral.toOffsetDateTimeLiteral
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
+import org.komapper.r2dbc.R2dbcBlobByteArrayType
 import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
@@ -41,6 +42,7 @@ class MySqlR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBooleanType("bit(1)"),
             R2dbcByteType("tinyint"),
             R2dbcByteArrayType("varbinary(500)"),
+            R2dbcBlobByteArrayType("blob"),
             R2dbcClobType("text"),
             R2dbcClobStringType("text"),
             R2dbcDoubleType("double precision") { toDoubleLiteral(it) },
