@@ -78,6 +78,8 @@ include("komapper-quarkus-jdbc")
 include("komapper-quarkus-jdbc-deployment")
 include("komapper-tx-context-jdbc")
 include("komapper-tx-context-r2dbc")
+include("komapper-exposed")
+include("komapper-exposed-jdbc")
 
 // EXAMPLE
 include("example-basic-jdbc")
@@ -91,3 +93,5 @@ include("example-starter-r2dbc")
 include("integration-test-core")
 include("integration-test-jdbc")
 include("integration-test-r2dbc")
+
+include("komapper-exposed-r2dbc")
