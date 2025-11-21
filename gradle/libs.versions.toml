@@ -82,7 +82,7 @@ testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgr
 testcontainers-sqlserver = { module = "org.testcontainers:testcontainers-mssqlserver" }
 
 google-java-format = { module = "com.google.googlejavaformat:google-java-format", version = "1.28.0" }
-ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version = "1.7.1" }
+ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version = "1.8.0" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
