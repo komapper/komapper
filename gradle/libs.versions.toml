@@ -73,7 +73,7 @@ quarkus-arc-deployment = { module = "io.quarkus:quarkus-arc-deployment", version
 quarkus-agroal-deployment = { module = "io.quarkus:quarkus-agroal-deployment", version.ref = "quarkus" }
 quarkus-datasource-deployment = { module = "io.quarkus:quarkus-datasource-deployment", version.ref = "quarkus" }
 
-testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "2.0.2" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version = "2.0.3" }
 testcontainers-r2dbc = { module = "org.testcontainers:testcontainers-r2dbc" }
 testcontainers-mariadb = { module = "org.testcontainers:testcontainers-mariadb" }
 testcontainers-mysql = { module = "org.testcontainers:testcontainers-mysql" }
