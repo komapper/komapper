@@ -57,7 +57,10 @@ internal class SqlParser constructor(
             tokenType = tokenizer.next()
             token = tokenizer.token
             when (tokenType) {
-                DELIMITER, EOF -> break@outer
+                DELIMITER, EOF -> {
+                    break@outer
+                }
+
                 OPEN_PAREN -> {
                     val parser = SqlParser(sql, tokenizer)
                     val node = parser.parse()
@@ -66,38 +69,120 @@ internal class SqlParser constructor(
                     }
                     pushNode(SqlNode.Paren(node))
                 }
-                CLOSE_PAREN -> break@outer
-                WORD, QUOTE -> pushNode(SqlNode.Token.Word(token))
-                SPACE -> pushNode(SqlNode.Token.Space.of(token))
-                OTHER -> pushNode(SqlNode.Token.Other.of(token))
-                EOL -> pushNode(SqlNode.Token.Eol(token))
-                MULTI_LINE_COMMENT, SINGLE_LINE_COMMENT -> pushNode(SqlNode.Token.Comment(token))
-                SELECT -> reducers.push(SelectReducer(location, token))
-                FROM -> reducers.push(FromReducer(location, token))
-                WHERE -> reducers.push(WhereReducer(location, token))
-                GROUP_BY -> reducers.push(GroupByReducer(location, token))
-                HAVING -> reducers.push(HavingReducer(location, token))
-                ORDER_BY -> reducers.push(OrderByReducer(location, token))
-                FOR_UPDATE -> reducers.push(ForUpdateReducer(location, token))
-                OPTION -> reducers.push(OptionReducer(location, token))
-                AND -> reducers.push(AndReducer(location, token))
-                OR -> reducers.push(OrReducer(location, token))
+
+                CLOSE_PAREN -> {
+                    break@outer
+                }
+
+                WORD, QUOTE -> {
+                    pushNode(SqlNode.Token.Word(token))
+                }
+
+                SPACE -> {
+                    pushNode(SqlNode.Token.Space.of(token))
+                }
+
+                OTHER -> {
+                    pushNode(SqlNode.Token.Other.of(token))
+                }
+
+                EOL -> {
+                    pushNode(SqlNode.Token.Eol(token))
+                }
+
+                MULTI_LINE_COMMENT, SINGLE_LINE_COMMENT -> {
+                    pushNode(SqlNode.Token.Comment(token))
+                }
+
+                SELECT -> {
+                    reducers.push(SelectReducer(location, token))
+                }
+
+                FROM -> {
+                    reducers.push(FromReducer(location, token))
+                }
+
+                WHERE -> {
+                    reducers.push(WhereReducer(location, token))
+                }
+
+                GROUP_BY -> {
+                    reducers.push(GroupByReducer(location, token))
+                }
+
+                HAVING -> {
+                    reducers.push(HavingReducer(location, token))
+                }
+
+                ORDER_BY -> {
+                    reducers.push(OrderByReducer(location, token))
+                }
+
+                FOR_UPDATE -> {
+                    reducers.push(ForUpdateReducer(location, token))
+                }
+
+                OPTION -> {
+                    reducers.push(OptionReducer(location, token))
+                }
+
+                AND -> {
+                    reducers.push(AndReducer(location, token))
+                }
+
+                OR -> {
+                    reducers.push(OrReducer(location, token))
+                }
+
                 UNION, EXCEPT, MINUS, INTERSECT -> {
                     val node = reduceAll()
                     reducers.push(SetReducer(location, token, node))
                     reducers.push(StatementReducer())
                 }
-                BIND_VALUE_DIRECTIVE -> parseBindValueDirective()
-                LITERAL_VALUE_DIRECTIVE -> parseLiteralValueDirective()
-                EMBEDDED_VALUE_DIRECTIVE -> parseEmbeddedValueDirective()
-                IF_DIRECTIVE -> parseIfDirective()
-                ELSEIF_DIRECTIVE -> parseElseifDirective()
-                ELSE_DIRECTIVE -> parseElseDirective()
-                END_DIRECTIVE -> parseEndDirective()
-                FOR_DIRECTIVE -> parseForDirective()
-                WITH_DIRECTIVE -> parseWithDirective()
-                PARTIAL_DIRECTIVE -> parsePartialDirective()
-                PARSER_LEVEL_COMMENT_DIRECTIVE -> Unit // do nothing
+
+                BIND_VALUE_DIRECTIVE -> {
+                    parseBindValueDirective()
+                }
+
+                LITERAL_VALUE_DIRECTIVE -> {
+                    parseLiteralValueDirective()
+                }
+
+                EMBEDDED_VALUE_DIRECTIVE -> {
+                    parseEmbeddedValueDirective()
+                }
+
+                IF_DIRECTIVE -> {
+                    parseIfDirective()
+                }
+
+                ELSEIF_DIRECTIVE -> {
+                    parseElseifDirective()
+                }
+
+                ELSE_DIRECTIVE -> {
+                    parseElseDirective()
+                }
+
+                END_DIRECTIVE -> {
+                    parseEndDirective()
+                }
+
+                FOR_DIRECTIVE -> {
+                    parseForDirective()
+                }
+
+                WITH_DIRECTIVE -> {
+                    parseWithDirective()
+                }
+
+                PARTIAL_DIRECTIVE -> {
+                    parsePartialDirective()
+                }
+
+                PARSER_LEVEL_COMMENT_DIRECTIVE -> {
+                    Unit
+                } // do nothing
             }
         }
         return reduceAll()

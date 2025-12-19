@@ -26,7 +26,10 @@ internal class EntityProcessor(
             )
             for (symbol in (symbols - processedSymbols)) {
                 val model = when (val result = analyzer.analyze(symbol)) {
-                    is EntityAnalysisResult.Success -> result.model
+                    is EntityAnalysisResult.Success -> {
+                        result.model
+                    }
+
                     is EntityAnalysisResult.Failure -> {
                         log(context, result.exit)
                         result.model

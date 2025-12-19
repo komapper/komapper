@@ -214,7 +214,7 @@ internal class EntityMetamodelGenerator(
                     fun throwException(value: String, propertyName: String, cause: String) =
                         "throw $EnumMappingException($exteriorType, $propertyName, $value, $cause)"
                     when (val strategy = p.kotlinClass.strategy) {
-                        is EnumStrategy.Name ->
+                        is EnumStrategy.Name -> {
                             "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${
                                 throwException(
                                     "it",
@@ -222,8 +222,9 @@ internal class EntityMetamodelGenerator(
                                     "e",
                                 )
                             } } }"
+                        }
 
-                        is EnumStrategy.Ordinal ->
+                        is EnumStrategy.Ordinal -> {
                             "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${
                                 throwException(
                                     "it",
@@ -231,8 +232,9 @@ internal class EntityMetamodelGenerator(
                                     "e",
                                 )
                             } } }"
+                        }
 
-                        is EnumStrategy.Property ->
+                        is EnumStrategy.Property -> {
                             "{ v -> $exteriorTypeName.values().firstOrNull { it.${strategy.propertyName} == v } ?: ${
                                 throwException(
                                     "v",
@@ -240,9 +242,11 @@ internal class EntityMetamodelGenerator(
                                     "null",
                                 )
                             } }"
+                        }
 
-                        is EnumStrategy.Type ->
+                        is EnumStrategy.Type -> {
                             "{ it }"
+                        }
                     }
                 }
 
@@ -419,7 +423,9 @@ internal class EntityMetamodelGenerator(
                     if (idKind != null) it to idKind else null
                 }
 
-                else -> null
+                else -> {
+                    null
+                }
             }
         }
 

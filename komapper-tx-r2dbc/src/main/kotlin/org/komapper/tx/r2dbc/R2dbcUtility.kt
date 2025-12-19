@@ -18,25 +18,31 @@ fun <T> defineTransactionProperty(option: Option<T>, value: T): TransactionPrope
                 else -> null
             }
         }
+
         TransactionDefinition.LOCK_WAIT_TIMEOUT -> {
             when (value) {
                 is Duration -> TransactionProperty.LockWaitTime(value)
                 else -> null
             }
         }
+
         TransactionDefinition.NAME -> {
             when (value) {
                 is String -> TransactionProperty.Name(value)
                 else -> null
             }
         }
+
         TransactionDefinition.READ_ONLY -> {
             when (value) {
                 is Boolean -> TransactionProperty.ReadOnly(value)
                 else -> null
             }
         }
-        else -> null
+
+        else -> {
+            null
+        }
     }
     return property ?: OptionElement(option, value)
 }
@@ -92,10 +98,22 @@ private class TransactionPropertyAdapter(private val adaptee: TransactionPropert
                     TransactionProperty.IsolationLevel.SERIALIZABLE -> IsolationLevel.SERIALIZABLE
                 }
             }
-            is TransactionProperty.LockWaitTime -> element.value
-            is TransactionProperty.Name -> element.value
-            is TransactionProperty.ReadOnly -> element.value
-            else -> null
+
+            is TransactionProperty.LockWaitTime -> {
+                element.value
+            }
+
+            is TransactionProperty.Name -> {
+                element.value
+            }
+
+            is TransactionProperty.ReadOnly -> {
+                element.value
+            }
+
+            else -> {
+                null
+            }
         }
         @Suppress("UNCHECKED_CAST")
         return (value ?: element?.value) as T?

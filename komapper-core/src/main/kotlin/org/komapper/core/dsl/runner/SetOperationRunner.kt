@@ -33,6 +33,7 @@ class SetOperationRunner(
             is SelectContext<*, *, *> -> {
                 checkWhereClause(subqueryContext)
             }
+
             is SetOperationContext -> {
                 checkWhereClauses(subqueryContext.left)
                 checkWhereClauses(subqueryContext.right)

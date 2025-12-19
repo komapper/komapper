@@ -19,7 +19,10 @@ internal class R2dbcEntityInsertReturningRunnerSupport<ENTITY : Any, ID : Any, M
                     null
                 }
             }
-            else -> null
+
+            else -> {
+                null
+            }
         }
         val clock = config.clockProvider.now()
         return context.target.preInsert(newEntity ?: entity, clock)

@@ -57,6 +57,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
             MySqlVersion.V5 -> {
                 // do nothing
             }
+
             MySqlVersion.V8 -> {
                 buf.append(" as ")
                 table(excluded, TableNameType.ALIAS_ONLY)

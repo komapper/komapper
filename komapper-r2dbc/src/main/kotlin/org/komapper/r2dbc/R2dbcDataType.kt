@@ -493,9 +493,18 @@ class R2dbcOffsetDateTimeType(override val name: String, toLiteral: (DataType.(O
                 val offset = zoneId.rules.getOffset(value)
                 value.atOffset(offset)
             }
-            is OffsetDateTime -> value
-            is String -> OffsetDateTime.parse(value)
-            else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
+
+            is OffsetDateTime -> {
+                value
+            }
+
+            is String -> {
+                OffsetDateTime.parse(value)
+            }
+
+            else -> {
+                error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
+            }
         }
     }
 
@@ -535,6 +544,7 @@ class R2dbcUByteType(override val name: String, toLiteral: (DataType.(UByte?) ->
             is Number -> value.toLong().also {
                 if (it < 0L) error("Negative value isn't convertible to UByte. value=$value")
             }.toUByte()
+
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
     }
@@ -550,6 +560,7 @@ class R2dbcUIntType(override val name: String, toLiteral: (DataType.(UInt?) -> S
             is Number -> value.toLong().also {
                 if (it < 0L) error("Negative value isn't convertible to UInt. value=$value")
             }.toUInt()
+
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
     }
@@ -566,6 +577,7 @@ class R2dbcUShortType(override val name: String, toLiteral: (DataType.(UShort?) 
             is Number -> value.toLong().also {
                 if (it < 0L) error("Negative value isn't convertible to UShort. value=$value")
             }.toUShort()
+
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
     }

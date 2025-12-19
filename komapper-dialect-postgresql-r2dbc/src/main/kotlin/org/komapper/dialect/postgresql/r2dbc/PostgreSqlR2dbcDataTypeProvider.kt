@@ -97,12 +97,30 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
     private fun <T : Any> getArrayDataType(type: KType): R2dbcDataType<T>? {
         return when (val klass = type.classifier as KClass<*>) {
             // CharArray and ByteArray are not supported.
-            BooleanArray::class -> createArrayType(Any::class, Boolean::class)
-            DoubleArray::class -> createArrayType(Any::class, Double::class)
-            FloatArray::class -> createArrayType(Any::class, Float::class)
-            IntArray::class -> createArrayType(Any::class, Int::class)
-            LongArray::class -> createArrayType(Any::class, Long::class)
-            ShortArray::class -> createArrayType(Any::class, Short::class)
+            BooleanArray::class -> {
+                createArrayType(Any::class, Boolean::class)
+            }
+
+            DoubleArray::class -> {
+                createArrayType(Any::class, Double::class)
+            }
+
+            FloatArray::class -> {
+                createArrayType(Any::class, Float::class)
+            }
+
+            IntArray::class -> {
+                createArrayType(Any::class, Int::class)
+            }
+
+            LongArray::class -> {
+                createArrayType(Any::class, Long::class)
+            }
+
+            ShortArray::class -> {
+                createArrayType(Any::class, Short::class)
+            }
+
             else -> {
                 if (Array::class.java.isAssignableFrom(klass.java)) {
                     val componentType = klass.java.componentType.kotlin

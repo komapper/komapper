@@ -12,14 +12,18 @@ internal class JdbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
 ) {
     fun preInsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         val newEntity = when (val idGenerator = context.target.idGenerator()) {
-            is IdGenerator.Sequence<ENTITY, ID> ->
+            is IdGenerator.Sequence<ENTITY, ID> -> {
                 if (!context.target.disableSequenceAssignment() && !context.options.disableSequenceAssignment) {
                     val id = idGenerator.execute(config, context.options)
                     idGenerator.property.setter(entity, id)
                 } else {
                     null
                 }
-            else -> null
+            }
+
+            else -> {
+                null
+            }
         }
         val clock = config.clockProvider.now()
         return context.target.preInsert(newEntity ?: entity, clock)

@@ -57,44 +57,144 @@ internal class ExprParser(
             tokenType = tokenizer.next()
             token = tokenizer.token
             when (tokenType) {
-                EOE -> break@outer
-                OPEN_PAREN -> parseParen()
-                CLOSE_PAREN -> break@outer
+                EOE -> {
+                    break@outer
+                }
+
+                OPEN_PAREN -> {
+                    parseParen()
+                }
+
+                CLOSE_PAREN -> {
+                    break@outer
+                }
+
                 WHITESPACE, EOL -> {
                 }
-                CLASS_REF -> parseClassRef()
-                VALUE -> parseValue()
-                CALLABLE_VALUE -> parseCallableValue()
-                CHAR -> parseCharLiteral()
-                STRING -> parseStringLiteral()
-                INT -> parseIntLiteral()
-                LONG -> parseLongLiteral()
-                FLOAT -> parseFloatLiteral()
-                DOUBLE -> parseDoubleLiteral()
-                BIG_DECIMAL -> parseBigDecimalLiteral()
-                TRUE -> parseTrueLiteral()
-                FALSE -> parseFalseLiteral()
-                NULL -> parseNullLiteral()
-                NOT -> pushReducer(NotReducer(location))
-                AND -> pushReducer(AndReducer(location))
-                OR -> pushReducer(OrReducer(location))
-                COMMA -> pushReducer(CommaReducer(location))
-                EQ -> pushReducer(EqReducer(location))
-                NE -> pushReducer(NeReducer(location))
-                GE -> pushReducer(GeReducer(location))
-                LE -> pushReducer(LeReducer(location))
-                GT -> pushReducer(GtReducer(location))
-                LT -> pushReducer(LtReducer(location))
-                IS -> pushReducer(IsReducer(location))
-                AS -> pushReducer(AsReducer(location))
-                SAFE_CALL_FUNCTION -> parseFunction(true)
-                SAFE_CALL_PROPERTY -> parseProperty(true)
-                FUNCTION -> parseFunction()
-                PROPERTY -> parseProperty()
-                ILLEGAL_NUMBER ->
+
+                CLASS_REF -> {
+                    parseClassRef()
+                }
+
+                VALUE -> {
+                    parseValue()
+                }
+
+                CALLABLE_VALUE -> {
+                    parseCallableValue()
+                }
+
+                CHAR -> {
+                    parseCharLiteral()
+                }
+
+                STRING -> {
+                    parseStringLiteral()
+                }
+
+                INT -> {
+                    parseIntLiteral()
+                }
+
+                LONG -> {
+                    parseLongLiteral()
+                }
+
+                FLOAT -> {
+                    parseFloatLiteral()
+                }
+
+                DOUBLE -> {
+                    parseDoubleLiteral()
+                }
+
+                BIG_DECIMAL -> {
+                    parseBigDecimalLiteral()
+                }
+
+                TRUE -> {
+                    parseTrueLiteral()
+                }
+
+                FALSE -> {
+                    parseFalseLiteral()
+                }
+
+                NULL -> {
+                    parseNullLiteral()
+                }
+
+                NOT -> {
+                    pushReducer(NotReducer(location))
+                }
+
+                AND -> {
+                    pushReducer(AndReducer(location))
+                }
+
+                OR -> {
+                    pushReducer(OrReducer(location))
+                }
+
+                COMMA -> {
+                    pushReducer(CommaReducer(location))
+                }
+
+                EQ -> {
+                    pushReducer(EqReducer(location))
+                }
+
+                NE -> {
+                    pushReducer(NeReducer(location))
+                }
+
+                GE -> {
+                    pushReducer(GeReducer(location))
+                }
+
+                LE -> {
+                    pushReducer(LeReducer(location))
+                }
+
+                GT -> {
+                    pushReducer(GtReducer(location))
+                }
+
+                LT -> {
+                    pushReducer(LtReducer(location))
+                }
+
+                IS -> {
+                    pushReducer(IsReducer(location))
+                }
+
+                AS -> {
+                    pushReducer(AsReducer(location))
+                }
+
+                SAFE_CALL_FUNCTION -> {
+                    parseFunction(true)
+                }
+
+                SAFE_CALL_PROPERTY -> {
+                    parseProperty(true)
+                }
+
+                FUNCTION -> {
+                    parseFunction()
+                }
+
+                PROPERTY -> {
+                    parseProperty()
+                }
+
+                ILLEGAL_NUMBER -> {
                     throw ExprException("The illegal number literal \"$token\" is found at $location")
-                OTHER ->
+                }
+
+                OTHER -> {
                     throw ExprException("The token \"$token\" is not supported at $location")
+                }
             }
         }
         reduceAll()

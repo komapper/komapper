@@ -156,7 +156,10 @@ class SelectStatementBuilder(
                             )
                         }
                     }
-                    else -> Unit
+
+                    else -> {
+                        Unit
+                    }
                 }
             }
         }
@@ -234,7 +237,10 @@ class SelectStatementBuilder(
 
     private fun lockTarget(lockTarget: LockTarget) {
         when (lockTarget) {
-            is LockTarget.Empty -> Unit
+            is LockTarget.Empty -> {
+                Unit
+            }
+
             is LockTarget.Metamodels -> {
                 when (true) {
                     dialect.supportsLockOfColumns() -> {
@@ -259,9 +265,11 @@ class SelectStatementBuilder(
                         }
                     }
 
-                    else -> throw UnsupportedOperationException(
-                        "The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf"
-                    )
+                    else -> {
+                        throw UnsupportedOperationException(
+                            "The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf"
+                        )
+                    }
                 }
             }
         }
@@ -273,6 +281,7 @@ class SelectStatementBuilder(
         }
         when (lockOption) {
             is LockOption.Default -> Unit
+
             is LockOption.Nowait -> if (dialect.supportsLockOptionNowait()) {
                 buf.append(" nowait")
             } else {

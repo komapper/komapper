@@ -16,6 +16,7 @@ open class PostgreSqlSchemaStatementBuilder(dialect: BuilderDialect) :
                     Long::class -> "bigserial"
                     else -> error("Illegal assignment type: ${classifier.qualifiedName}")
                 }
+
                 else -> error("The classifier type must not be null.")
             }
         } else {

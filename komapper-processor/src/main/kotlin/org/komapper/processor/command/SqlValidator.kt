@@ -67,7 +67,9 @@ internal class SqlValidator(
                     }
                 }
 
-                else -> Unit
+                else -> {
+                    Unit
+                }
             }
             node.nodeList.fold(paramMap, ::visit)
         }
@@ -158,7 +160,9 @@ internal class SqlValidator(
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
         is SqlNode.WithDirective,
-        -> error("unreachable")
+        -> {
+            error("unreachable")
+        }
     }
 
     private fun validateExpression(location: SqlLocation, expression: String, paramMap: Map<String, KSType>): ExprEvalResult {

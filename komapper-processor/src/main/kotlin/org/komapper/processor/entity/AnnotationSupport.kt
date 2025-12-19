@@ -112,33 +112,47 @@ internal class AnnotationSupport(
                     linkAnnotation?.let { annotation ->
                         val source = annotation.findValue("source")?.toString().let {
                             when (it) {
-                                KomapperLink.SOURCE, null -> defaultSource
-                                !in sourceEntity.names ->
+                                KomapperLink.SOURCE, null -> {
+                                    defaultSource
+                                }
+
+                                !in sourceEntity.names -> {
                                     report(
                                         "@KomapperLink.source \"$it\" is invalid. It must be one of ${sourceEntity.names}.",
                                         node,
                                     )
+                                }
 
-                                else -> it
+                                else -> {
+                                    it
+                                }
                             }
                         }
                         val target = annotation.findValue("target")?.toString().let {
                             when (it) {
-                                KomapperLink.TARGET, null -> defaultTarget
-                                !in targetEntity.names ->
+                                KomapperLink.TARGET, null -> {
+                                    defaultTarget
+                                }
+
+                                !in targetEntity.names -> {
                                     report(
                                         "@KomapperLink.target \"$it\" is invalid. It must be one of ${targetEntity.names}.",
                                         node,
                                     )
+                                }
 
-                                else -> it
+                                else -> {
+                                    it
+                                }
                             }
                         }
                         Link(source, target)
                     }
                 }
 
-                else -> null
+                else -> {
+                    null
+                }
             }
         } ?: report("Cannot get a value from the link property", annotation)
         val navigator = annotation.findValue("navigator")?.toString()?.trim().let { navigator ->
@@ -168,7 +182,9 @@ internal class AnnotationSupport(
                     }
                 }
 
-                else -> null
+                else -> {
+                    null
+                }
             }
         }
         return definitionSource
@@ -195,17 +211,20 @@ internal class AnnotationSupport(
             if (type !is KSType) report("The alternateType is not KSType.", columnAnnotation)
             val classDeclaration = type.declaration as? KSClassDeclaration
             when {
-                classDeclaration == null ->
+                classDeclaration == null -> {
                     report("The alternateType property is illegal.", columnAnnotation)
+                }
 
-                classDeclaration.qualifiedName?.asString() == Symbols.Void ->
+                classDeclaration.qualifiedName?.asString() == Symbols.Void -> {
                     null
+                }
 
-                !classDeclaration.isValueClass() ->
+                !classDeclaration.isValueClass() -> {
                     report(
                         "The alternateType property must be a value class. class=${classDeclaration.qualifiedName?.asString()}, modifiers=${classDeclaration.modifiers}",
                         columnAnnotation,
                     )
+                }
 
                 else -> {
                     val constructor = classDeclaration.primaryConstructor
@@ -273,25 +292,44 @@ internal class AnnotationSupport(
     private fun getEnumStrategy(annotation: KSAnnotation?): EnumStrategy {
         if (annotation == null) return context.config.enumStrategy
         val declaration = when (val type = annotation.findValue("type")) {
-            is KSType -> type.declaration // KSP 1
-            is KSDeclaration -> type // KSP 2
+            is KSType -> type.declaration
+
+            // KSP 1
+            is KSDeclaration -> type
+
+            // KSP 2
             else -> null
         }
         return when (declaration?.parentDeclaration?.qualifiedName?.asString()) {
             Symbols.EnumType -> {
                 when (declaration.simpleName.asString()) {
-                    Symbols.EnumType_NAME -> return EnumStrategy.Name
-                    Symbols.EnumType_TYPE -> return EnumStrategy.Type
-                    Symbols.EnumType_ORDINAL -> return EnumStrategy.Ordinal
+                    Symbols.EnumType_NAME -> {
+                        return EnumStrategy.Name
+                    }
+
+                    Symbols.EnumType_TYPE -> {
+                        return EnumStrategy.Type
+                    }
+
+                    Symbols.EnumType_ORDINAL -> {
+                        return EnumStrategy.Ordinal
+                    }
+
                     Symbols.EnumType_PROPERTY -> {
                         val hint = annotation.findValue("hint")?.toString()
                             ?: report("The hint property is missing", annotation)
                         EnumStrategy.Property(hint, annotation)
                     }
-                    else -> context.config.enumStrategy
+
+                    else -> {
+                        context.config.enumStrategy
+                    }
                 }
             }
-            else -> context.config.enumStrategy
+
+            else -> {
+                context.config.enumStrategy
+            }
         }
     }
 
