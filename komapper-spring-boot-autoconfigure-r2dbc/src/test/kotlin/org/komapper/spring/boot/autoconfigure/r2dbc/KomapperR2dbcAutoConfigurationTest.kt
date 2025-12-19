@@ -20,9 +20,9 @@ import org.komapper.r2dbc.R2dbcUserDefinedDataTypeAdapter
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import org.mockito.Mockito
 import org.springframework.boot.autoconfigure.AutoConfigurations
-import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
-import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails
-import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
+import org.springframework.boot.r2dbc.autoconfigure.R2dbcAutoConfiguration
+import org.springframework.boot.r2dbc.autoconfigure.R2dbcConnectionDetails
+import org.springframework.boot.r2dbc.autoconfigure.R2dbcTransactionManagerAutoConfiguration
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
