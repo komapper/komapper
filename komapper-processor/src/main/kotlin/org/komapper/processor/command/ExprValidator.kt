@@ -52,28 +52,88 @@ internal class ExprValidator(
     }
 
     private fun visit(node: ExprNode, paramMap: Map<String, KSType>): KSType = when (node) {
-        is ExprNode.Not -> perform(node.location, node.operand, paramMap)
-        is ExprNode.And -> perform(node.location, node.left, node.right, paramMap)
-        is ExprNode.Or -> perform(node.location, node.left, node.right, paramMap)
-        is ExprNode.Eq -> equal(node.location, node.left, node.right, paramMap)
-        is ExprNode.Ne -> equal(node.location, node.left, node.right, paramMap)
-        is ExprNode.Ge -> compare(node.location, node.left, node.right, paramMap)
-        is ExprNode.Gt -> compare(node.location, node.left, node.right, paramMap)
-        is ExprNode.Le -> compare(node.location, node.left, node.right, paramMap)
-        is ExprNode.Lt -> compare(node.location, node.left, node.right, paramMap)
-        is ExprNode.Is -> visitIs(node.location, node.left, node.right, paramMap)
-        is ExprNode.As -> visitAs(node.location, node.left, node.right, paramMap)
+        is ExprNode.Not -> {
+            perform(node.location, node.operand, paramMap)
+        }
+
+        is ExprNode.And -> {
+            perform(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Or -> {
+            perform(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Eq -> {
+            equal(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Ne -> {
+            equal(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Ge -> {
+            compare(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Gt -> {
+            compare(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Le -> {
+            compare(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Lt -> {
+            compare(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.Is -> {
+            visitIs(node.location, node.left, node.right, paramMap)
+        }
+
+        is ExprNode.As -> {
+            visitAs(node.location, node.left, node.right, paramMap)
+        }
+
         is ExprNode.Literal -> {
             when (node.type) {
-                typeOf<Byte>() -> context.resolver.builtIns.byteType
-                typeOf<Short>() -> context.resolver.builtIns.shortType
-                typeOf<Int>() -> context.resolver.builtIns.intType
-                typeOf<Long>() -> context.resolver.builtIns.longType
-                typeOf<Float>() -> context.resolver.builtIns.floatType
-                typeOf<Double>() -> context.resolver.builtIns.doubleType
-                typeOf<Char>() -> context.resolver.builtIns.charType
-                typeOf<Boolean>() -> context.resolver.builtIns.booleanType
-                typeOf<String>() -> context.resolver.builtIns.stringType
+                typeOf<Byte>() -> {
+                    context.resolver.builtIns.byteType
+                }
+
+                typeOf<Short>() -> {
+                    context.resolver.builtIns.shortType
+                }
+
+                typeOf<Int>() -> {
+                    context.resolver.builtIns.intType
+                }
+
+                typeOf<Long>() -> {
+                    context.resolver.builtIns.longType
+                }
+
+                typeOf<Float>() -> {
+                    context.resolver.builtIns.floatType
+                }
+
+                typeOf<Double>() -> {
+                    context.resolver.builtIns.doubleType
+                }
+
+                typeOf<Char>() -> {
+                    context.resolver.builtIns.charType
+                }
+
+                typeOf<Boolean>() -> {
+                    context.resolver.builtIns.booleanType
+                }
+
+                typeOf<String>() -> {
+                    context.resolver.builtIns.stringType
+                }
+
                 else -> {
                     val klass = node.type.classifier as? KClass<*>
                     klass?.qualifiedName?.let {
@@ -90,12 +150,29 @@ internal class ExprValidator(
             KSTypeList(types)
         }
 
-        is ExprNode.ClassRef -> visitClassRef(node, paramMap)
-        is ExprNode.Value -> visitValue(node, paramMap)
-        is ExprNode.CallableValue -> visitCallableValue(node, paramMap)
-        is ExprNode.Property -> visitProperty(node, paramMap)
-        is ExprNode.Function -> visitFunction(node, paramMap)
-        is ExprNode.Empty -> context.resolver.builtIns.unitType
+        is ExprNode.ClassRef -> {
+            visitClassRef(node, paramMap)
+        }
+
+        is ExprNode.Value -> {
+            visitValue(node, paramMap)
+        }
+
+        is ExprNode.CallableValue -> {
+            visitCallableValue(node, paramMap)
+        }
+
+        is ExprNode.Property -> {
+            visitProperty(node, paramMap)
+        }
+
+        is ExprNode.Function -> {
+            visitFunction(node, paramMap)
+        }
+
+        is ExprNode.Empty -> {
+            context.resolver.builtIns.unitType
+        }
     }
 
     private fun perform(
@@ -222,6 +299,7 @@ internal class ExprValidator(
             ?: throw InvokeFunctionNotFoundException("The variable \"${node.name}\" does not have a invoke function at ${node.location}.")
         val argList = when (val args = visit(node.args, paramMap)) {
             is KSTypeList -> args.argList
+
             else -> if (args == unitType) {
                 emptyList()
             } else {
@@ -278,6 +356,7 @@ internal class ExprValidator(
         val receiver = visit(node.receiver, paramMap)
         val argList = when (val args = visit(node.args, paramMap)) {
             is KSTypeList -> args.argList
+
             else -> if (args == unitType) {
                 emptyList()
             } else {

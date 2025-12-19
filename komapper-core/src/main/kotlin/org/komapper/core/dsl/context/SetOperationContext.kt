@@ -27,7 +27,10 @@ data class SetOperationContext(
     override fun getTables(): Set<TableExpression<*>> {
         fun visitSubqueryContext(subqueryContext: SubqueryContext): Set<TableExpression<*>> {
             return when (subqueryContext) {
-                is SelectContext<*, *, *> -> setOf(subqueryContext.target)
+                is SelectContext<*, *, *> -> {
+                    setOf(subqueryContext.target)
+                }
+
                 is SetOperationContext -> {
                     visitSubqueryContext(subqueryContext.left) + visitSubqueryContext(subqueryContext.right)
                 }

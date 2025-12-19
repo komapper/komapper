@@ -30,7 +30,7 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
             .apply {
                 useKsp2()
                 languageVersion = "2.1"
-                apiVersion = "1.8"
+                apiVersion = "1.9"
                 workingDir = tempDir!!.toFile()
                 inheritClassPath = true
                 symbolProcessorProviders = providers.toMutableList()

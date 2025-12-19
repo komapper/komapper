@@ -164,6 +164,7 @@ private fun toUnitDeclaration(symbol: Any?, errorHandler: () -> Nothing): KSClas
                 else -> errorHandler()
             }
         }
+
         else -> null
     }
 }

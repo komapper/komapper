@@ -27,8 +27,9 @@ internal class PartialProcessor(
                     log(context, result.exit)
                 }
 
-                is PartialAnalysisResult.Error ->
+                is PartialAnalysisResult.Error -> {
                     log(context, result.exit)
+                }
             }
         }
         return emptyList()

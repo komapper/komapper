@@ -26,7 +26,10 @@ class SetOperationStatementBuilder(
 
     private fun visitSubqueryContext(subqueryContext: SubqueryContext) {
         when (subqueryContext) {
-            is SelectContext<*, *, *> -> visitSelectContext(subqueryContext)
+            is SelectContext<*, *, *> -> {
+                visitSelectContext(subqueryContext)
+            }
+
             is SetOperationContext -> {
                 visitSubqueryContext(subqueryContext.left)
                 val operator = when (subqueryContext.kind) {
@@ -39,6 +42,7 @@ class SetOperationStatementBuilder(
                             )
                         }
                     }
+
                     SetOperationKind.EXCEPT -> {
                         if (dialect.supportsSetOperationExcept()) {
                             "except"
@@ -50,8 +54,14 @@ class SetOperationStatementBuilder(
                             )
                         }
                     }
-                    SetOperationKind.UNION -> "union"
-                    SetOperationKind.UNION_ALL -> "union all"
+
+                    SetOperationKind.UNION -> {
+                        "union"
+                    }
+
+                    SetOperationKind.UNION_ALL -> {
+                        "union all"
+                    }
                 }
                 buf.append(" $operator ")
                 visitSubqueryContext(subqueryContext.right)

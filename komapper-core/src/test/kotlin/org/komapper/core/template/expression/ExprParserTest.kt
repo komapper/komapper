@@ -13,7 +13,9 @@ class ExprParserTest {
                 assertEquals("aaa.bbb.Ccc", expr.name)
             }
 
-            else -> throw AssertionError(expr)
+            else -> {
+                throw AssertionError(expr)
+            }
         }
     }
 
@@ -25,7 +27,9 @@ class ExprParserTest {
                 assertTrue(expr.right is ExprNode.Literal)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -37,7 +41,9 @@ class ExprParserTest {
                 assertTrue(expr.right is ExprNode.ClassRef)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -49,7 +55,9 @@ class ExprParserTest {
                 assertTrue(expr.right is ExprNode.Literal)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -62,7 +70,9 @@ class ExprParserTest {
                 assertEquals("aaa", (expr.receiver as ExprNode.Value).name)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -79,7 +89,9 @@ class ExprParserTest {
                 assertEquals("aaa", grandParent.name)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -92,7 +104,9 @@ class ExprParserTest {
                 assertEquals("aaa", (expr.receiver as ExprNode.Value).name)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -127,7 +141,9 @@ class ExprParserTest {
                 assertEquals("aaa", grandParent.name)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 
@@ -138,7 +154,9 @@ class ExprParserTest {
                 assertEquals(3, expr.nodeList.size)
             }
 
-            else -> throw AssertionError()
+            else -> {
+                throw AssertionError()
+            }
         }
     }
 

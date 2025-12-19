@@ -41,11 +41,17 @@ data class Statement(val parts: List<StatementPart>) {
         var index = 0
         return parts.joinToString(separator = "") { part ->
             when (part) {
-                is StatementPart.Text -> part
+                is StatementPart.Text -> {
+                    part
+                }
+
                 is StatementPart.Value -> {
                     format(index++, part)
                 }
-                is StatementPart.ReturnParameter -> part
+
+                is StatementPart.ReturnParameter -> {
+                    part
+                }
             }
         }
     }
@@ -58,12 +64,18 @@ data class Statement(val parts: List<StatementPart>) {
     fun toSqlWithArgs(format: (Any?, KType, Boolean) -> CharSequence): String {
         return parts.joinToString(separator = "") { part ->
             when (part) {
-                is StatementPart.Text -> part.text
+                is StatementPart.Text -> {
+                    part.text
+                }
+
                 is StatementPart.Value -> {
                     val value = part.value
                     format(value.any, value.type, value.masking)
                 }
-                is StatementPart.ReturnParameter -> part
+
+                is StatementPart.ReturnParameter -> {
+                    part
+                }
             }
         }
     }

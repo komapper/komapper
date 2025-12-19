@@ -23,16 +23,18 @@ internal class CommandProcessor(
         for (symbol in symbols) {
             val analyzer = CommandAnalyzer(context, annotationClass)
             when (val result = analyzer.analyze(symbol)) {
-                is CommandAnalysisResult.Success ->
+                is CommandAnalysisResult.Success -> {
                     generateMetamodel(context, result.command)
+                }
 
                 is CommandAnalysisResult.Failure -> {
                     log(context, result.exit)
                     generateMetamodel(context, result.command)
                 }
 
-                is CommandAnalysisResult.Error ->
+                is CommandAnalysisResult.Error -> {
                     log(context, result.exit)
+                }
             }
         }
         return emptyList()

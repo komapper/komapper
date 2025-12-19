@@ -494,11 +494,26 @@ class BuilderSupport(
 
     private fun visitWindowFunction(function: WindowFunction<*, *>) {
         when (function) {
-            is RowNumber -> buf.append("row_number()")
-            is Rank -> buf.append("rank()")
-            is DenseRank -> buf.append("dense_rank()")
-            is PercentRank -> buf.append("percent_rank()")
-            is CumeDist -> buf.append("cume_dist()")
+            is RowNumber -> {
+                buf.append("row_number()")
+            }
+
+            is Rank -> {
+                buf.append("rank()")
+            }
+
+            is DenseRank -> {
+                buf.append("dense_rank()")
+            }
+
+            is PercentRank -> {
+                buf.append("percent_rank()")
+            }
+
+            is CumeDist -> {
+                buf.append("cume_dist()")
+            }
+
             is Ntile -> {
                 buf.append("ntile(")
                 visitOperand(function.bucketSize)
@@ -557,7 +572,9 @@ class BuilderSupport(
                 buf.append(")")
             }
 
-            is AggregateFunction<*, *> -> visitAggregateFunction(function)
+            is AggregateFunction<*, *> -> {
+                visitAggregateFunction(function)
+            }
         }
     }
 
@@ -585,9 +602,18 @@ class BuilderSupport(
 
     private fun visitWindowFrameBound(bound: WindowFrameBound) {
         when (bound) {
-            is WindowFrameBound.CurrentRow -> buf.append("current row")
-            is WindowFrameBound.UnboundedFollowing -> buf.append("unbounded following")
-            is WindowFrameBound.UnboundedPreceding -> buf.append("unbounded preceding")
+            is WindowFrameBound.CurrentRow -> {
+                buf.append("current row")
+            }
+
+            is WindowFrameBound.UnboundedFollowing -> {
+                buf.append("unbounded following")
+            }
+
+            is WindowFrameBound.UnboundedPreceding -> {
+                buf.append("unbounded preceding")
+            }
+
             is WindowFrameBound.Following -> {
                 if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
                     buf.bind(Value(bound.offset, typeOf<Int>()))
@@ -633,7 +659,10 @@ class BuilderSupport(
         val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
         fun visit(e: EscapeExpression) {
             when (e) {
-                is EscapeExpression.Text -> patternBuf.append(e.value)
+                is EscapeExpression.Text -> {
+                    patternBuf.append(e.value)
+                }
+
                 is EscapeExpression.Escape -> {
                     val escaped = dialect.escape(e.value.toString(), finalEscapeSequence)
                     patternBuf.append(escaped)

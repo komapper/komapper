@@ -392,7 +392,7 @@ internal class SqlTokenizer(private val sql: String) {
                     if (c2 == '*' && c3 == '/') {
                         return
                     }
-                    if (c2 == '\r' && c3 == '\n' || c2 == '\r' || c2 == '\n') {
+                    if ((c2 == '\r' && c3 == '\n') || c2 == '\r' || c2 == '\n') {
                         lineIndex++
                     }
                     buf.reset()

@@ -12,6 +12,7 @@ sealed class Projection {
     fun expressions(projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }): List<ColumnExpression<*, *>> {
         return when (this) {
             is Expressions -> this.expressions.filter(projectionPredicate)
+
             is Metamodels -> this.metamodels.flatMap {
                 it.properties().filter(projectionPredicate)
             }
