@@ -162,6 +162,7 @@ internal class ContextualR2dbcDatabaseImpl(
         return with(context) {
             when (transactionAttribute) {
                 TransactionAttribute.REQUIRED -> coroutineTransactionOperator.required(transactionProperty, block)
+
                 TransactionAttribute.REQUIRES_NEW -> coroutineTransactionOperator.requiresNew(
                     transactionProperty,
                     block,

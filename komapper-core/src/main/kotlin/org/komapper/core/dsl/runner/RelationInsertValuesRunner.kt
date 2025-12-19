@@ -23,7 +23,10 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
                 val argument = Operand.Argument(idGenerator.property, null)
                 idGenerator.property to argument
             }
-            else -> null
+
+            else -> {
+                null
+            }
         }
         val statement = buildStatement(config, idAssignment)
         return DryRunStatement.of(statement, config)

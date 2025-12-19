@@ -50,7 +50,10 @@ internal class TwoWayTemplateStatementBuilder(
     }
 
     private fun visit(state: State, node: SqlNode): State = when (node) {
-        is SqlNode.Statement -> node.nodeList.fold(state, ::visit)
+        is SqlNode.Statement -> {
+            node.nodeList.fold(state, ::visit)
+        }
+
         is SqlNode.Set -> {
             val left = visit(State(state.asExprContext()), node.left)
             if (left.available) {
@@ -152,7 +155,9 @@ internal class TwoWayTemplateStatementBuilder(
                                     .bind(newValue(t)).append(")")
                             }
 
-                            else -> state.bind(newValue(o))
+                            else -> {
+                                state.bind(newValue(o))
+                            }
                         }
                     }
                     if (counter == 0) {
@@ -280,7 +285,9 @@ internal class TwoWayTemplateStatementBuilder(
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
         is SqlNode.WithDirective,
-        -> error("unreachable")
+        -> {
+            error("unreachable")
+        }
     }
 
     private fun newValue(o: Any?): Value<*> {
@@ -296,7 +303,10 @@ internal class TwoWayTemplateStatementBuilder(
             val property = klass.declaredMemberProperties.firstOrNull { it.name == parameter.name }
                 ?: error("The property is not found. parameter=${parameter.name}, class=${klass.qualifiedName}.")
             val v = when (val any = value.any) {
-                null -> null
+                null -> {
+                    null
+                }
+
                 else -> {
                     @Suppress("UNCHECKED_CAST")
                     property as KProperty1<Any, *>

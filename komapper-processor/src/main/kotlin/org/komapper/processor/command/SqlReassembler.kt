@@ -152,7 +152,9 @@ internal class SqlReassembler(
         is SqlNode.EndDirective,
         is SqlNode.ForDirective,
         is SqlNode.WithDirective,
-        -> error("unreachable")
+        -> {
+            error("unreachable")
+        }
     }
 
     private fun getPartialSql(classDeclaration: KSClassDeclaration, qualifiedName: String, node: SqlNode.PartialDirective): String {

@@ -53,17 +53,29 @@ internal class DefaultExprEvaluator(
 
     private fun visit(node: ExprNode, ctx: ExprContext): Value<*> = when (node) {
         is ExprNode.Not -> perform(node.location, node.operand, ctx) { !it }
+
         is ExprNode.And -> perform(node.location, node.left, node.right, ctx) { x, y -> x && y }
+
         is ExprNode.Or -> perform(node.location, node.left, node.right, ctx) { x, y -> x || y }
+
         is ExprNode.Eq -> equal(node.location, node.left, node.right, ctx) { x, y -> x == y }
+
         is ExprNode.Ne -> equal(node.location, node.left, node.right, ctx) { x, y -> x != y }
+
         is ExprNode.Ge -> compare(node.location, node.left, node.right, ctx) { x, y -> x >= y }
+
         is ExprNode.Gt -> compare(node.location, node.left, node.right, ctx) { x, y -> x > y }
+
         is ExprNode.Le -> compare(node.location, node.left, node.right, ctx) { x, y -> x <= y }
+
         is ExprNode.Lt -> compare(node.location, node.left, node.right, ctx) { x, y -> x < y }
+
         is ExprNode.Is -> visitIs(node.location, node.left, node.right, ctx)
+
         is ExprNode.As -> visitAs(node.location, node.left, node.right, ctx)
+
         is ExprNode.Literal -> Value(node.value, node.type)
+
         is ExprNode.Comma -> node.nodeList.map {
             visit(it, ctx)
         }.map { it.any }.toCollection(ExprArgList()).let {
@@ -74,10 +86,15 @@ internal class DefaultExprEvaluator(
         }
 
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
+
         is ExprNode.Value -> visitValue(node, ctx)
+
         is ExprNode.CallableValue -> visitCallableValue(node, ctx)
+
         is ExprNode.Property -> visitProperty(node, ctx)
+
         is ExprNode.Function -> visitFunction(node, ctx)
+
         is ExprNode.Empty -> Value(Unit, typeOf<Unit>())
     }
 

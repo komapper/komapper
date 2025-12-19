@@ -162,9 +162,18 @@ internal class R2dbcExecutor(
                     throw cause
                 }
             }
-            is RuntimeException -> throw cause
-            is Exception -> throw RuntimeException(cause)
-            else -> throw cause
+
+            is RuntimeException -> {
+                throw cause
+            }
+
+            is Exception -> {
+                throw RuntimeException(cause)
+            }
+
+            else -> {
+                throw cause
+            }
         }
     }
 
@@ -220,6 +229,7 @@ internal class R2dbcExecutor(
         return result.map { row, _ ->
             when (val value = row.get(0)) {
                 is Number -> value.toLong()
+
                 else -> error(
                     "Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}"
                 )

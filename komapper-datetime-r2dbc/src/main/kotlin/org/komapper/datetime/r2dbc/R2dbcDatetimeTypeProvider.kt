@@ -23,12 +23,16 @@ class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataType
                     ?: error("The dataType is not found for java.time.LocalDate.")
                 JdbcKotlinLocalDateType(dataType)
             }
+
             LocalDateTime::class -> {
                 val dataType = next.get<java.time.LocalDateTime>(typeOf<java.time.LocalDateTime>())
                     ?: error("The dataType is not found for java.time.LocalDateTime.")
                 JdbcKotlinLocalDateTimeType(dataType)
             }
-            else -> next.get<T>(type)
+
+            else -> {
+                next.get<T>(type)
+            }
         }
         @Suppress("UNCHECKED_CAST")
         return dataType as R2dbcDataType<T>?

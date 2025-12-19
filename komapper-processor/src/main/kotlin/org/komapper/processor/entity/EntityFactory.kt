@@ -92,6 +92,7 @@ internal class EntityFactory(
                         parameter = parameter,
                         declaration = declaration,
                     )
+
                     is LeafPropertyDef -> createLeafProperty(
                         parameter = parameter,
                         declaration = declaration,
@@ -101,6 +102,7 @@ internal class EntityFactory(
                         enumStrategy = propertyDef.enumStrategy,
                         parent = null,
                     )
+
                     else -> createLeafProperty(
                         parameter = parameter,
                         declaration = declaration,
@@ -228,9 +230,18 @@ internal class EntityFactory(
         val classDeclaration = type.declaration as? KSClassDeclaration
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
             when (val strategy = enumStrategy ?: context.config.enumStrategy) {
-                EnumStrategy.Name -> EnumClass(type, EnumStrategy.Name.typeName, strategy)
-                EnumStrategy.Type -> EnumClass(type, type.backquotedName, strategy)
-                EnumStrategy.Ordinal -> EnumClass(type, EnumStrategy.Ordinal.typeName, strategy)
+                EnumStrategy.Name -> {
+                    EnumClass(type, EnumStrategy.Name.typeName, strategy)
+                }
+
+                EnumStrategy.Type -> {
+                    EnumClass(type, type.backquotedName, strategy)
+                }
+
+                EnumStrategy.Ordinal -> {
+                    EnumClass(type, EnumStrategy.Ordinal.typeName, strategy)
+                }
+
                 is EnumStrategy.Property -> {
                     val propertyName = strategy.propertyName
                     val propertyType = classDeclaration.getDeclaredProperties()
@@ -379,22 +390,29 @@ internal class EntityFactory(
         if (idKind == null) return
         fun validate(annotationName: String) {
             when (property.typeName) {
-                "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
+                "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> {
+                    Unit
+                }
+
                 else -> {
                     when (val kotlinClass = property.kotlinClass) {
                         is ValueClass -> {
                             when (kotlinClass.property.typeName) {
                                 "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
+
                                 else -> report(
                                     "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
                                     property.node,
                                 )
                             }
                         }
-                        else -> report(
-                            "The type of $annotationName annotated property must be either Int, Long, UInt or value class.",
-                            property.node,
-                        )
+
+                        else -> {
+                            report(
+                                "The type of $annotationName annotated property must be either Int, Long, UInt or value class.",
+                                property.node,
+                            )
+                        }
                     }
                 }
             }
@@ -407,22 +425,29 @@ internal class EntityFactory(
 
     private fun validateVersionProperty(property: LeafProperty) {
         when (property.typeName) {
-            "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
+            "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> {
+                Unit
+            }
+
             else -> {
                 when (val kotlinClass = property.kotlinClass) {
                     is ValueClass -> {
                         when (kotlinClass.property.typeName) {
                             "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
+
                             else -> report(
                                 "When the type of @${KomapperVersion::class.simpleName} annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
                                 property.node,
                             )
                         }
                     }
-                    else -> report(
-                        "The type of @${KomapperVersion::class.simpleName} annotated property must be either Int, Long, UInt or value class.",
-                        property.node,
-                    )
+
+                    else -> {
+                        report(
+                            "The type of @${KomapperVersion::class.simpleName} annotated property must be either Int, Long, UInt or value class.",
+                            property.node,
+                        )
+                    }
                 }
             }
         }
@@ -430,22 +455,29 @@ internal class EntityFactory(
 
     private fun validateTimestampProperty(property: LeafProperty, annotationName: String) {
         when (property.typeName) {
-            Instant, LocalDateTime, OffsetDateTime, KotlinxInstant, KotlinxLocalDateTime, KotlinInstant -> Unit
+            Instant, LocalDateTime, OffsetDateTime, KotlinxInstant, KotlinxLocalDateTime, KotlinInstant -> {
+                Unit
+            }
+
             else -> {
                 when (val kotlinClass = property.kotlinClass) {
                     is ValueClass -> {
                         when (kotlinClass.property.typeName) {
                             Instant, LocalDateTime, OffsetDateTime, KotlinxInstant, KotlinxLocalDateTime, KotlinInstant -> Unit
+
                             else -> report(
                                 "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
                                 property.node,
                             )
                         }
                     }
-                    else -> report(
-                        "The type of $annotationName annotated property must be either Instant, LocalDateTime or OffsetDateTime.",
-                        property.node,
-                    )
+
+                    else -> {
+                        report(
+                            "The type of $annotationName annotated property must be either Instant, LocalDateTime or OffsetDateTime.",
+                            property.node,
+                        )
+                    }
                 }
             }
         }

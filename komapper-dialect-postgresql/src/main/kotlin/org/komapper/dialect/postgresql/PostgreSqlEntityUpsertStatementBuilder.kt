@@ -58,6 +58,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
                 onConflict(context.keys)
                 buf.append(" do nothing")
             }
+
             DuplicateKeyType.UPDATE -> {
                 onConflict(context.keys.ifEmpty { context.target.idProperties() })
                 buf.append(" do update set ")
