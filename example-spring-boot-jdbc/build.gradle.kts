@@ -12,6 +12,9 @@ dependencies {
     implementation(project(":komapper-spring-boot-starter-jdbc"))
     runtimeOnly(project(":komapper-dialect-h2-jdbc"))
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.boot.http.client)
+    testImplementation(libs.spring.boot.restclient)
+    testImplementation(libs.spring.boot.resttestclient)
 }
 
 ksp {

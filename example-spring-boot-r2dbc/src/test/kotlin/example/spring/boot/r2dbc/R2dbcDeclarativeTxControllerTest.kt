@@ -1,8 +1,8 @@
 package example.spring.boot.r2dbc
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -32,7 +32,7 @@ class R2dbcDeclarativeTxControllerTest {
         val (id, text) = restTemplate.getForObject(
             UriComponentsBuilder.fromUriString(baseUri).port(port).queryParam("text", "Hi!").build().toUri(),
             Message::class.java,
-        )
+        )!!
         assertNotNull(id)
         assertEquals("Hi!", text)
 

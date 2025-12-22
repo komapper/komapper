@@ -1,7 +1,7 @@
 package org.komapper.spring.boot.test.autoconfigure.jdbc
 
 import org.springframework.boot.context.TypeExcludeFilter
-import org.springframework.boot.test.autoconfigure.filter.StandardAnnotationCustomizableTypeExcludeFilter
+import org.springframework.boot.test.context.filter.annotation.StandardAnnotationCustomizableTypeExcludeFilter
 
 /**
  * [TypeExcludeFilter] for [@KomapperJdbcTest][KomapperJdbcTest].

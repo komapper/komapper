@@ -3,10 +3,9 @@ package org.komapper.spring.boot.test.autoconfigure.jdbc
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.cache.test.autoconfigure.AutoConfigureCache
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration
-import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache
-import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.context.filter.annotation.TypeExcludeFilters
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.env.Environment

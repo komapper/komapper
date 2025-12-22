@@ -1,6 +1,6 @@
 dependencies {
-    api(libs.spring.r2dbc)
     api(libs.spring.boot.autoconfigure)
+    api(libs.spring.boot.r2dbc)
     api(project(":komapper-r2dbc"))
     api(project(":komapper-spring-r2dbc"))
     testImplementation(project(":komapper-slf4j"))
