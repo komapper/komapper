@@ -4,7 +4,7 @@ ksp = "2.3.4"
 kotlinx-coroutines = "1.10.2"
 springframework = "6.2.15"
 spring-boot = "3.5.9"
-quarkus = "3.30.4"
+quarkus = "3.30.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
