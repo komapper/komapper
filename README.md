@@ -193,4 +193,4 @@ Our top backers are shown below!
 <a href="https://opencollective.com/komapper/backer/6/website" target="_blank"><img src="https://opencollective.com/komapper/backer/6/avatar.svg"></a>
 
 ## Powered by
-[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSourceSupport)
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)
