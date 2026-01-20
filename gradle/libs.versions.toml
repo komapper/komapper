@@ -4,7 +4,7 @@ ksp = "2.3.4"
 kotlinx-coroutines = "1.10.2"
 springframework = "7.0.2"
 spring-boot = "4.0.1"
-quarkus = "3.30.4"
+quarkus = "3.30.6"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -13,7 +13,7 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 
 ksp-symbol-processing = { module = "com.google.devtools.ksp:symbol-processing", version.ref = "ksp" }
 ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
-ksp-test = { module = "dev.zacsweers.kctfork:ksp", version = "0.12.0" }
+ksp-test = { module = "dev.zacsweers.kctfork:ksp", version = "0.12.1" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlinx-coroutines" }
@@ -25,7 +25,7 @@ jdbc-h2 = { module = "com.h2database:h2", version = "2.4.240" }
 jdbc-mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version = "3.5.7" }
 jdbc-mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 jdbc-oracle = { module = "com.oracle.database.jdbc:ojdbc11", version = "23.26.0.0.0" }
-jdbc-postgresql = { module = "org.postgresql:postgresql", version = "42.7.8" }
+jdbc-postgresql = { module = "org.postgresql:postgresql", version = "42.7.9" }
 jdbc-sqlserver = { module = "com.microsoft.sqlserver:mssql-jdbc", version = "12.10.2.jre11" }
 
 r2dbc-h2 = { module = "io.r2dbc:r2dbc-h2", version = "1.1.0.RELEASE" }
@@ -33,7 +33,7 @@ r2dbc-mariadb = { module = "org.mariadb:r2dbc-mariadb", version = "1.3.0" }
 r2dbc-mysql = { module = "com.github.jasync-sql:jasync-r2dbc-mysql", version = "2.2.4" }
 r2dbc-oracle = { module = "com.oracle.database.r2dbc:oracle-r2dbc", version = "1.3.0" }
 r2dbc-postgresql = { module = "org.postgresql:r2dbc-postgresql", version = "1.1.1.RELEASE" }
-r2dbc-sqlserver = { module = "io.r2dbc:r2dbc-mssql", version = "1.0.3.RELEASE" }
+r2dbc-sqlserver = { module = "io.r2dbc:r2dbc-mssql", version = "1.0.4.RELEASE" }
 
 r2dbc-spi = { module = "io.r2dbc:r2dbc-spi", version = "1.0.0.RELEASE" }
 r2dbc-pool = { module = "io.r2dbc:r2dbc-pool", version = "1.0.2.RELEASE" }
@@ -42,10 +42,10 @@ annotations = { module = "org.jetbrains:annotations", version = "26.0.2-1" }
 pluralize = { module = "io.github.encryptorcode:pluralize", version = "1.0.0" }
 hikariCP = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 sqlcommenter = { module = "com.google.cloud:sqlcommenter", version = "2.0.1" }
-opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "1.57.0" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version = "1.58.0" }
 jts-core = { module = "org.locationtech.jts:jts-core", version = "1.20.0" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.22" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.25" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
 
 spring-beans = { module = "org.springframework:spring-beans", version.ref = "springframework" }
