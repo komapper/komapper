@@ -1,9 +1,7 @@
 # AutoConfigureKomapperR2dbc auto-configuration imports
 org.komapper.spring.boot.autoconfigure.r2dbc.KomapperR2dbcAutoConfiguration
-org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
-org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration
-org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
-org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
-org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration
-org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration
+org.springframework.boot.r2dbc.autoconfigure.R2dbcAutoConfiguration
+org.springframework.boot.r2dbc.autoconfigure.R2dbcTransactionManagerAutoConfiguration
+org.springframework.boot.r2dbc.autoconfigure.R2dbcInitializationAutoConfiguration
+org.springframework.boot.transaction.autoconfigure.TransactionAutoConfiguration
 optional:org.springframework.boot.testcontainers.service.connection.ServiceConnectionAutoConfiguration
