@@ -1,6 +1,6 @@
 dependencies {
-    api(libs.spring.jdbc)
     api(libs.spring.boot.autoconfigure)
+    api(libs.spring.boot.jdbc)
     api(project(":komapper-jdbc"))
     api(project(":komapper-spring-jdbc"))
     testImplementation(project(":komapper-slf4j"))

@@ -2,8 +2,8 @@
 kotlin = "2.3.0"
 ksp = "2.3.4"
 kotlinx-coroutines = "1.10.2"
-springframework = "6.2.15"
-spring-boot = "3.5.9"
+springframework = "7.0.2"
+spring-boot = "4.0.1"
 quarkus = "3.30.6"
 
 [libraries]
@@ -57,6 +57,12 @@ spring-test = { module = "org.springframework:spring-test", version.ref = "sprin
 spring-tx = { module = "org.springframework:spring-tx", version.ref = "springframework" }
 
 spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot" }
+spring-boot-jdbc = { module = "org.springframework.boot:spring-boot-jdbc", version.ref = "spring-boot" }
+spring-boot-r2dbc = { module = "org.springframework.boot:spring-boot-r2dbc", version.ref = "spring-boot" }
+spring-boot-http-client = { module = "org.springframework.boot:spring-boot-http-client", version.ref = "spring-boot" }
+spring-boot-restclient = { module = "org.springframework.boot:spring-boot-restclient", version.ref = "spring-boot" }
+spring-boot-resttestclient = { module = "org.springframework.boot:spring-boot-resttestclient", version.ref = "spring-boot" }
+spring-boot-cache-test = { module = "org.springframework.boot:spring-boot-cache-test", version.ref = "spring-boot" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
