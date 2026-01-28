@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.3.0"
-ksp = "2.3.4"
+ksp = "2.3.5"
 kotlinx-coroutines = "1.10.2"
 springframework = "7.0.3"
 spring-boot = "4.0.2"
