@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 ksp = "2.3.5"
 kotlinx-coroutines = "1.10.2"
 springframework = "7.0.3"
