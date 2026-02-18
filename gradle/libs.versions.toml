@@ -38,7 +38,7 @@ r2dbc-sqlserver = { module = "io.r2dbc:r2dbc-mssql", version = "1.0.4.RELEASE" }
 r2dbc-spi = { module = "io.r2dbc:r2dbc-spi", version = "1.0.0.RELEASE" }
 r2dbc-pool = { module = "io.r2dbc:r2dbc-pool", version = "1.0.2.RELEASE" }
 
-annotations = { module = "org.jetbrains:annotations", version = "26.0.2-1" }
+annotations = { module = "org.jetbrains:annotations", version = "26.1.0" }
 pluralize = { module = "io.github.encryptorcode:pluralize", version = "1.0.0" }
 hikariCP = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 sqlcommenter = { module = "com.google.cloud:sqlcommenter", version = "2.0.1" }
