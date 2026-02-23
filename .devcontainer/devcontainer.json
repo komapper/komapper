@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/java:3-17",
 
   "features": {
-    "ghcr.io/devcontainers/features/java:1.6.3": {
+    "ghcr.io/devcontainers/features/java:1.7.2": {
       "version": "17",
       "jdkDistro": "tem"
     },
