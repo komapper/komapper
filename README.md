@@ -177,20 +177,17 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
-## Backers
+## Financial Contributors
 
-If you use Komapper in your project or enterprise and would like to support ongoing development, 
-please consider becoming a backer. [[Become a backer](https://opencollective.com/komapper#category-CONTRIBUTE)]
+Support Komapper's development on [Open Collective](https://opencollective.com/komapper#category-CONTRIBUTE).
 
-Our top backers are shown below!
+**Organizations**
 
-<a href="https://opencollective.com/komapper/backer/0/website" target="_blank"><img src="https://opencollective.com/komapper/backer/0/avatar.svg"></a>
-<a href="https://opencollective.com/komapper/backer/1/website" target="_blank"><img src="https://opencollective.com/komapper/backer/1/avatar.svg"></a>
-<a href="https://opencollective.com/komapper/backer/2/website" target="_blank"><img src="https://opencollective.com/komapper/backer/2/avatar.svg"></a>
-<a href="https://opencollective.com/komapper/backer/3/website" target="_blank"><img src="https://opencollective.com/komapper/backer/3/avatar.svg"></a>
-<a href="https://opencollective.com/komapper/backer/4/website" target="_blank"><img src="https://opencollective.com/komapper/backer/4/avatar.svg"></a>
-<a href="https://opencollective.com/komapper/backer/5/website" target="_blank"><img src="https://opencollective.com/komapper/backer/5/avatar.svg"></a>
-<a href="https://opencollective.com/komapper/backer/6/website" target="_blank"><img src="https://opencollective.com/komapper/backer/6/avatar.svg"></a>
+[![Organizations](https://opencollective.com/komapper/organizations.svg)](https://opencollective.com/komapper#category-CONTRIBUTE)
+
+**Individuals**
+
+[![Individuals](https://opencollective.com/komapper/individuals.svg)](https://opencollective.com/komapper#category-CONTRIBUTE)
 
 ## Powered by
 [![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)
