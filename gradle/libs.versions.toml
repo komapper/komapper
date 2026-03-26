@@ -3,7 +3,7 @@ kotlin = "2.3.20"
 ksp = "2.3.6"
 kotlinx-coroutines = "1.10.2"
 springframework = "7.0.6"
-spring-boot = "4.0.4"
+spring-boot = "4.0.5"
 quarkus = "3.30.6"
 
 [libraries]
