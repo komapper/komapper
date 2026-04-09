@@ -18,4 +18,4 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: release-drafter/release-drafter/autolabeler@139054aeaa9adc52ab36ddf67437541f039b88e2 # v7.1.1
+      - uses: release-drafter/release-drafter/autolabeler@5de93583980a40bd78603b6dfdcda5b4df377b32 # v7.2.0
