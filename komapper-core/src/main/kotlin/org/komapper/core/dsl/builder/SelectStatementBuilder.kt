@@ -77,6 +77,10 @@ class SelectStatementBuilder(
 
     private fun selectClause() {
         buf.append("select ")
+        val hint = context.options.hint
+        if (hint != null) {
+            buf.append("/* $hint */ ")
+        }
         if (context.distinct) {
             buf.append("distinct ")
         }
