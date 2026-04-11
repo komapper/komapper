@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.asFlux
 import org.komapper.spring.SpringTransactionDefinition
+import org.komapper.tx.core.EmptyTransactionProperty
 import org.komapper.tx.core.FlowTransactionOperator
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
@@ -17,13 +18,16 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import java.util.Optional
 import kotlin.coroutines.coroutineContext
 
-internal class SpringR2dbcFlowTransactionOperator(private val transactionManager: ReactiveTransactionManager, private val transaction: ReactiveTransaction? = null) :
-    FlowTransactionOperator {
+internal class SpringR2dbcFlowTransactionOperator(
+    private val transactionManager: ReactiveTransactionManager,
+    private val transaction: ReactiveTransaction? = null,
+    override val transactionProperty: TransactionProperty = EmptyTransactionProperty,
+) : FlowTransactionOperator {
     override fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
-        val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
+        val definition = SpringTransactionDefinition(this.transactionProperty + transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)
     }
 
@@ -31,12 +35,12 @@ internal class SpringR2dbcFlowTransactionOperator(private val transactionManager
         transactionProperty: TransactionProperty,
         block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
-        val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
+        val definition = SpringTransactionDefinition(this.transactionProperty + transactionProperty, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
     }
 
     private fun <R> execute(
-        definition: org.springframework.transaction.TransactionDefinition,
+        definition: SpringTransactionDefinition,
         block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         return flow {
@@ -44,7 +48,7 @@ internal class SpringR2dbcFlowTransactionOperator(private val transactionManager
             val txOp = TransactionalOperator.create(transactionManager, definition)
             val flux = txOp.execute { tx ->
                 flow {
-                    val operator = SpringR2dbcFlowTransactionOperator(transactionManager, tx)
+                    val operator = SpringR2dbcFlowTransactionOperator(transactionManager, tx, definition.transactionProperty)
                     try {
                         block(operator)
                     } finally {
@@ -72,5 +76,12 @@ internal class SpringR2dbcFlowTransactionOperator(private val transactionManager
             error("The transaction is null.")
         }
         return transaction.isRollbackOnly
+    }
+
+    override suspend fun isActive(): Boolean {
+        if (transaction == null) {
+            return false
+        }
+        return transaction.hasTransaction()
     }
 }
