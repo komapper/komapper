@@ -6,14 +6,15 @@ import org.komapper.tx.core.TransactionProperty
 
 internal class JdbcTransactionOperator(
     private val transactionManager: JdbcTransactionManager,
-    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
+    override val transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : TransactionOperator {
     override fun <R> required(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
-            block(this)
+            val operator = JdbcTransactionOperator(transactionManager, this.transactionProperty + transactionProperty)
+            block(operator)
         } else {
             executeInNewTransaction(transactionProperty, block)
         }
@@ -46,9 +47,11 @@ internal class JdbcTransactionOperator(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R,
     ): R {
-        transactionManager.begin(defaultTransactionProperty + transactionProperty)
+        val newTransactionProperty = this.transactionProperty + transactionProperty
+        transactionManager.begin(newTransactionProperty)
         return runCatching {
-            block(this)
+            val operator = JdbcTransactionOperator(transactionManager, newTransactionProperty)
+            block(operator)
         }.onSuccess {
             if (transactionManager.isRollbackOnly()) {
                 transactionManager.rollback()
@@ -70,5 +73,9 @@ internal class JdbcTransactionOperator(
 
     override fun isRollbackOnly(): Boolean {
         return transactionManager.isRollbackOnly()
+    }
+
+    override fun isActive(): Boolean {
+        return transactionManager.isActive()
     }
 }
