@@ -7,14 +7,15 @@ import org.komapper.tx.core.TransactionProperty
 
 internal class R2dbcCoroutineTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
-    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
+    override val transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : CoroutineTransactionOperator {
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
-            block(this)
+            val operator = R2dbcCoroutineTransactionOperator(transactionManager, this.transactionProperty + transactionProperty)
+            block(operator)
         } else {
             executeInNewTransaction(transactionProperty, block)
         }
@@ -40,10 +41,12 @@ internal class R2dbcCoroutineTransactionOperator(
         transactionProperty: TransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
-        val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
+        val newTransactionProperty = this.transactionProperty + transactionProperty
+        val txContext = transactionManager.begin(newTransactionProperty)
         return withContext(txContext) {
             runCatching {
-                block(this@R2dbcCoroutineTransactionOperator)
+                val operator = R2dbcCoroutineTransactionOperator(transactionManager, newTransactionProperty)
+                block(operator)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()
@@ -66,5 +69,9 @@ internal class R2dbcCoroutineTransactionOperator(
 
     override suspend fun isRollbackOnly(): Boolean {
         return transactionManager.isRollbackOnly()
+    }
+
+    override suspend fun isActive(): Boolean {
+        return transactionManager.isActive()
     }
 }
