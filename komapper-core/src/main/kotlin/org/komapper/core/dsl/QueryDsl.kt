@@ -8,8 +8,10 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
+import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.element.With
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ScalarExpression
@@ -93,6 +95,29 @@ interface QueryDsl {
     fun withRecursive(
         vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
     ): WithQueryDsl
+
+    /**
+     * Creates a VALUES subquery expression for use in CTEs or derived tables.
+     *
+     * Each element in the list becomes a single-column row in the VALUES clause.
+     * For example, `values(literal(1), literal(2), literal(3))` generates `VALUES (1), (2), (3)`.
+     *
+     * @param values the column expressions, each becoming a row
+     * @return the subquery expression
+     */
+    fun values(vararg values: ColumnExpression<*, *>): SubqueryExpression<*>
+
+    /**
+     * Creates a multi-column VALUES subquery expression for use in CTEs or derived tables.
+     *
+     * Each inner list represents a row in the VALUES clause.
+     * For example, `values(listOf(listOf(literal(1), literal("a")), listOf(literal(2), literal("b"))))`
+     * generates `VALUES (1, 'a'), (2, 'b')`.
+     *
+     * @param rows the list of rows, where each row is a list of column expressions
+     * @return the subquery expression
+     */
+    fun values(rows: List<List<ColumnExpression<*, *>>>): SubqueryExpression<*>
 
     /**
      * Creates a SELECT query builder.
@@ -316,6 +341,15 @@ internal class QueryDslImpl(
         return WithQueryDslImpl(with, selectOptions)
     }
 
+    override fun values(vararg values: ColumnExpression<*, *>): SubqueryExpression<*> {
+        val rows = values.map { listOf(it) }
+        return ValuesSubquery(ValuesContext(rows, selectOptions))
+    }
+
+    override fun values(rows: List<List<ColumnExpression<*, *>>>): SubqueryExpression<*> {
+        return ValuesSubquery(ValuesContext(rows, selectOptions))
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META,
     ): SelectQueryBuilder<ENTITY, ID, META> {
@@ -464,3 +498,7 @@ fun QueryDsl(
         updateOptions,
     )
 }
+
+internal data class ValuesSubquery(
+    override val context: ValuesContext,
+) : SubqueryExpression<Any>

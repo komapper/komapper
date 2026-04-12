@@ -9,6 +9,7 @@ import org.komapper.core.dsl.builder.SetOperationStatementBuilder
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.context.ValuesContext
 
 class SetOperationRunner(
     private val context: SetOperationContext,
@@ -37,6 +38,10 @@ class SetOperationRunner(
             is SetOperationContext -> {
                 checkWhereClauses(subqueryContext.left)
                 checkWhereClauses(subqueryContext.right)
+            }
+
+            is ValuesContext -> {
+                // VALUES has no WHERE clause, nothing to check
             }
         }
     }

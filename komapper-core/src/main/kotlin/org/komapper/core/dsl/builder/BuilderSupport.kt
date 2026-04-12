@@ -8,6 +8,7 @@ import org.komapper.core.Value
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
@@ -352,6 +353,11 @@ class BuilderSupport(
 
             is SetOperationContext -> {
                 val builder = SetOperationStatementBuilder(dialect, context, aliasManager, projectionPredicate)
+                builder.build()
+            }
+
+            is ValuesContext -> {
+                val builder = ValuesStatementBuilder(dialect, context)
                 builder.build()
             }
         }

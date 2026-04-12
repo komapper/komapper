@@ -6,6 +6,7 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.element.FullJoin
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
@@ -321,6 +322,10 @@ class SelectStatementBuilder(
                     left = assignAliasesToSubqueryColumns(subqueryContext.left, outerColumns),
                     right = assignAliasesToSubqueryColumns(subqueryContext.right, outerColumns),
                 )
+            }
+
+            is ValuesContext -> {
+                subqueryContext
             }
         }
     }

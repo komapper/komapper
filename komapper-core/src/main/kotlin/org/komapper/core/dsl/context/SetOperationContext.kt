@@ -19,6 +19,7 @@ data class SetOperationContext(
             return when (subqueryContext) {
                 is SelectContext<*, *, *> -> subqueryContext.getProjection()
                 is SetOperationContext -> visitSubqueryContext(subqueryContext.left)
+                is ValuesContext -> subqueryContext.getProjection()
             }
         }
         return visitSubqueryContext(left)
@@ -33,6 +34,10 @@ data class SetOperationContext(
 
                 is SetOperationContext -> {
                     visitSubqueryContext(subqueryContext.left) + visitSubqueryContext(subqueryContext.right)
+                }
+
+                is ValuesContext -> {
+                    emptySet()
                 }
             }
         }

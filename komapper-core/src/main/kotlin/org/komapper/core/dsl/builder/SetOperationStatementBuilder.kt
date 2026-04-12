@@ -7,6 +7,7 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.expression.ColumnExpression
 
 class SetOperationStatementBuilder(
@@ -66,12 +67,24 @@ class SetOperationStatementBuilder(
                 buf.append(" $operator ")
                 visitSubqueryContext(subqueryContext.right)
             }
+
+            is ValuesContext -> {
+                visitValuesContext(subqueryContext)
+            }
         }
     }
 
     private fun visitSelectContext(selectContext: SelectContext<*, *, *>) {
         val childAliasManager = DefaultAliasManager(selectContext, aliasManager)
         val builder = SelectStatementBuilder(dialect, selectContext, childAliasManager, projectionPredicate)
+        val statement = builder.build()
+        buf.append("(")
+        buf.append(statement)
+        buf.append(")")
+    }
+
+    private fun visitValuesContext(valuesContext: ValuesContext) {
+        val builder = ValuesStatementBuilder(dialect, valuesContext)
         val statement = builder.build()
         buf.append("(")
         buf.append(statement)
