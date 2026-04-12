@@ -111,6 +111,7 @@ class JdbcSelectWithTest(private val db: JdbcDatabase) {
         assertEquals(55, result)
     }
 
+    @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun withValues() {
         val t = Meta.t
