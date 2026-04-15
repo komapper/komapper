@@ -108,7 +108,7 @@ class QueryDslTest {
     fun selectOptions() {
         val a = Meta.address
 
-        val expected = SelectOptions(fetchSize = 10, queryTimeoutSeconds = 20, suppressLogging = true)
+        val expected = SelectOptions(fetchSize = 10, hint = "SET_VAR(query_timeout=3600)", queryTimeoutSeconds = 20, suppressLogging = true)
         var actual: SelectOptions? = null
         QueryDsl(selectOptions = expected).from(a).options {
             actual = it

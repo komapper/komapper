@@ -75,8 +75,23 @@ class SelectStatementBuilder(
         }
     }
 
+    private fun validatedHint(hint: String?): String? {
+        val normalized = hint?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        require(!normalized.contains("*/")) {
+            "The SQL hint must not contain the comment terminator '*/'."
+        }
+        require(normalized.none { it.isISOControl() }) {
+            "The SQL hint must not contain control characters."
+        }
+        return normalized
+    }
+
     private fun selectClause() {
         buf.append("select ")
+        val hint = validatedHint(context.options.hint)
+        if (hint != null) {
+            buf.append("/* $hint */ ")
+        }
         if (context.distinct) {
             buf.append("distinct ")
         }
