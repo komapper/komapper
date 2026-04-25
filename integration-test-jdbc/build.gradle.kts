@@ -129,6 +129,10 @@ fun JvmTestSuite.setup(identifier: String) {
                 val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
                 systemProperty("identifier", identifier)
                 systemProperty("url", url)
+                if (identifier == "oracle") {
+                    systemProperty("user.language", "en")
+                    systemProperty("user.country", "US")
+                }
             }
         }
     }
