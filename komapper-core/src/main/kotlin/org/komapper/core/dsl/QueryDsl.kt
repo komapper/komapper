@@ -58,6 +58,25 @@ interface QueryDsl {
     /**
      * Creates a `WITH` query DSL.
      *
+     * The example below defines a CTE named `employeeRank` that ranks employees within each department by salary,
+     * then joins it back to the `employee` table to pick the top-paid employee in every department.
+     * ```
+     * val e = Meta.employee
+     * val t = Meta.employeeRank
+     * val subquery = QueryDsl.from(e).select(
+     *     e.employeeId,
+     *     e.employeeName,
+     *     rank().over {
+     *         partitionBy(e.departmentId)
+     *         orderBy(e.salary.desc())
+     *     },
+     * )
+     * val query = QueryDsl.with(t, subquery)
+     *     .from(e)
+     *     .innerJoin(t) { e.employeeId eq t.employeeId }
+     *     .where { t.rank eq 1 }
+     * ```
+     *
      * @param metamodel the entity metamodel
      * @param subquery the subquery expression
      * @return the `WITH` query DSL
@@ -70,6 +89,18 @@ interface QueryDsl {
     /**
      * Creates a `WITH` query DSL with multiple pairs of entity metamodels and subquery expressions.
      *
+     * The example below declares two CTEs in a single `WITH` clause &mdash; one filtering addresses,
+     * the other filtering high-salary employees &mdash; and joins them in the main query.
+     * ```
+     * val a = Meta.address
+     * val e = Meta.employee
+     * val addressSubquery = QueryDsl.from(a).where { a.addressId less 5 }
+     * val employeeSubquery = QueryDsl.from(e).where { e.salary greater BigDecimal("2000") }
+     * val query = QueryDsl.with(a to addressSubquery, e to employeeSubquery)
+     *     .from(e)
+     *     .innerJoin(a) { e.addressId eq a.addressId }
+     * ```
+     *
      * @param pairs the pairs of entity metamodels and subquery expressions
      * @return the `WITH` query DSL
      */
@@ -79,6 +110,16 @@ interface QueryDsl {
 
     /**
      * Creates a `WITH RECURSIVE` query DSL.
+     *
+     * The example below builds a recursive CTE that generates the integers 1..10
+     * (a base case unioned with a recursive step) and then selects their sum from the CTE.
+     * ```
+     * val t = Meta.t
+     * val subquery = QueryDsl.select(literal(1)).unionAll(
+     *     QueryDsl.from(t).where { t.n less 10 }.select(t.n + 1),
+     * )
+     * val query = QueryDsl.withRecursive(t, subquery).from(t).select(sum(t.n))
+     * ```
      *
      * @param metamodel the entity metamodel
      * @param subquery the subquery expression
@@ -92,6 +133,22 @@ interface QueryDsl {
     /**
      * Creates a `WITH RECURSIVE` query DSL with multiple pairs of entity metamodels and subquery expressions.
      *
+     * The example below declares two recursive CTEs in a single `WITH RECURSIVE` clause
+     * (each generating a small integer sequence) and joins them on equal values.
+     * ```
+     * val t1 = Meta.t1
+     * val t2 = Meta.t2
+     * val subquery1 = QueryDsl.select(literal(1)).unionAll(
+     *     QueryDsl.from(t1).where { t1.n less 10 }.select(t1.n + 1),
+     * )
+     * val subquery2 = QueryDsl.select(literal(1)).unionAll(
+     *     QueryDsl.from(t2).where { t2.n less 5 }.select(t2.n + 1),
+     * )
+     * val query = QueryDsl.withRecursive(t1 to subquery1, t2 to subquery2)
+     *     .from(t1)
+     *     .innerJoin(t2) { t1.n eq t2.n }
+     * ```
+     *
      * @param pairs the pairs of entity metamodels and subquery expressions
      * @return the `WITH RECURSIVE` query DSL
      */
@@ -101,6 +158,42 @@ interface QueryDsl {
 
     /**
      * Creates a SELECT query builder.
+     *
+     * Basic filtering &mdash; selects all `Address` rows whose `street` equals `"STREET 1"`,
+     * ordered by `addressId`:
+     * ```
+     * val a = Meta.address
+     * val query: Query<List<Address>> = QueryDsl.from(a)
+     *     .where { a.street eq "STREET 1" }
+     *     .orderBy(a.addressId)
+     * ```
+     *
+     * Inner join &mdash; joins `Address` and `Employee` on `addressId`:
+     * ```
+     * val a = Meta.address
+     * val e = Meta.employee
+     * val query: Query<List<Address>> = QueryDsl.from(a)
+     *     .innerJoin(e) { a.addressId eq e.addressId }
+     * ```
+     *
+     * Aggregation &mdash; counts employees per department, returning departments with at least 4 employees:
+     * ```
+     * val e = Meta.employee
+     * val query: Query<List<Pair<Int?, Long?>>> = QueryDsl.from(e)
+     *     .groupBy(e.departmentId)
+     *     .having { count(e.employeeId) greaterEq 4L }
+     *     .orderBy(e.departmentId)
+     *     .select(e.departmentId, count(e.employeeId))
+     * ```
+     *
+     * Pagination with pessimistic lock &mdash; locks the first three rows ordered by `addressId`:
+     * ```
+     * val a = Meta.address
+     * val query: Query<List<Address>> = QueryDsl.from(a)
+     *     .orderBy(a.addressId)
+     *     .offset(10).limit(3)
+     *     .forUpdate { nowait() }
+     * ```
      *
      * @param ENTITY the entity type
      * @param ID the entity id type
@@ -114,6 +207,24 @@ interface QueryDsl {
 
     /**
      * Creates a SELECT query builder which uses a derived table.
+     *
+     * The example below builds a subquery that ranks employees by salary within each department,
+     * then uses it as a derived table to filter only the top-ranked employees.
+     * ```
+     * val e = Meta.employee
+     * val t = Meta.employeeRank
+     * val subquery = QueryDsl.from(e).select(
+     *     e.employeeId,
+     *     e.employeeName,
+     *     rank().over {
+     *         partitionBy(e.departmentId)
+     *         orderBy(e.salary.desc())
+     *     },
+     * )
+     * val query = QueryDsl.from(t, subquery)
+     *     .where { t.rank eq 1 }
+     *     .orderBy(t.employeeId)
+     * ```
      *
      * @param ENTITY the entity type
      * @param ID the entity id type
@@ -130,6 +241,23 @@ interface QueryDsl {
     /**
      * Creates a VALUES table constructor that can be used as a derived table.
      *
+     * The example below constructs an inline two-row table from literals and uses it as a derived table
+     * in a `SELECT ... FROM (VALUES ...)` query, ordered by `name`.
+     * ```
+     * val t = Meta.nameAndAmount
+     * val rows = QueryDsl.values(t) {
+     *     row {
+     *         t.name eq "alice"
+     *         t.amount eq BigDecimal("100")
+     *     }
+     *     row {
+     *         t.name eq "bob"
+     *         t.amount eq BigDecimal("200")
+     *     }
+     * }
+     * val query = QueryDsl.from(t, rows).orderBy(t.name)
+     * ```
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
@@ -145,6 +273,11 @@ interface QueryDsl {
     /**
      * Creates a SELECT query for a single column expression.
      *
+     * The example below issues a tableless `SELECT 1` and returns it as a single-element list.
+     * ```
+     * val query: Query<List<Int?>> = QueryDsl.select(literal(1))
+     * ```
+     *
      * @param A the type of the column expression
      * @param expression the column expression
      * @return a flow subquery for the column expression
@@ -153,6 +286,12 @@ interface QueryDsl {
 
     /**
      * Creates a SELECT query for two column expressions.
+     *
+     * The example below issues a tableless `SELECT 1, 'a'` and returns each row as a `Pair`.
+     * ```
+     * val query: Query<List<Pair<Int?, String?>>> =
+     *     QueryDsl.select(literal(1), literal("a"))
+     * ```
      *
      * @param A the type of the first column expression
      * @param B the type of the second column expression
@@ -167,6 +306,12 @@ interface QueryDsl {
 
     /**
      * Creates a SELECT query for three column expressions.
+     *
+     * The example below issues a tableless `SELECT 1, 'a', 2` and returns each row as a `Triple`.
+     * ```
+     * val query: Query<List<Triple<Int?, String?, Int?>>> =
+     *     QueryDsl.select(literal(1), literal("a"), literal(2))
+     * ```
      *
      * @param A the type of the first column expression
      * @param B the type of the second column expression
@@ -185,6 +330,15 @@ interface QueryDsl {
     /**
      * Creates a SELECT query for a scalar expression.
      *
+     * The scalar query produced here yields a single value and can be embedded directly in another query.
+     * The example below builds a `count()` subquery over `Address` and uses it as a scalar value
+     * in a `WHERE` clause comparison.
+     * ```
+     * val a = Meta.address
+     * val countSubquery = QueryDsl.from(a).select(count())
+     * val query = QueryDsl.from(a).where { a.addressId greater countSubquery }
+     * ```
+     *
      * @param T the exterior type of the scalar expression
      * @param S the interior type of the scalar expression
      * @param expression the scalar expression
@@ -196,6 +350,71 @@ interface QueryDsl {
 
     /**
      * Creates a INSERT query builder.
+     *
+     * Single insert &mdash; inserts a single `Address` entity and returns it
+     * (with any auto-generated values such as identifiers populated):
+     * ```
+     * val a = Meta.address
+     * val address = Address(16, "STREET 16", 0)
+     * val query: Query<Address> = QueryDsl.insert(a).single(address)
+     * ```
+     *
+     * Multiple insert &mdash; inserts several rows in a single SQL statement:
+     * ```
+     * val a = Meta.address
+     * val query: Query<List<Address>> = QueryDsl.insert(a).multiple(
+     *     Address(16, "STREET 16", 0),
+     *     Address(17, "STREET 17", 0),
+     *     Address(18, "STREET 18", 0),
+     * )
+     * ```
+     *
+     * Batch insert &mdash; inserts each row using a separate statement (useful for very large lists):
+     * ```
+     * val a = Meta.address
+     * val query: Query<List<Address>> = QueryDsl.insert(a).batch(
+     *     Address(16, "STREET 16", 0),
+     *     Address(17, "STREET 17", 0),
+     *     Address(18, "STREET 18", 0),
+     * )
+     * ```
+     *
+     * UPSERT &mdash; on duplicate key, updates `departmentName` and concatenates `location`
+     * using the conflicting row exposed via `excluded`:
+     * ```
+     * val d = Meta.department
+     * val department: Department = Department(...)
+     * val query = QueryDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
+     *     d.departmentName eq "PLANNING2"
+     *     d.location eq concat(d.location, concat("_", excluded.location))
+     * }.single(department)
+     * ```
+     *
+     * UPSERT (ignore) &mdash; inserts a row, silently skipping if a duplicate key exists:
+     * ```
+     * val a = Meta.address
+     * val address: Address = Address(16, "STREET 16", 0)
+     * val query: Query<Address?> = QueryDsl.insert(a).onDuplicateKeyIgnore().executeAndGet(address)
+     * ```
+     *
+     * INSERT-SELECT &mdash; copies rows whose `addressId` is in 1..5 to an archive table:
+     * ```
+     * val a = Meta.address
+     * val aa = Meta.address.clone(table = "ADDRESS_ARCHIVE")
+     * val query: Query<Pair<Long, List<Int>>> = QueryDsl.insert(aa).select {
+     *     QueryDsl.from(a).where { a.addressId between 1..5 }
+     * }
+     * ```
+     *
+     * Values DSL &mdash; inserts a row by assigning columns directly, without an entity instance:
+     * ```
+     * val a = Meta.address
+     * val query: Query<Pair<Long, Int?>> = QueryDsl.insert(a).values {
+     *     a.addressId eq 19
+     *     a.street eq "STREET 16"
+     *     a.version eq 0
+     * }
+     * ```
      *
      * @param ENTITY the entity type
      * @param ID the entity id type
@@ -210,6 +429,36 @@ interface QueryDsl {
     /**
      * Creates a UPDATE query builder.
      *
+     * Single entity update &mdash; updates the row identified by the entity's primary key
+     * (and increments the version when an `@KomapperVersion` property is present):
+     * ```
+     * val a = Meta.address
+     * val address: Address = ...
+     * val query: Query<Address> = QueryDsl.update(a).single(address)
+     * ```
+     *
+     * Set + where &mdash; updates the `street` column for the row whose `addressId` is `1`,
+     * returning the number of affected rows:
+     * ```
+     * val a = Meta.address
+     * val query: Query<Long> = QueryDsl.update(a)
+     *     .set { a.street eq "STREET 16" }
+     *     .where { a.addressId eq 1 }
+     * ```
+     *
+     * Batch update &mdash; updates each entity using a separate statement:
+     * ```
+     * val a = Meta.address
+     * val query: Query<List<Address>> = QueryDsl.update(a).batch(address1, address2, address3)
+     * ```
+     *
+     * Include &mdash; updates only the listed properties (here, just `departmentName`):
+     * ```
+     * val d = Meta.department
+     * val department: Department = ...
+     * val query: Query<Department> = QueryDsl.update(d).include(d.departmentName).single(department)
+     * ```
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
@@ -222,6 +471,33 @@ interface QueryDsl {
 
     /**
      * Creates a DELETE query builder.
+     *
+     * Delete by where clause &mdash; deletes the row whose `addressId` is `15`,
+     * returning the number of affected rows:
+     * ```
+     * val a = Meta.address
+     * val query: Query<Long> = QueryDsl.delete(a).where { a.addressId eq 15 }
+     * ```
+     *
+     * Delete a single entity &mdash; deletes by the entity's primary key
+     * (and verifies the version when an `@KomapperVersion` property is present):
+     * ```
+     * val a = Meta.address
+     * val address: Address = ...
+     * val query: Query<Unit> = QueryDsl.delete(a).single(address)
+     * ```
+     *
+     * Batch delete &mdash; deletes each entity using a separate statement:
+     * ```
+     * val a = Meta.address
+     * val query: Query<Unit> = QueryDsl.delete(a).batch(address1, address2, address3)
+     * ```
+     *
+     * Delete all rows &mdash; deletes every row in the table:
+     * ```
+     * val e = Meta.employee
+     * val query: Query<Long> = QueryDsl.delete(e).all()
+     * ```
      *
      * @param ENTITY the entity type
      * @param ID the entity id type
@@ -236,6 +512,21 @@ interface QueryDsl {
     /**
      * Creates a builder for constructing a SELECT query.
      *
+     * The example below runs a templated SELECT statement &mdash; the `/*street*/'test'` comment denotes
+     * a bind variable named `street` &mdash; and maps each result row to an `Address` instance.
+     * ```
+     * val sql = "select * from ADDRESS where street = /*street*/'test'"
+     * val query: Query<List<Address>> = QueryDsl.fromTemplate(sql)
+     *     .bind("street", "STREET 10")
+     *     .select { row ->
+     *         Address(
+     *             row.getNotNull("address_id"),
+     *             row.getNotNull("street"),
+     *             row.getNotNull("version"),
+     *         )
+     *     }
+     * ```
+     *
      * @param sql the sql template
      * @return the builder
      */
@@ -245,6 +536,15 @@ interface QueryDsl {
 
     /**
      * Creates a query for executing an arbitrary command.
+     *
+     * The example below executes a templated UPDATE statement with two bind variables
+     * (`id` and `street`) and returns the number of affected rows.
+     * ```
+     * val sql = "update ADDRESS set street = /*street*/'' where address_id = /*id*/0"
+     * val query: Query<Long> = QueryDsl.executeTemplate(sql)
+     *     .bind("id", 15)
+     *     .bind("street", "NY street")
+     * ```
      *
      * @param sql the sql template
      * @return the query
@@ -256,6 +556,16 @@ interface QueryDsl {
     /**
      * Creates a query for executing a script.
      *
+     * The example below runs a multi-statement SQL script
+     * (drop, recreate, and seed a table) as a single query.
+     * ```
+     * val query: Query<Unit> = QueryDsl.executeScript("""
+     *     drop table if exists example;
+     *     create table example (id integer not null primary key, value varchar(20));
+     *     insert into example (id, value) values(1, 'test');
+     * """.trimIndent())
+     * ```
+     *
      * @param sql the script to execute
      */
     fun executeScript(
@@ -265,12 +575,24 @@ interface QueryDsl {
     /**
      * Creates a query for creating tables and their associated constraints.
      *
+     * The example below issues `CREATE TABLE` statements (and any associated constraints)
+     * for the `address` and `employee` entities.
+     * ```
+     * val query: Query<Unit> = QueryDsl.create(listOf(Meta.address, Meta.employee))
+     * ```
+     *
      * @param metamodels the entity metamodels
      */
     fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery
 
     /**
      * Creates a query for creating tables and their associated constraints.
+     *
+     * The example below issues `CREATE TABLE` statements (and any associated constraints)
+     * for the `address` and `employee` entities.
+     * ```
+     * val query: Query<Unit> = QueryDsl.create(Meta.address, Meta.employee)
+     * ```
      *
      * @param metamodels the entity metamodels
      */
@@ -279,12 +601,24 @@ interface QueryDsl {
     /**
      * Creates a query for dropping tables and their associated constraints.
      *
+     * The example below issues `DROP TABLE` statements (and any associated constraints)
+     * for the `address` and `employee` entities.
+     * ```
+     * val query: Query<Unit> = QueryDsl.drop(listOf(Meta.address, Meta.employee))
+     * ```
+     *
      * @param metamodels the entity metamodels
      */
     fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery
 
     /**
      * Creates a query for dropping tables and their associated constraints.
+     *
+     * The example below issues `DROP TABLE` statements (and any associated constraints)
+     * for the `address` and `employee` entities.
+     * ```
+     * val query: Query<Unit> = QueryDsl.drop(Meta.address, Meta.employee)
+     * ```
      *
      * @param metamodels the entity metamodels
      */
