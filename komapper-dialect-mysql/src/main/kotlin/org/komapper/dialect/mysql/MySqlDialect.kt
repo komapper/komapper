@@ -85,4 +85,14 @@ interface MySqlDialect : Dialect {
     override fun supportsSetOperationIntersect(): Boolean = false
 
     override fun supportsSetOperationExcept(): Boolean = false
+
+    override fun supportsRowKeywordInTableValueConstructor(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
+    }
+
+    override fun supportsAliasColumnListInDerivedTable(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
+    }
 }

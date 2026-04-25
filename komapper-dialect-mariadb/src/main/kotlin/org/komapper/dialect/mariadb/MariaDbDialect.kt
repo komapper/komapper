@@ -81,6 +81,8 @@ interface MariaDbDialect : Dialect {
         return MariaDbRelationInsertValuesStatementBuilder(dialect, context)
     }
 
+    override fun supportsAliasColumnListInDerivedTable(): Boolean = false
+
     override fun supportsAliasForDeleteStatement() = false
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false

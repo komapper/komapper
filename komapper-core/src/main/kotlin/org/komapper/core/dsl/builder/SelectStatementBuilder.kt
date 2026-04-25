@@ -6,6 +6,7 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.element.FullJoin
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
@@ -125,6 +126,17 @@ class SelectStatementBuilder(
                     buf.append(" as")
                 }
                 buf.append(" $alias")
+            }
+            if (context.derivedTable.context is ValuesContext<*, *, *> &&
+                dialect.supportsAliasColumnListInDerivedTable()
+            ) {
+                buf.append(" (")
+                for (p in context.target.properties()) {
+                    buf.append(p.getCanonicalColumnName(dialect::enquote))
+                    buf.append(", ")
+                }
+                buf.cutBack(2)
+                buf.append(")")
             }
         }
 
@@ -336,6 +348,10 @@ class SelectStatementBuilder(
                     left = assignAliasesToSubqueryColumns(subqueryContext.left, outerColumns),
                     right = assignAliasesToSubqueryColumns(subqueryContext.right, outerColumns),
                 )
+            }
+
+            is ValuesContext<*, *, *> -> {
+                subqueryContext
             }
         }
     }

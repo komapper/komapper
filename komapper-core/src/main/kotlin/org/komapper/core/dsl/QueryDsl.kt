@@ -10,12 +10,16 @@ import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
+import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.element.With
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.ValuesExpression
 import org.komapper.core.dsl.metamodel.EmptyMetamodel
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.options.SchemaOptions
@@ -44,6 +48,7 @@ import org.komapper.core.dsl.query.TemplateSelectQueryBuilder
 import org.komapper.core.dsl.query.TemplateSelectQueryBuilderImpl
 import org.komapper.core.dsl.query.UpdateQueryBuilder
 import org.komapper.core.dsl.query.UpdateQueryBuilderImpl
+import org.komapper.core.dsl.scope.ValuesScope
 
 /**
  * The entry point for constructing queries.
@@ -121,6 +126,21 @@ interface QueryDsl {
         metamodel: META,
         subquery: SubqueryExpression<*>,
     ): SelectQueryBuilder<ENTITY, ID, META>
+
+    /**
+     * Creates a VALUES table constructor that can be used as a derived table.
+     *
+     * @param ENTITY the entity type
+     * @param ID the entity id type
+     * @param META the entity metamodel type
+     * @param metamodel the entity metamodel that defines the column shape of the VALUES rows
+     * @param declaration the row declarations
+     * @return the subquery expression representing the VALUES table constructor
+     */
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> values(
+        metamodel: META,
+        declaration: ValuesScope<ENTITY, ID, META>.() -> Unit,
+    ): SubqueryExpression<ENTITY>
 
     /**
      * Creates a SELECT query for a single column expression.
@@ -327,6 +347,17 @@ internal class QueryDslImpl(
         subquery: SubqueryExpression<*>,
     ): SelectQueryBuilder<ENTITY, ID, META> {
         return SelectQueryBuilderImpl(SelectContext(metamodel, subquery, options = selectOptions))
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> values(
+        metamodel: META,
+        declaration: ValuesScope<ENTITY, ID, META>.() -> Unit,
+    ): SubqueryExpression<ENTITY> {
+        val rows = mutableListOf<List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>>()
+        val scope = ValuesScope(metamodel, rows)
+        scope.declaration()
+        val context = ValuesContext(metamodel, rows, selectOptions)
+        return ValuesExpression(context)
     }
 
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
