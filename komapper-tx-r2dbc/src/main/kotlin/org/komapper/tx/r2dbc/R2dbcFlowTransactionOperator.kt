@@ -13,7 +13,7 @@ import org.komapper.tx.core.TransactionProperty
 
 internal class R2dbcFlowTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
-    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
+    override val transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : FlowTransactionOperator {
     override fun <R> required(
         transactionProperty: TransactionProperty,
@@ -21,7 +21,8 @@ internal class R2dbcFlowTransactionOperator(
     ): Flow<R> {
         return flow {
             if (transactionManager.isActive()) {
-                block(this@R2dbcFlowTransactionOperator)
+                val operator = R2dbcFlowTransactionOperator(transactionManager, this@R2dbcFlowTransactionOperator.transactionProperty + transactionProperty)
+                block(operator)
             } else {
                 val value = executeInNewTransaction(transactionProperty, block)
                 emitAll(value)
@@ -52,10 +53,12 @@ internal class R2dbcFlowTransactionOperator(
         transactionProperty: TransactionProperty,
         block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
-        val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
+        val newTransactionProperty = this.transactionProperty + transactionProperty
+        val txContext = transactionManager.begin(newTransactionProperty)
+        val operator = R2dbcFlowTransactionOperator(transactionManager, newTransactionProperty)
         return flow {
             kotlin.runCatching {
-                block(this@R2dbcFlowTransactionOperator)
+                block(operator)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()
@@ -78,5 +81,9 @@ internal class R2dbcFlowTransactionOperator(
 
     override suspend fun isRollbackOnly(): Boolean {
         return transactionManager.isRollbackOnly()
+    }
+
+    override suspend fun isActive(): Boolean {
+        return transactionManager.isActive()
     }
 }

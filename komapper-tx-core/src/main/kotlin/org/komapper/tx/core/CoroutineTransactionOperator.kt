@@ -5,6 +5,11 @@ import org.komapper.core.ThreadSafe
 @ThreadSafe
 interface CoroutineTransactionOperator {
     /**
+     * The property of the current transaction.
+     */
+    val transactionProperty: TransactionProperty
+
+    /**
      * Begins a REQUIRED transaction.
      *
      * @param R the return type of the block
@@ -39,4 +44,9 @@ interface CoroutineTransactionOperator {
      * Returns true if the transaction is marked as rollback.
      */
     suspend fun isRollbackOnly(): Boolean
+
+    /**
+     * Returns true if a transaction is currently active.
+     */
+    suspend fun isActive(): Boolean
 }

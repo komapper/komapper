@@ -7,6 +7,11 @@ import org.komapper.core.ThreadSafe
 @ThreadSafe
 interface FlowTransactionOperator {
     /**
+     * The property of the current transaction.
+     */
+    val transactionProperty: TransactionProperty
+
+    /**
      * Build a REQUIRED transactional [Flow].
      *
      * @param R the return type of the flow
@@ -41,4 +46,9 @@ interface FlowTransactionOperator {
      * Returns true if the transaction is marked as rollback.
      */
     suspend fun isRollbackOnly(): Boolean
+
+    /**
+     * Returns true if a transaction is currently active.
+     */
+    suspend fun isActive(): Boolean
 }

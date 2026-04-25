@@ -2,18 +2,23 @@ package org.komapper.quarkus.jdbc
 
 import jakarta.transaction.Status
 import jakarta.transaction.TransactionManager
+import org.komapper.tx.core.EmptyTransactionProperty
 import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
 
-internal class QuarkusJdbcTransactionOperator(private val transactionManager: TransactionManager) : TransactionOperator {
+internal class QuarkusJdbcTransactionOperator(
+    private val transactionManager: TransactionManager,
+    override val transactionProperty: TransactionProperty = EmptyTransactionProperty,
+) : TransactionOperator {
     override fun <R> required(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
-            block(this)
+            val operator = QuarkusJdbcTransactionOperator(transactionManager, this.transactionProperty + transactionProperty)
+            block(operator)
         } else {
-            executeInNewTransaction(block)
+            executeInNewTransaction(transactionProperty, block)
         }
     }
 
@@ -24,7 +29,7 @@ internal class QuarkusJdbcTransactionOperator(private val transactionManager: Tr
         return if (transactionManager.isActive()) {
             val tx = transactionManager.suspend()
             runCatching {
-                executeInNewTransaction(block)
+                executeInNewTransaction(transactionProperty, block)
             }.onSuccess {
                 transactionManager.resume(tx)
             }.onFailure { cause ->
@@ -35,14 +40,18 @@ internal class QuarkusJdbcTransactionOperator(private val transactionManager: Tr
                 }
             }.getOrThrow()
         } else {
-            executeInNewTransaction(block)
+            executeInNewTransaction(transactionProperty, block)
         }
     }
 
-    private fun <R> executeInNewTransaction(block: (TransactionOperator) -> R): R {
+    private fun <R> executeInNewTransaction(
+        transactionProperty: TransactionProperty,
+        block: (TransactionOperator) -> R,
+    ): R {
         transactionManager.begin()
         return runCatching {
-            block(this)
+            val operator = QuarkusJdbcTransactionOperator(transactionManager, this.transactionProperty + transactionProperty)
+            block(operator)
         }.onSuccess {
             if (transactionManager.isRollbackOnly()) {
                 transactionManager.rollback()
@@ -64,6 +73,10 @@ internal class QuarkusJdbcTransactionOperator(private val transactionManager: Tr
 
     override fun isRollbackOnly(): Boolean {
         return transactionManager.isRollbackOnly()
+    }
+
+    override fun isActive(): Boolean {
+        return transactionManager.isActive()
     }
 }
 

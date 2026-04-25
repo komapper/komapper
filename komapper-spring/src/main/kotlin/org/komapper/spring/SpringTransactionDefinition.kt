@@ -5,7 +5,7 @@ import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.TransactionDefinition
 
 class SpringTransactionDefinition(
-    private val transactionProperty: TransactionProperty,
+    val transactionProperty: TransactionProperty,
     private val transactionAttribute: TransactionAttribute,
 ) : TransactionDefinition by TransactionDefinition.withDefaults() {
     override fun getPropagationBehavior(): Int {
