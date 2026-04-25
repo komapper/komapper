@@ -396,6 +396,13 @@ interface Dialect {
      */
     fun supportsAliasColumnListInDerivedTable(): Boolean = true
 
+    /**
+     * Returns whether the `VALUES` table value constructor is accepted directly as the body of a CTE
+     * definition (e.g. `WITH t (c) AS (VALUES (1), (2))`). When `false`, the equivalent
+     * `SELECT v AS c UNION ALL SELECT v` form must be emitted instead. SQL Server requires this fallback.
+     */
+    fun supportsValuesClauseAsCteBody(): Boolean = true
+
     fun supportsSelectStatementWithoutFromClause(): Boolean = true
 
     /**

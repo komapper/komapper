@@ -9,6 +9,7 @@ class ValuesStatementBuilder(
     private val dialect: BuilderDialect,
     private val context: ValuesContext<*, *, *>,
     private val aliasManager: AliasManager,
+    private val useSelectUnionForm: Boolean = !dialect.supportsAliasColumnListInDerivedTable(),
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
@@ -22,10 +23,10 @@ class ValuesStatementBuilder(
         require(context.rows.isNotEmpty()) {
             "The VALUES clause requires at least one row."
         }
-        if (dialect.supportsAliasColumnListInDerivedTable()) {
-            buildValuesForm()
-        } else {
+        if (useSelectUnionForm) {
             buildSelectUnionForm()
+        } else {
+            buildValuesForm()
         }
         return buf.toStatement()
     }

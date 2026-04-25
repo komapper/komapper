@@ -110,4 +110,17 @@ class JdbcSelectWithTest(private val db: JdbcDatabase) {
         val result = db.runQuery(query)
         assertEquals(55, result)
     }
+
+    @Test
+    fun withValues() {
+        val t = Meta.t
+        val rows = QueryDsl.values(t) {
+            row { t.n eq 1 }
+            row { t.n eq 2 }
+            row { t.n eq 3 }
+        }
+        val query = QueryDsl.with(t, rows).from(t).orderBy(t.n).select(t.n)
+        val list = db.runQuery(query)
+        assertEquals(listOf(1, 2, 3), list)
+    }
 }

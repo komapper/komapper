@@ -156,4 +156,6 @@ interface SqlServerDialect : Dialect {
     override fun supportsUpsertMultipleReturning(): Boolean = true
 
     override fun supportsUpsertSingleReturning(): Boolean = true
+
+    override fun supportsValuesClauseAsCteBody(): Boolean = false
 }

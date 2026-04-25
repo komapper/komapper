@@ -60,13 +60,13 @@ class SelectStatementBuilder(
                     }
                     buf.cutBack(2)
                     buf.append(") as (")
-                    val statement = support.buildSubqueryStatement(subquery.context)
+                    val statement = buildCteBodyStatement(subquery.context)
                     buf.append(statement)
                     buf.append("), ")
                 } else {
                     buf.append(" as (")
                     val subqueryContext = assignAliasesToSubqueryColumns(subquery.context, table.properties())
-                    val statement = support.buildSubqueryStatement(subqueryContext)
+                    val statement = buildCteBodyStatement(subqueryContext)
                     buf.append(statement)
                     buf.append("), ")
                 }
@@ -327,6 +327,40 @@ class SelectStatementBuilder(
                 raiseError("wait")
             }
         }
+    }
+
+    private fun buildCteBodyStatement(subqueryContext: SubqueryContext): Statement {
+        if (subqueryContext is ValuesContext<*, *, *> && !dialect.supportsValuesClauseAsCteBody()) {
+            return wrapValuesInSelectStatement(subqueryContext)
+        }
+        return support.buildSubqueryStatement(subqueryContext)
+    }
+
+    private fun wrapValuesInSelectStatement(valuesContext: ValuesContext<*, *, *>): Statement {
+        val properties = valuesContext.target.properties()
+        val innerAlias = "v_"
+        val sb = StatementBuffer()
+        sb.append("select ")
+        for (p in properties) {
+            sb.append("$innerAlias.")
+            sb.append(p.getCanonicalColumnName(dialect::enquote))
+            sb.append(", ")
+        }
+        sb.cutBack(2)
+        sb.append(" from (")
+        sb.append(ValuesStatementBuilder(dialect, valuesContext, aliasManager).build())
+        sb.append(") ")
+        if (dialect.supportsAsKeywordForTableAlias()) {
+            sb.append("as ")
+        }
+        sb.append("$innerAlias (")
+        for (p in properties) {
+            sb.append(p.getCanonicalColumnName(dialect::enquote))
+            sb.append(", ")
+        }
+        sb.cutBack(2)
+        sb.append(")")
+        return sb.toStatement()
     }
 
     private fun assignAliasesToSubqueryColumns(subqueryContext: SubqueryContext, outerColumns: List<ColumnExpression<*, *>>): SubqueryContext {
