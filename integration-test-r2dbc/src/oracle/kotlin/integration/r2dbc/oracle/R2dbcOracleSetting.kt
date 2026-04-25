@@ -5,10 +5,10 @@ import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
 import org.komapper.r2dbc.R2dbcDatabase
-import org.testcontainers.containers.OracleContainer
-import org.testcontainers.containers.OracleContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl
 import org.testcontainers.lifecycle.Startable
+import org.testcontainers.oracle.OracleContainer
+import org.testcontainers.oracle.OracleContainerProvider
 import org.testcontainers.r2dbc.R2DBCDatabaseContainer
 
 @Suppress("unused")

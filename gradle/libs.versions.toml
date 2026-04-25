@@ -83,7 +83,7 @@ testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version
 testcontainers-r2dbc = { module = "org.testcontainers:testcontainers-r2dbc" }
 testcontainers-mariadb = { module = "org.testcontainers:testcontainers-mariadb" }
 testcontainers-mysql = { module = "org.testcontainers:testcontainers-mysql" }
-testcontainers-oracle = { module = "org.testcontainers:testcontainers-oracle-xe" }
+testcontainers-oracle = { module = "org.testcontainers:testcontainers-oracle-free" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
 testcontainers-sqlserver = { module = "org.testcontainers:testcontainers-mssqlserver" }
 
