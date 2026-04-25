@@ -377,6 +377,32 @@ interface Dialect {
 
     fun supportsRecursiveKeywordInCommonTableExpression(): Boolean = true
 
+    /**
+     * Returns whether the `VALUES` table value constructor used as a derived table
+     * (e.g. `(VALUES (1, 'a'), (2, 'b')) AS t(c1, c2)`) is supported.
+     */
+    fun supportsTableValueConstructor(): Boolean = true
+
+    /**
+     * Returns whether each row in the `VALUES` table value constructor must be prefixed with the `ROW` keyword
+     * (e.g. `VALUES ROW(1, 'a'), ROW(2, 'b')`). MySQL 8.0.19+ requires this form for the table value constructor.
+     */
+    fun supportsRowKeywordInTableValueConstructor(): Boolean = false
+
+    /**
+     * Returns whether a derived table can be aliased with a column name list
+     * (e.g. `(SELECT ...) AS t(c1, c2)`). When `false`, callers must alias the columns inside the derived
+     * table itself (e.g. `(SELECT v AS c1, v AS c2 UNION ALL ...) AS t`). MariaDB does not support this syntax.
+     */
+    fun supportsAliasColumnListInDerivedTable(): Boolean = true
+
+    /**
+     * Returns whether the `VALUES` table value constructor is accepted directly as the body of a CTE
+     * definition (e.g. `WITH t (c) AS (VALUES (1), (2))`). When `false`, the equivalent
+     * `SELECT v AS c UNION ALL SELECT v` form must be emitted instead. SQL Server requires this fallback.
+     */
+    fun supportsValuesClauseAsCteBody(): Boolean = true
+
     fun supportsSelectStatementWithoutFromClause(): Boolean = true
 
     /**

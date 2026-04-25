@@ -97,4 +97,53 @@ class JdbcSelectSubqueryTest(private val db: JdbcDatabase) {
         )
         assertEquals(expected, list)
     }
+
+    @Test
+    fun values_as_derived_table() {
+        val t = Meta.nameAndAmount
+
+        val rows = QueryDsl.values(t) {
+            row {
+                t.name eq "alice"
+                t.amount eq BigDecimal("100")
+            }
+            row {
+                t.name eq "bob"
+                t.amount eq BigDecimal("200")
+            }
+            row {
+                t.name eq "carol"
+                t.amount eq BigDecimal("300")
+            }
+        }
+
+        val query = QueryDsl.from(t, rows).orderBy(t.name)
+        val list = db.runQuery { query }
+        val expected = listOf(
+            NameAndAmount("alice", BigDecimal("100")),
+            NameAndAmount("bob", BigDecimal("200")),
+            NameAndAmount("carol", BigDecimal("300")),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun values_as_derived_table_with_where() {
+        val t = Meta.nameAndAmount
+
+        val rows = QueryDsl.values(t) {
+            row {
+                t.name eq "alice"
+                t.amount eq BigDecimal("100")
+            }
+            row {
+                t.name eq "bob"
+                t.amount eq BigDecimal("200")
+            }
+        }
+
+        val query = QueryDsl.from(t, rows).where { t.amount greater BigDecimal("150") }
+        val list = db.runQuery { query }
+        assertEquals(listOf(NameAndAmount("bob", BigDecimal("200"))), list)
+    }
 }
