@@ -16,6 +16,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.ValuesDeclaration
 import org.komapper.core.dsl.expression.ValuesExpression
 import org.komapper.core.dsl.metamodel.EmptyMetamodel
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -262,7 +263,7 @@ interface QueryDsl {
      * @param ID the entity id type
      * @param META the entity metamodel type
      * @param metamodel the entity metamodel that defines the column shape of the VALUES rows
-     * @param declaration the row declarations
+     * @param declaration the values declaration
      * @return the subquery expression representing the VALUES table constructor
      */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> values(
@@ -685,7 +686,7 @@ internal class QueryDslImpl(
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> values(
         metamodel: META,
-        declaration: ValuesScope<ENTITY, ID, META>.() -> Unit,
+        declaration: ValuesDeclaration<ENTITY, ID, META>,
     ): SubqueryExpression<ENTITY> {
         val rows = mutableListOf<List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>>()
         val scope = ValuesScope(metamodel, rows)

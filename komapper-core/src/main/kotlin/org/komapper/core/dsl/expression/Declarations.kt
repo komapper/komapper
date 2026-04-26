@@ -5,6 +5,7 @@ import org.komapper.core.dsl.scope.ForUpdateScope
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.OverScope
+import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.dsl.scope.WhenScope
 import org.komapper.core.dsl.scope.WhereScope
 
@@ -15,3 +16,4 @@ typealias AssignmentDeclaration<ENTITY, META> = AssignmentScope<ENTITY>.(META) -
 typealias WhenDeclaration = WhenScope.() -> Unit
 typealias ForUpdateDeclaration = ForUpdateScope.() -> Unit
 typealias OverDeclaration = OverScope.() -> Unit
+typealias ValuesDeclaration<ENTITY, ID, META> = ValuesScope<ENTITY, ID, META>.() -> Unit
