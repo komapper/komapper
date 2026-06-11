@@ -331,6 +331,16 @@ class ExprEvaluatorTest {
         }
 
         @Test
+        fun and_short_circuit() {
+            val ctx = ExprContext(
+                mapOf("p" to Value(null, typeOf<Person>())),
+                extensions,
+            )
+            val result = evaluator.eval("p != null && p.name == \"aaa\"", ctx)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
+        }
+
+        @Test
         fun or_true() {
             val ctx = ExprContext(mapOf("a" to Value(true, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a || false", ctx)
@@ -342,6 +352,16 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(mapOf("a" to Value(false, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a || false", ctx)
             assertEquals(Value(false, typeOf<Boolean>()), result)
+        }
+
+        @Test
+        fun or_short_circuit() {
+            val ctx = ExprContext(
+                mapOf("p" to Value(null, typeOf<Person>())),
+                extensions,
+            )
+            val result = evaluator.eval("p == null || p.name == \"aaa\"", ctx)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
