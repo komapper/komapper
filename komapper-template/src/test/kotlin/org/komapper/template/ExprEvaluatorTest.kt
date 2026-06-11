@@ -385,11 +385,61 @@ class ExprEvaluatorTest {
         }
 
         @Test
-        fun `Cannot perform the logical operator because either operand is not boolean`() {
+        fun `Cannot perform the logical operator because the left operand is null for or`() {
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("a || false", ctx)
+            }
+            println(exception)
+        }
+
+        @Test
+        fun `Cannot perform the logical operator because the right operand is null for or`() {
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("false || a", ctx)
+            }
+            println(exception)
+        }
+
+        @Test
+        fun `Cannot perform the logical operator because the left operand is not Boolean`() {
+            val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("a && true", ctx)
+            }
+            println(exception)
+        }
+
+        @Test
+        fun `Cannot perform the logical operator because the right operand is not Boolean`() {
             val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("true && a", ctx)
+            }
+            println(exception)
+        }
+
+        @Test
+        fun `Cannot perform the logical operator because the left operand is not Boolean for or`() {
+            val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("a || false", ctx)
+            }
+            println(exception)
+        }
+
+        @Test
+        fun `Cannot perform the logical operator because the right operand is not Boolean for or`() {
+            val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
+            val exception = assertFailsWith<ExprException> {
+                evaluator
+                    .eval("false || a", ctx)
             }
             println(exception)
         }
