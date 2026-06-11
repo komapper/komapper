@@ -54,9 +54,9 @@ internal class DefaultExprEvaluator(
     private fun visit(node: ExprNode, ctx: ExprContext): Value<*> = when (node) {
         is ExprNode.Not -> perform(node.location, node.operand, ctx) { !it }
 
-        is ExprNode.And -> perform(node.location, node.left, node.right, ctx) { x, y -> x && y }
+        is ExprNode.And -> visitAnd(node.location, node.left, node.right, ctx)
 
-        is ExprNode.Or -> perform(node.location, node.left, node.right, ctx) { x, y -> x || y }
+        is ExprNode.Or -> visitOr(node.location, node.left, node.right, ctx)
 
         is ExprNode.Eq -> equal(node.location, node.left, node.right, ctx) { x, y -> x == y }
 
@@ -123,32 +123,48 @@ internal class DefaultExprEvaluator(
         return Value(f(value), typeOf<Boolean>())
     }
 
-    private fun perform(
+    private fun visitAnd(
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
         ctx: ExprContext,
-        f: (Boolean, Boolean) -> Boolean,
     ): Value<Boolean> {
-        fun checkNull(location: ExprLocation, value: Any?, which: String) {
-            if (value != null) {
-                return
-            }
+        val left = visitLogicalOperand(location, leftNode, ctx, "left")
+        if (!left) return Value(false, typeOf<Boolean>())
+        val right = visitLogicalOperand(location, rightNode, ctx, "right")
+        return Value(right, typeOf<Boolean>())
+    }
+
+    private fun visitOr(
+        location: ExprLocation,
+        leftNode: ExprNode,
+        rightNode: ExprNode,
+        ctx: ExprContext,
+    ): Value<Boolean> {
+        val left = visitLogicalOperand(location, leftNode, ctx, "left")
+        if (left) return Value(true, typeOf<Boolean>())
+        val right = visitLogicalOperand(location, rightNode, ctx, "right")
+        return Value(right, typeOf<Boolean>())
+    }
+
+    private fun visitLogicalOperand(
+        location: ExprLocation,
+        node: ExprNode,
+        ctx: ExprContext,
+        which: String,
+    ): Boolean {
+        val (value) = visit(node, ctx)
+        if (value == null) {
             throw ExprException(
-                "Cannot perform the logical operator because the $which operand is null at $location",
+                "Cannot perform the logical operator because the $which operand is null at ${node.location}",
             )
         }
-
-        val (left) = visit(leftNode, ctx)
-        val (right) = visit(rightNode, ctx)
-        checkNull(leftNode.location, left, "left")
-        checkNull(rightNode.location, right, "right")
-        if (left !is Boolean || right !is Boolean) {
+        if (value !is Boolean) {
             throw ExprException(
                 "Cannot perform the logical operator because either operands is not Boolean at $location",
             )
         }
-        return Value(f(left, right), typeOf<Boolean>())
+        return value
     }
 
     @Suppress("UNUSED_PARAMETER")
