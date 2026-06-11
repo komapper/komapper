@@ -167,34 +167,6 @@ internal class DefaultExprEvaluator(
         return value
     }
 
-    private fun perform(
-        location: ExprLocation,
-        leftNode: ExprNode,
-        rightNode: ExprNode,
-        ctx: ExprContext,
-        f: (Boolean, Boolean) -> Boolean,
-    ): Value<Boolean> {
-        fun checkNull(location: ExprLocation, value: Any?, which: String) {
-            if (value != null) {
-                return
-            }
-            throw ExprException(
-                "Cannot perform the logical operator because the $which operand is null at $location",
-            )
-        }
-
-        val (left) = visit(leftNode, ctx)
-        val (right) = visit(rightNode, ctx)
-        checkNull(leftNode.location, left, "left")
-        checkNull(rightNode.location, right, "right")
-        if (left !is Boolean || right !is Boolean) {
-            throw ExprException(
-                "Cannot perform the logical operator because either operands is not Boolean at $location",
-            )
-        }
-        return Value(f(left, right), typeOf<Boolean>())
-    }
-
     @Suppress("UNUSED_PARAMETER")
     private fun equal(
         location: ExprLocation,
