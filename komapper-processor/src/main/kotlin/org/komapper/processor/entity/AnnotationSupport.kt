@@ -235,7 +235,7 @@ internal class AnnotationSupport(
                             columnAnnotation,
                         )
                     }
-                    val parameter = constructor?.parameters?.firstOrNull()
+                    val parameter = constructor.parameters.firstOrNull()
                         ?: error("No parameter is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
                     val declaration =
                         classDeclaration.getDeclaredProperties().firstOrNull { it.simpleName == parameter.name }

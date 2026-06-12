@@ -670,7 +670,7 @@ class BuilderSupport(
                 }
 
                 is EscapeExpression.Escape -> {
-                    val escaped = dialect.escape(e.value.toString(), finalEscapeSequence)
+                    val escaped = dialect.escape(e.value, finalEscapeSequence)
                     patternBuf.append(escaped)
                 }
 

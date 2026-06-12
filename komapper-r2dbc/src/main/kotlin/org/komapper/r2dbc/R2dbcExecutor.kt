@@ -230,6 +230,10 @@ internal class R2dbcExecutor(
             when (val value = row.get(0)) {
                 is Number -> value.toLong()
 
+                null -> error(
+                    "Generated value is null. generatedColumn=$generatedColumn"
+                )
+
                 else -> error(
                     "Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}"
                 )
