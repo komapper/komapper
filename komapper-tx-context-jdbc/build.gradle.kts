@@ -12,14 +12,6 @@ dependencies {
     kspTest(project(":komapper-processor"))
 }
 
-tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        compilerOptions {
-            freeCompilerArgs.add("-Xcontext-parameters")
-        }
-    }
-}
-
 ksp {
     arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
 }
