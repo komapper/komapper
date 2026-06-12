@@ -29,7 +29,7 @@ For more documentation, go to our site:
 
 ## Prerequisite
 
-- Kotlin 2.2.0 or later
+- Kotlin 2.3.0 or later
 - JRE 17 or later
 - Gradle 7.6.4 or later
 
