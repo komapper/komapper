@@ -9,10 +9,12 @@ import java.util.Objects;
 import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.work.DisableCachingByDefault;
 import org.komapper.codegen.CodeGenerator;
 import org.komapper.codegen.MetadataReader;
 import org.komapper.codegen.Table;
 
+@DisableCachingByDefault(because = "Reads metadata from a live database")
 public class GenerateTask extends DefaultTask {
 
   private final Generator settings;
