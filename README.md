@@ -29,8 +29,8 @@ For more documentation, go to our site:
 
 ## Prerequisite
 
-- Kotlin 2.2.0 or later
-- JRE 11 or later
+- Kotlin 2.3.21 or later
+- JRE 17 or later
 - Gradle 7.6.4 or later
 
 ## Supported Databases
@@ -173,7 +173,8 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 | 2.0.21-1.0.28          | 2.x - 5.x        | Yes           | 11              | 7.6.4              |
 | 2.1.21-2.0.2           | 5.x              | Yes           | 11              | 7.6.4              |
 | 2.2.20-2.0.3           | 5.x              | Yes           | 11              | 7.6.4              |
-| 2.3.0                  | 5.x              | Yes           | 11              | 7.6.4              |
+| 2.3.0                  | 5.x - 6.1.0      | Yes           | 11              | 7.6.4              |
+| 2.3.21                 | 7.0.0 or later   | Yes           | 17              | 7.6.4              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 

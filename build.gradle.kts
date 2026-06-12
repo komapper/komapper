@@ -68,7 +68,11 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
     }
 
-    val jvmTargetVersion = if (project.name.contains("spring") || project.name.contains("quarkus")) 17 else 11
+    val jvmTargetVersion = 17
+
+    // Context parameters require Kotlin language version 2.4
+    val usesContextParameters = project.name.contains("tx-context") || project.name.startsWith("integration-test")
+    val kotlinLanguageVersion = if (usesContextParameters) KotlinVersion.KOTLIN_2_4 else KotlinVersion.KOTLIN_2_3
 
     tasks {
         withType<Test>().configureEach {
@@ -89,7 +93,8 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
             compilerOptions {
                 freeCompilerArgs.add("-Xjdk-release=$jvmTargetVersion")
                 jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion.toString()))
-                apiVersion.set(KotlinVersion.KOTLIN_2_2)
+                apiVersion.set(KotlinVersion.KOTLIN_2_3)
+                languageVersion.set(kotlinLanguageVersion)
             }
         }
     }

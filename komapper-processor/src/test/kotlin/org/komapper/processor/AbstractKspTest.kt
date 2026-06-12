@@ -29,8 +29,8 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
         val compilation = KotlinCompilation()
             .apply {
                 useKsp2()
-                languageVersion = "2.1"
-                apiVersion = "2.0"
+                languageVersion = "2.3"
+                apiVersion = "2.3"
                 workingDir = tempDir!!.toFile()
                 inheritClassPath = true
                 symbolProcessorProviders = providers.toMutableList()
