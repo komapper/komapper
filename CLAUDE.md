@@ -76,7 +76,7 @@ The project follows a modular architecture with clear separation of concerns:
 ### Build Configuration
 - Uses Gradle with Kotlin DSL
 - JVM target: 11 (17 for Spring modules)
-- Kotlin API version: 1.8
+- Kotlin API version: 2.2
 - KSP2 enabled for better performance
 - Automatic code formatting with Spotless (ktlint for Kotlin, Google Java Format for Java)
 

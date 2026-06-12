@@ -29,7 +29,7 @@ For more documentation, go to our site:
 
 ## Prerequisite
 
-- Kotlin 1.9.24 or later
+- Kotlin 2.2.0 or later
 - JRE 11 or later
 - Gradle 6.8.3 or later
 
@@ -58,8 +58,8 @@ Add the following code to the Gradle build script (gradle.build.kts).
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "2.2.21"
-    id("com.google.devtools.ksp") version "2.3.0"
+    kotlin("jvm") version "2.4.0"
+    id("com.google.devtools.ksp") version "2.3.9"
 }
 
 val komapperVersion = "6.1.0"

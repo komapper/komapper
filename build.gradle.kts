@@ -89,7 +89,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
             compilerOptions {
                 freeCompilerArgs.add("-Xjdk-release=$jvmTargetVersion")
                 jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion.toString()))
-                apiVersion.set(KotlinVersion.KOTLIN_2_1)
+                apiVersion.set(KotlinVersion.KOTLIN_2_2)
             }
         }
     }
