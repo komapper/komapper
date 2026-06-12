@@ -68,7 +68,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
     }
 
-    val jvmTargetVersion = if (project.name.contains("spring") || project.name.contains("quarkus")) 17 else 11
+    val jvmTargetVersion = 17
 
     tasks {
         withType<Test>().configureEach {
