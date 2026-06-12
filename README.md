@@ -31,7 +31,7 @@ For more documentation, go to our site:
 
 - Kotlin 2.2.0 or later
 - JRE 11 or later
-- Gradle 6.8.3 or later
+- Gradle 7.6.4 or later
 
 ## Supported Databases
 
