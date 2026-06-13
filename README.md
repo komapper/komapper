@@ -173,8 +173,11 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 | 2.0.21-1.0.28          | 2.x - 5.x        | Yes           | 11              | 7.6.4              |
 | 2.1.21-2.0.2           | 5.x              | Yes           | 11              | 7.6.4              |
 | 2.2.20-2.0.3           | 5.x              | Yes           | 11              | 7.6.4              |
-| 2.3.0                  | 5.x - 6.1.0      | Yes           | 11              | 7.6.4              |
-| 2.3.21                 | 7.0.0 or later   | Yes           | 17              | 7.6.4              |
+| 2.3.0                  | 5.x - 6.1.0      | Yes           | 11              | 8.2                |
+| 2.3.21                 | 7.0.0 or later   | Yes           | 17              | 8.2                |
+| 2.4.0                  | 7.0.0 or later   | Yes           | 17              | 8.2                |
+
+For Kotlin 2.3.0 and later, KSP is versioned independently of Kotlin (standalone KSP). These rows were verified with KSP 2.3.9.
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
