@@ -15,6 +15,28 @@ import org.komapper.core.dsl.operator.asSuffix as asSuffixFunction
  */
 interface FilterScope<F : FilterScope<F>> {
     /**
+     * The context for registering user-defined criteria.
+     *
+     * Combine this with a context parameter to define custom operators directly,
+     * without wrapping them in an [extension] block. For example:
+     *
+     * ```
+     * context(scope: FilterScope<*>)
+     * infix fun <T : Any> ColumnExpression<T, String>.match(pattern: T?) {
+     *     if (pattern == null) return
+     *     val left = Operand.Column(this)
+     *     val right = Operand.Argument(this, pattern)
+     *     scope.criteriaContext.add {
+     *         visit(left)
+     *         append(" ~ ")
+     *         visit(right)
+     *     }
+     * }
+     * ```
+     */
+    val criteriaContext: CriteriaContext
+
+    /**
      * Applies the `=` operator.
      */
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.eq(operand: ColumnExpression<T, S>)
