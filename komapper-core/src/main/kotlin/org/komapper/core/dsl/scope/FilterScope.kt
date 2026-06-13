@@ -343,6 +343,28 @@ interface FilterScope<F : FilterScope<F>> {
     fun CharSequence.asSuffix(): EscapeExpression = this.asSuffixFunction()
 
     /**
+     * The context for registering user-defined criteria.
+     *
+     * Combine this with a context parameter to define custom operators directly,
+     * without wrapping them in an [extension] block. For example:
+     *
+     * ```
+     * context(scope: FilterScope<*>)
+     * infix fun <T : Any> ColumnExpression<T, String>.match(pattern: T?) {
+     *     if (pattern == null) return
+     *     val left = Operand.Column(this)
+     *     val right = Operand.Argument(this, pattern)
+     *     scope.criteriaContext.add {
+     *         visit(left)
+     *         append(" ~ ")
+     *         visit(right)
+     *     }
+     * }
+     * ```
+     */
+    val criteriaContext: CriteriaContext
+
+    /**
      * Adds an extension.
      *
      * @param EXTENSION the type of extension

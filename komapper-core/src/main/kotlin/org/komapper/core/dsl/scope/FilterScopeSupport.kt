@@ -17,6 +17,14 @@ class FilterScopeSupport<F : FilterScope<F>>(
     private val deque: Deque<MutableList<Criterion>> = LinkedList(),
     private val criteria: MutableList<Criterion> = mutableListOf(),
 ) : FilterScope<F> {
+    override val criteriaContext: CriteriaContext = object : CriteriaContext {
+        override fun add(build: SqlBuilderScope.() -> Unit) {
+            val criterion = Criterion.UserDefined(build)
+            val target = deque.peek() ?: criteria
+            target.add(criterion)
+        }
+    }
+
     fun toList(): List<Criterion> {
         return criteria.toList()
     }
@@ -382,14 +390,7 @@ class FilterScopeSupport<F : FilterScope<F>>(
     }
 
     override fun <EXTENSION> extension(construct: (context: CriteriaContext) -> EXTENSION, declaration: EXTENSION.() -> Unit) {
-        val context = object : CriteriaContext {
-            override fun add(build: SqlBuilderScope.() -> Unit) {
-                val criterion = Criterion.UserDefined(build)
-                val target = deque.peek() ?: criteria
-                target.add(criterion)
-            }
-        }
-        val scope = construct(context)
+        val scope = construct(criteriaContext)
         scope.declaration()
     }
 }
