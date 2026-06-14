@@ -142,11 +142,11 @@ class ExprTokenizer(private val expression: String) {
                 type = LE
                 binaryOpAvailable = false
                 return
-            } else if (c[0] == 'i' && c[1] == 's') {
+            } else if (c[0] == 'i' && c[1] == 's' && isWordTerminated()) {
                 type = IS
                 binaryOpAvailable = false
                 return
-            } else if (c[0] == 'a' && c[1] == 's') {
+            } else if (c[0] == 'a' && c[1] == 's' && isWordTerminated()) {
                 type = AS
                 binaryOpAvailable = false
                 return
@@ -208,6 +208,7 @@ class ExprTokenizer(private val expression: String) {
             return
         } else if (c == ',') {
             type = COMMA
+            binaryOpAvailable = false
             return
         } else if (c == '(') {
             type = OPEN_PAREN
@@ -371,6 +372,10 @@ class ExprTokenizer(private val expression: String) {
                 buf.reset()
                 break
             }
+        }
+        if (decimal && type == INT) {
+            // a decimal point requires a type suffix such as F, D or B
+            type = ILLEGAL_NUMBER
         }
         if (!isWordTerminated()) {
             type = ILLEGAL_NUMBER
