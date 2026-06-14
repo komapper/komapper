@@ -161,6 +161,34 @@ class ExprParserTest {
     }
 
     @Test
+    fun `An argument starting with is is parsed as a value`() {
+        when (val expr = ExprParser("f(a, isActive)").parse()) {
+            is ExprNode.CallableValue -> {
+                assertEquals("f", expr.name)
+                val args = expr.args
+                assertTrue(args is ExprNode.Comma)
+                assertEquals(2, args.nodeList.size)
+                val first = args.nodeList[0]
+                val second = args.nodeList[1]
+                assertTrue(first is ExprNode.Value)
+                assertEquals("a", first.name)
+                assertTrue(second is ExprNode.Value)
+                assertEquals("isActive", second.name)
+            }
+
+            else -> {
+                throw AssertionError(expr)
+            }
+        }
+    }
+
+    @Test
+    fun `A decimal literal without a type suffix throws an exception`() {
+        val exception = assertFailsWith<ExprException> { ExprParser("1.5").parse() }
+        println(exception)
+    }
+
+    @Test
     fun `The operand is not found`() {
         val exception = assertFailsWith<ExprException> { ExprParser("aaa >").parse() }
         println(exception)

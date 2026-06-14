@@ -3,12 +3,15 @@ package org.komapper.core.template.expression
 import org.komapper.core.template.expression.ExprTokenType.AND
 import org.komapper.core.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.core.template.expression.ExprTokenType.CLASS_REF
+import org.komapper.core.template.expression.ExprTokenType.COMMA
 import org.komapper.core.template.expression.ExprTokenType.DOUBLE
 import org.komapper.core.template.expression.ExprTokenType.EOE
 import org.komapper.core.template.expression.ExprTokenType.EOL
 import org.komapper.core.template.expression.ExprTokenType.FALSE
 import org.komapper.core.template.expression.ExprTokenType.FLOAT
+import org.komapper.core.template.expression.ExprTokenType.ILLEGAL_NUMBER
 import org.komapper.core.template.expression.ExprTokenType.INT
+import org.komapper.core.template.expression.ExprTokenType.IS
 import org.komapper.core.template.expression.ExprTokenType.LONG
 import org.komapper.core.template.expression.ExprTokenType.NULL
 import org.komapper.core.template.expression.ExprTokenType.PROPERTY
@@ -219,6 +222,51 @@ class ExprTokenizerTest {
         assertEquals("?.bbb", tokenizer.token)
         assertEquals(EOE, tokenizer.next())
         assertEquals("", tokenizer.token)
+    }
+
+    @Test
+    fun `A value starting with is after a comma is not treated as the is operator`() {
+        val tokenizer = ExprTokenizer("a, isActive")
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("a", tokenizer.token)
+        assertEquals(COMMA, tokenizer.next())
+        assertEquals(",", tokenizer.token)
+        assertEquals(WHITESPACE, tokenizer.next())
+        assertEquals(" ", tokenizer.token)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("isActive", tokenizer.token)
+        assertEquals(EOE, tokenizer.next())
+    }
+
+    @Test
+    fun `A value starting with as after a comma is not treated as the as operator`() {
+        val tokenizer = ExprTokenizer("a, aspectRatio")
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("a", tokenizer.token)
+        assertEquals(COMMA, tokenizer.next())
+        assertEquals(",", tokenizer.token)
+        assertEquals(WHITESPACE, tokenizer.next())
+        assertEquals(" ", tokenizer.token)
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("aspectRatio", tokenizer.token)
+        assertEquals(EOE, tokenizer.next())
+    }
+
+    @Test
+    fun `The is operator is still recognized`() {
+        val tokenizer = ExprTokenizer("a is @Foo@")
+        assertEquals(VALUE, tokenizer.next())
+        assertEquals("a", tokenizer.token)
+        assertEquals(WHITESPACE, tokenizer.next())
+        assertEquals(IS, tokenizer.next())
+        assertEquals("is", tokenizer.token)
+    }
+
+    @Test
+    fun `A decimal literal without a type suffix is illegal`() {
+        val tokenizer = ExprTokenizer("1.5")
+        assertEquals(ILLEGAL_NUMBER, tokenizer.next())
+        assertEquals("1.5", tokenizer.token)
     }
 
     @Test
