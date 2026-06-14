@@ -459,6 +459,46 @@ class SqlParserTest {
         }
 
         @Test
+        fun `identifier and expression are split on the in keyword`() {
+            val sql = "/*%for item in items*/ b /*%end*/"
+            val node = SqlParser(sql).parse() as SqlNode.Statement
+            assertEquals(sql, node.toText())
+            val forBlock = node.nodeList.filterIsInstance<SqlNode.ForBlock>().single()
+            assertEquals("item", forBlock.forDirective.identifier)
+            assertEquals("items", forBlock.forDirective.expression)
+        }
+
+        @Test
+        fun `identifier starting with in`() {
+            val sql = "/*%for index in indexes*/ b /*%end*/"
+            val node = SqlParser(sql).parse() as SqlNode.Statement
+            assertEquals(sql, node.toText())
+            val forBlock = node.nodeList.filterIsInstance<SqlNode.ForBlock>().single()
+            assertEquals("index", forBlock.forDirective.identifier)
+            assertEquals("indexes", forBlock.forDirective.expression)
+        }
+
+        @Test
+        fun `identifier containing in`() {
+            val sql = "/*%for line in lines*/ b /*%end*/"
+            val node = SqlParser(sql).parse() as SqlNode.Statement
+            assertEquals(sql, node.toText())
+            val forBlock = node.nodeList.filterIsInstance<SqlNode.ForBlock>().single()
+            assertEquals("line", forBlock.forDirective.identifier)
+            assertEquals("lines", forBlock.forDirective.expression)
+        }
+
+        @Test
+        fun `expression containing the in keyword`() {
+            val sql = "/*%for x in xs.filter { it in ys }*/ b /*%end*/"
+            val node = SqlParser(sql).parse() as SqlNode.Statement
+            assertEquals(sql, node.toText())
+            val forBlock = node.nodeList.filterIsInstance<SqlNode.ForBlock>().single()
+            assertEquals("x", forBlock.forDirective.identifier)
+            assertEquals("xs.filter { it in ys }", forBlock.forDirective.expression)
+        }
+
+        @Test
         fun `The corresponding end directive is not found`() {
             val sql = "/*%for a in aaa*/ b"
             val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }

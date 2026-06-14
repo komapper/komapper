@@ -259,15 +259,15 @@ internal class SqlParser constructor(
         if (iterationExpression.isEmpty()) {
             throw SqlException("The iteration expression is not found in the for directive at $location")
         }
-        val pos = iterationExpression.indexOf("in")
-        if (pos == -1) {
+        val inKeyword = IN_KEYWORD_REGEX.find(iterationExpression)
+        if (inKeyword == null) {
             throw SqlException("The keyword \"in\" is not found in the iteration expression in the for directive at $location")
         }
-        val identifier = iterationExpression.substring(0, pos).trim()
+        val identifier = iterationExpression.substring(0, inKeyword.range.first).trim()
         if (identifier.isEmpty()) {
             throw SqlException("The identifier is not found in the iteration expression in the for directive at $location")
         }
-        val iterableExpression = iterationExpression.substring(pos + 2).trim()
+        val iterableExpression = iterationExpression.substring(inKeyword.range.last + 1).trim()
         if (iterableExpression.isEmpty()) {
             throw SqlException("The iterable expression is not found in the iteration expression in the for directive at $location")
         }
@@ -322,6 +322,10 @@ internal class SqlParser constructor(
         reducers.peek()?.addNode(node)
     }
 }
+
+// Matches the "in" keyword as a standalone word so that identifiers
+// containing the substring "in" (e.g. "index", "line") are not split incorrectly.
+private val IN_KEYWORD_REGEX = Regex("""\bin\b""")
 
 private fun String.strip(prefix: String, suffix: String): String {
     return this.substring(prefix.length, this.length - suffix.length).trim()
