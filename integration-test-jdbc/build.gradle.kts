@@ -113,6 +113,9 @@ testing {
 }
 
 fun JvmTestSuite.setup(identifier: String) {
+    // Since KSP 2.3.10, the `ksp` configuration applies only to the main source set,
+    // so the processor must be registered for each test suite source set.
+    project.dependencies.add("ksp${identifier.replaceFirstChar { it.uppercase() }}", project(":komapper-processor"))
     sources {
         java {
             setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$identifier/kotlin"))
