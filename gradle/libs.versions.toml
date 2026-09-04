@@ -21,7 +21,7 @@ kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0-0.6.x-compat" }
 
-jdbc-h2 = { module = "com.h2database:h2", version = "2.4.240" }
+jdbc-h2 = { module = "com.h2database:h2", version = "2.5.250" }
 jdbc-mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version = "3.5.10" }
 jdbc-mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 jdbc-oracle = { module = "com.oracle.database.jdbc:ojdbc11", version = "23.26.3.0.0" }
