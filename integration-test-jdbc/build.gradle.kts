@@ -60,7 +60,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project())
-                runtimeOnly(libs.testcontainers.mariadb)
+                implementation(libs.testcontainers.mariadb)
                 runtimeOnly(project(":komapper-dialect-mariadb-jdbc"))
             }
         }
