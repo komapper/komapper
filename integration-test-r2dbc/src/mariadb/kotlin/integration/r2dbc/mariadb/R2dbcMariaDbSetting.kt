@@ -16,9 +16,6 @@ class R2dbcMariaDbSetting(private val url: String) :
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
         val container = MariaDBContainerProvider().newInstance(connectionUrl) as MariaDBContainer<*>
-        // MariaDB Connector/J 4, used for the container's startup check, enables TLS by default,
-        // but the container does not support it.
-        container.withUrlParam("sslMode", "disable")
         val r2dbcContainer = MariaDBR2DBCDatabaseContainer(container)
         r2dbcContainer.start()
         r2dbcContainer.configure(
