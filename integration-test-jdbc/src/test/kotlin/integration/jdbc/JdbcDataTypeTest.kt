@@ -703,7 +703,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data3)
     }
 
-    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
+    @Run(unless = [Dbms.MYSQL_5])
     @Test
     fun instant_null() {
         val m = Meta.instantData
@@ -713,18 +713,6 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
-    }
-
-    @Run(onlyIf = [Dbms.MARIADB])
-    @Test
-    fun instant_automatic() {
-        val m = Meta.instantData
-        val data = InstantData(1, null)
-        db.runQuery { QueryDsl.insert(m).single(data) }
-        val data2 = db.runQuery {
-            QueryDsl.from(m).where { m.id eq 1 }.first()
-        }
-        assertNotNull(data2.value)
     }
 
     @Test
